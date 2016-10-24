@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:padding="10dp"
+    android:id="@+id/activity_socket"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="cn.com.hotled.xyled.ui.Socket">
+
+    <EditText
+        android:id="@+id/socket_address"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="ipAddress"/>
+    <EditText
+        android:hint="port"
+        android:id="@+id/socket_port"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <EditText
+        android:id="@+id/inputText"
+        android:hint="input your word"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <Button
+        android:id="@+id/send"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="send"/>
+    <TextView
+        android:id="@+id/socket_tvShow"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+</LinearLayout>
