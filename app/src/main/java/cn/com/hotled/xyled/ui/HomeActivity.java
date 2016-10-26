@@ -4,6 +4,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewPager;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -18,31 +21,32 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import cn.com.hotled.xyled.R;
+import cn.com.hotled.xyled.adapter.TabFragmentAdapter;
+import cn.com.hotled.xyled.fragment.ImageFragment;
+import cn.com.hotled.xyled.fragment.TextFragment;
 
 public class HomeActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    @BindView(R.id.home_tv_show)
-    TextView home_tv_show;
-    @BindView(R.id.home_bt_strong)
-    Button home_bt_strong;
-    @BindView(R.id.home_bt_italic)
-    Button home_bt_italic;
-    @BindView(R.id.home_bt_addSize)
-    Button home_bt_addSize;
-    @BindView(R.id.home_bt_minusSize)
-    Button home_bt_minusSize;
 
+    TabLayout tabLayout;
+    ViewPager viewPager;
+    private ArrayList<Fragment> fragmentList;
+    private TextFragment textFragment;
+    private ImageFragment imageFragment;
+    private List<String> titleList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
-        ButterKnife.bind(this);
         initView();
 
     }
@@ -53,9 +57,10 @@ public class HomeActivity extends AppCompatActivity
      * initialize toolbar,Drawer and Navigation
      */
     private void initView() {
+        //Toolbar----------------------------------------------
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
+        //FloatingActionButton------------------------------------------
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -64,24 +69,33 @@ public class HomeActivity extends AppCompatActivity
                         .setAction("Action", null).show();
             }
         });
-
+        //DrawerLayout-------------------------------------------------------------------
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
-
+        //NavigationView------------------------------------------------------------
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        //ViewPager------------------------------------------------
+        textFragment = new TextFragment();
+        imageFragment = new ImageFragment();
+
+        fragmentList = new ArrayList<>();
+        fragmentList.add(textFragment);
+        fragmentList.add(imageFragment);
+
+        titleList = new ArrayList();
+        titleList.add("文字");
+        titleList.add("图片");
+        viewPager= (ViewPager) findViewById(R.id.vp_home);
+        TabFragmentAdapter adapter=new TabFragmentAdapter(getSupportFragmentManager(),fragmentList,titleList);
+        viewPager.setAdapter(adapter);
+        //Tablayout-------------------------------------------
+        tabLayout= (TabLayout) findViewById(R.id.tl_home);
+        tabLayout.setupWithViewPager(viewPager,true);
     }
-
-
-    @OnClick(R.id.home_bt_strong)
-    void enterConnectWifi(){
-        startActivity(new Intent(this,ConnectWifiActivity.class));
-     }
-
-
 
     @Override
     public void onBackPressed() {

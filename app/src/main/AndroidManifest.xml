@@ -21,7 +21,6 @@
         <activity android:name=".ui.Socket" />
         <activity
             android:name=".ui.HomeActivity"
-            android:label="@string/title_activity_home"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
