@@ -39,7 +39,10 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"/>
         </LinearLayout>
-
+        <TextView
+            android:text="字体效果："
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
         <LinearLayout
             android:layout_marginTop="5dp"
             android:layout_marginLeft="10dp"
@@ -75,7 +78,10 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent" />
         </LinearLayout>
-
+        <TextView
+            android:text="字体颜色："
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
         <LinearLayout
             android:layout_marginTop="5dp"
             android:layout_marginLeft="10dp"
@@ -114,7 +120,10 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent" />
         </LinearLayout>
-
+        <TextView
+            android:text="字体背景颜色："
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
         <LinearLayout
             android:layout_marginTop="5dp"
             android:layout_marginLeft="10dp"
@@ -152,6 +161,67 @@
                 android:background="@drawable/recycler_bg"
                 android:layout_width="0dp"
                 android:layout_height="match_parent" />
+        </LinearLayout>
+        <TextView
+            android:text="偏移量:"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <LinearLayout
+            android:layout_marginTop="5dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="5dp"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:text="水平方向"
+                android:layout_gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <EditText
+                android:id="@+id/et_fgText_X"
+                android:layout_margin="5dp"
+                android:layout_width="50dp"
+                android:lines="1"
+                android:layout_gravity="center"
+                android:inputType="number"
+                android:layout_height="wrap_content" />
+            <SeekBar
+                android:id="@+id/sb_fgText_X"
+                android:layout_margin="5dp"
+                android:layout_gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_marginTop="5dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="5dp"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:text="垂直方向"
+                android:layout_gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <EditText
+                android:id="@+id/et_fgText_Y"
+                android:layout_margin="5dp"
+                android:layout_width="50dp"
+                android:lines="1"
+                android:layout_gravity="center"
+                android:inputType="number"
+                android:layout_height="wrap_content" />
+            <SeekBar
+                android:id="@+id/sb_fgText_Y"
+                android:layout_margin="5dp"
+                android:layout_gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
         </LinearLayout>
     </LinearLayout>
 </ScrollView>

@@ -1,6 +1,7 @@
 package cn.com.hotled.xyled.fragment;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.media.Image;
 import android.net.Uri;
@@ -8,16 +9,28 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.SeekBar;
 import android.widget.Toast;
+
+import com.flask.colorpicker.ColorPickerView;
+import com.flask.colorpicker.OnColorSelectedListener;
+import com.flask.colorpicker.builder.ColorPickerClickListener;
+import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import butterknife.OnTextChanged;
+import butterknife.Unbinder;
 import cn.com.hotled.xyled.R;
 import jp.wasabeef.richeditor.RichEditor;
 
@@ -52,6 +65,15 @@ public class TextFragment extends Fragment {
     ImageButton ib_BlueTextBg;
     @BindView(R.id.ib_fgText_textBgMore)
     ImageButton ib_MoreTextBg;
+    @BindView(R.id.et_fgText_X)
+    EditText et_X;
+    @BindView(R.id.et_fgText_Y)
+    EditText et_Y;
+    @BindView(R.id.sb_fgText_X)
+    SeekBar sb_X;
+    @BindView(R.id.sb_fgText_Y)
+    SeekBar sb_Y;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -63,7 +85,98 @@ public class TextFragment extends Fragment {
         mEditor.setEditorFontColor(Color.RED);
         mEditor.setPadding(10, 10, 10, 10);
         mEditor.setPadding(10, 10, 10, 10);
+        mEditor.setPlaceholder("请在此输入文字");
+        initSeekBar();
         return inflate;
+    }
+
+    private void initSeekBar() {
+        sb_X.setProgress(50);
+        sb_Y.setProgress(50);
+        sb_X.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                int showProgress=progress-50;
+                et_X.setText(showProgress+"");
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                Log.i("initSeekbar", "onStartTrackingTouch");
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                Log.i("initSeekbar", "onStopTrackingTouch");
+            }
+        });
+
+        sb_Y.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                int showProgress=progress-50;
+                et_Y.setText(showProgress+"");
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+        et_X.addTextChangedListener(new TextWatcher(){
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                //// TODO: 2016/10/27 会产生只有“-”的结果，还有setProgress后，会调用onProgressChanged，在这里也会减去50，所以进度条一直都是-50
+                String substring="";
+                if (s.toString().contains("-")){
+                    substring = s.toString().substring(s.toString().lastIndexOf("-"));
+                }else {
+                    substring=s.toString();
+                }
+                int i = Integer.parseInt(substring);
+                sb_X.setProgress(i);
+            }
+        });
+
+        et_Y.addTextChangedListener(new TextWatcher(){
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                String substring="";
+                if (s.toString().contains("-")){
+                    substring = s.toString().substring(s.toString().lastIndexOf("-"));
+                }else {
+                    substring=s.toString();
+                }
+                int i = Integer.parseInt(substring);
+                sb_Y.setProgress(i);
+            }
+        });
     }
 
     @Override
@@ -99,6 +212,31 @@ public class TextFragment extends Fragment {
     @OnClick(R.id.ib_fgText_textColorMore)
     public void setTextColorMore(){
         // TODO: 2016/10/26
+        ColorPickerDialogBuilder.with(getContext())
+                .setTitle("选择字体颜色")
+                .initialColor(Color.RED)
+                .wheelType(ColorPickerView.WHEEL_TYPE.FLOWER)
+                .density(12)
+                .setOnColorSelectedListener(new OnColorSelectedListener() {
+                    @Override
+                    public void onColorSelected(int i) {
+                        Toast.makeText(getContext(), "ColorSelected:"+Integer.toHexString(i), Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .setPositiveButton("确定", new ColorPickerClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i, Integer[] integers) {
+                        mEditor.setTextColor(i);
+                    }
+                })
+                .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })
+                .build().show();
+
     }
     @OnClick(R.id.ib_fgText_textBgRed)
     public void setTextBgRed(){
@@ -112,11 +250,38 @@ public class TextFragment extends Fragment {
     public void setTextBgBlue(){
         mEditor.setTextBackgroundColor(Color.BLUE);
     }
-    @OnClick(R.id.ib_fgText_textBgRed)
+    @OnClick(R.id.ib_fgText_textBgMore)
     public void setTextBgMore(){
         // TODO: 2016/10/26
-
+        ColorPickerDialogBuilder.with(getContext())
+                .setTitle("选择字体背景颜色")
+                .initialColor(Color.RED)
+                .wheelType(ColorPickerView.WHEEL_TYPE.FLOWER)
+                .density(12)
+                .setOnColorSelectedListener(new OnColorSelectedListener() {
+                    @Override
+                    public void onColorSelected(int i) {
+                        Toast.makeText(getContext(), "ColorSelected:"+Integer.toHexString(i), Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .setPositiveButton("确定", new ColorPickerClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i, Integer[] integers) {
+                        mEditor.setTextBackgroundColor(i);
+                    }
+                })
+                .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })
+                .build().show();
     }
+
+
+
+
 
     @Override
     public void onDestroy() {

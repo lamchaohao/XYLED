@@ -42,4 +42,5 @@ dependencies {
     testCompile 'junit:junit:4.12'
     apt 'com.jakewharton:butterknife-compiler:8.4.0'
     compile 'jp.wasabeef:richeditor-android:1.2.1'
+    compile 'com.github.QuadFlask:colorpicker:0.0.12'
 }
