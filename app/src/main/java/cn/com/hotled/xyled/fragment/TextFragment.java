@@ -1,24 +1,23 @@
 package cn.com.hotled.xyled.fragment;
 
-import android.content.Context;
+import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.graphics.Color;
-import android.media.Image;
-import android.net.Uri;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AlertDialog;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.SeekBar;
+import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.flask.colorpicker.ColorPickerView;
@@ -26,12 +25,17 @@ import com.flask.colorpicker.OnColorSelectedListener;
 import com.flask.colorpicker.builder.ColorPickerClickListener;
 import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
 
+import org.w3c.dom.Text;
+
+import java.io.File;
+import java.util.Arrays;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import butterknife.OnTextChanged;
-import butterknife.Unbinder;
 import cn.com.hotled.xyled.R;
+import cn.com.hotled.xyled.adapter.TypefaceListAdapter;
+import cn.com.hotled.xyled.view.WheelView;
 import jp.wasabeef.richeditor.RichEditor;
 
 
@@ -65,15 +69,14 @@ public class TextFragment extends Fragment {
     ImageButton ib_BlueTextBg;
     @BindView(R.id.ib_fgText_textBgMore)
     ImageButton ib_MoreTextBg;
-    @BindView(R.id.et_fgText_X)
-    EditText et_X;
-    @BindView(R.id.et_fgText_Y)
-    EditText et_Y;
     @BindView(R.id.sb_fgText_X)
     SeekBar sb_X;
     @BindView(R.id.sb_fgText_Y)
     SeekBar sb_Y;
-
+    @BindView(R.id.tv_fgText_Xprogress)
+    TextView tv_Xprogress;
+    @BindView(R.id.tv_fgText_Yprogress)
+    TextView tv_Yprogress;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -93,29 +96,28 @@ public class TextFragment extends Fragment {
     private void initSeekBar() {
         sb_X.setProgress(50);
         sb_Y.setProgress(50);
+        tv_Xprogress.setText(0+"");
+        tv_Yprogress.setText(0+"");
         sb_X.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                int showProgress=progress-50;
-                et_X.setText(showProgress+"");
+                tv_Xprogress.setText(progress-50+"");
             }
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-                Log.i("initSeekbar", "onStartTrackingTouch");
+
             }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                Log.i("initSeekbar", "onStopTrackingTouch");
+
             }
         });
-
         sb_Y.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                int showProgress=progress-50;
-                et_Y.setText(showProgress+"");
+                tv_Yprogress.setText(progress-50+"");
             }
 
             @Override
@@ -126,55 +128,6 @@ public class TextFragment extends Fragment {
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
 
-            }
-        });
-
-        et_X.addTextChangedListener(new TextWatcher(){
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                //// TODO: 2016/10/27 会产生只有“-”的结果，还有setProgress后，会调用onProgressChanged，在这里也会减去50，所以进度条一直都是-50
-                String substring="";
-                if (s.toString().contains("-")){
-                    substring = s.toString().substring(s.toString().lastIndexOf("-"));
-                }else {
-                    substring=s.toString();
-                }
-                int i = Integer.parseInt(substring);
-                sb_X.setProgress(i);
-            }
-        });
-
-        et_Y.addTextChangedListener(new TextWatcher(){
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                String substring="";
-                if (s.toString().contains("-")){
-                    substring = s.toString().substring(s.toString().lastIndexOf("-"));
-                }else {
-                    substring=s.toString();
-                }
-                int i = Integer.parseInt(substring);
-                sb_Y.setProgress(i);
             }
         });
     }
@@ -188,6 +141,8 @@ public class TextFragment extends Fragment {
     @OnClick(R.id.ib_fgText_setBold)
     public void setBold(){
         mEditor.setBold();
+        String html = mEditor.getHtml();
+        Log.i("textFragm",html);
     }
     @OnClick(R.id.ib_fgText_setItalic)
     public void setItalic(){
@@ -227,6 +182,7 @@ public class TextFragment extends Fragment {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i, Integer[] integers) {
                         mEditor.setTextColor(i);
+
                     }
                 })
                 .setNegativeButton("取消", new DialogInterface.OnClickListener() {
@@ -279,7 +235,55 @@ public class TextFragment extends Fragment {
                 .build().show();
     }
 
+    @OnClick(R.id.bt_fgText_TextSize)
+    public void setTextSize(){
+        String[] textSizePxList=new String[100];
+        for (int i=0;i<100;i++){
+            textSizePxList[i]=i+1+"";
+        }
 
+        View outerView = LayoutInflater.from(getContext()).inflate(R.layout.wheel_view, null);
+        WheelView wv = (WheelView) outerView.findViewById(R.id.wheelview);
+        wv.setOffset(2);
+        wv.setItems(Arrays.asList(textSizePxList));
+        wv.setSeletion(3);
+        wv.setOnWheelViewListener(new WheelView.OnWheelViewListener() {
+            @Override
+            public void onSelected(int selectedIndex, String item) {
+                    bt_TextSize.setText("size:"+item);
+                    mEditor.setFontSize(selectedIndex);
+                Log.i("textFragm",selectedIndex+"");
+            }
+        });
+
+        new AlertDialog.Builder(getContext())
+                .setTitle("WheelView in Dialog")
+                .setView(outerView)
+                .setPositiveButton("OK", null)
+                .show();
+
+    }
+
+    @OnClick(R.id.bt_fgText_Font)
+    public void setFont(){
+        File file =new File("/system/fonts");
+        if (file.exists()){
+            Toast.makeText(getContext(), "exists", Toast.LENGTH_SHORT).show();
+        }
+        File[] files = file.listFiles();
+        for (int i=0;i<files.length;i++){
+            Log.i("textFragm",files[i].getName().toString());
+        }
+        View view = LayoutInflater.from(getContext()).inflate(R.layout.typeface_list, null);
+        ListView typeFaceListView = (ListView) view.findViewById(R.id.typeFaceListView);
+        typeFaceListView.setAdapter(new TypefaceListAdapter(files,getContext()));
+        new AlertDialog.Builder(getContext())
+                .setTitle("Choose Typeface")
+                .setView(view)
+                .setPositiveButton("OK", null)
+                .show();
+
+    }
 
 
 

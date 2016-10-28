@@ -180,13 +180,12 @@
                 android:layout_gravity="center"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
-            <EditText
-                android:id="@+id/et_fgText_X"
-                android:layout_margin="5dp"
-                android:layout_width="50dp"
-                android:lines="1"
-                android:layout_gravity="center"
-                android:inputType="number"
+            <TextView
+                android:id="@+id/tv_fgText_Xprogress"
+                android:textSize="18sp"
+                android:textColor="@color/colorPrimary"
+                android:paddingLeft="10dp"
+                android:layout_width="40dp"
                 android:layout_height="wrap_content" />
             <SeekBar
                 android:id="@+id/sb_fgText_X"
@@ -199,7 +198,7 @@
             android:layout_marginTop="5dp"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
-            android:layout_marginBottom="5dp"
+            android:layout_marginBottom="10dp"
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
@@ -208,13 +207,12 @@
                 android:layout_gravity="center"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
-            <EditText
-                android:id="@+id/et_fgText_Y"
-                android:layout_margin="5dp"
-                android:layout_width="50dp"
-                android:lines="1"
-                android:layout_gravity="center"
-                android:inputType="number"
+            <TextView
+                android:id="@+id/tv_fgText_Yprogress"
+                android:textSize="18sp"
+                android:textColor="@color/colorPrimary"
+                android:paddingLeft="10dp"
+                android:layout_width="40dp"
                 android:layout_height="wrap_content" />
             <SeekBar
                 android:id="@+id/sb_fgText_Y"
