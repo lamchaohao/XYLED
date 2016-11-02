@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <LinearLayout
+        android:id="@+id/ll_test"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_marginTop="5dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="5dp"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <Button
+                android:id="@+id/bt_fgText_TextSize"
+                android:layout_weight="1"
+                android:text="TextSize"
+                android:background="@drawable/recycler_bg"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content" />
+            <Button
+                android:id="@+id/bt_fgText_Font"
+                android:layout_weight="1"
+                android:text="sans-serif"
+                android:fontFamily="sans-serif"
+                android:background="@drawable/recycler_bg"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+        <TextView
+            android:text="字体效果："
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+        <LinearLayout
+            android:layout_marginTop="5dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="5dp"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <ImageButton
+                android:id="@+id/ib_fgText_setBold"
+                android:padding="10dp"
+                android:layout_weight="1"
+                android:src="@drawable/ic_format_bold_black_24dp"
+                android:background="@drawable/recycler_bg"
+                android:layout_width="0dp"
+                android:layout_height="match_parent" />
+
+            <ImageButton
+                android:id="@+id/ib_fgText_setItalic"
+                android:layout_weight="1"
+                android:src="@drawable/ic_format_italic_black_24dp"
+                android:background="@drawable/recycler_bg"
+                android:layout_width="0dp"
+                android:layout_height="match_parent" />
+            <ImageButton
+                android:id="@+id/ib_fgText_setUnderLine"
+                android:layout_weight="1"
+                android:text="sans-serif"
+                android:fontFamily="sans-serif"
+                android:background="@drawable/recycler_bg"
+                android:src="@drawable/ic_format_underlined_black_24dp"
+                android:layout_width="0dp"
+                android:layout_height="match_parent" />
+        </LinearLayout>
+        <TextView
+            android:text="字体颜色："
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+        <LinearLayout
+            android:layout_marginTop="5dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="5dp"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <ImageButton
+                android:id="@+id/ib_fgText_textColorRed"
+                android:padding="10dp"
+                android:layout_weight="1"
+                android:src="@drawable/ic_text_format_red_600_24dp"
+                android:background="@drawable/recycler_bg"
+                android:layout_width="0dp"
+                android:layout_height="match_parent" />
+            <ImageButton
+                android:id="@+id/ib_fgText_textColorGreen"
+                android:layout_weight="1"
+                android:src="@drawable/ic_text_format_green_600_24dp"
+                android:background="@drawable/recycler_bg"
+                android:layout_width="0dp"
+                android:layout_height="match_parent" />
+            <ImageButton
+                android:id="@+id/ib_fgText_textColorBlue"
+                android:layout_weight="1"
+                android:src="@drawable/ic_text_format_blue_600_24dp"
+                android:background="@drawable/recycler_bg"
+                android:layout_width="0dp"
+                android:layout_height="match_parent" />
+            <ImageButton
+                android:id="@+id/ib_fgText_textColorMore"
+                android:layout_weight="1"
+                android:src="@drawable/ic_more_horiz_black_24dp"
+                android:background="@drawable/recycler_bg"
+                android:layout_width="0dp"
+                android:layout_height="match_parent" />
+        </LinearLayout>
+        <TextView
+            android:text="字体背景颜色："
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+        <LinearLayout
+            android:layout_marginTop="5dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="5dp"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <ImageButton
+                android:id="@+id/ib_fgText_textBgRed"
+                android:padding="10dp"
+                android:layout_weight="1"
+                android:src="@drawable/ic_text_fields_red_bg_24dp"
+                android:background="@drawable/recycler_bg"
+                android:layout_width="0dp"
+                android:layout_height="match_parent" />
+            <ImageButton
+                android:id="@+id/ib_fgText_textBgGreen"
+                android:layout_weight="1"
+                android:src="@drawable/ic_text_fields_green_bg_24dp"
+                android:background="@drawable/recycler_bg"
+                android:layout_width="0dp"
+                android:layout_height="match_parent" />
+            <ImageButton
+                android:id="@+id/ib_fgText_textBgBlue"
+                android:layout_weight="1"
+                android:src="@drawable/ic_text_fields_blue_bg_24dp"
+                android:background="@drawable/recycler_bg"
+                android:layout_width="0dp"
+                android:layout_height="match_parent" />
+            <ImageButton
+                android:id="@+id/ib_fgText_textBgMore"
+                android:layout_weight="1"
+                android:src="@drawable/ic_more_horiz_black_24dp"
+                android:background="@drawable/recycler_bg"
+                android:layout_width="0dp"
+                android:layout_height="match_parent" />
+        </LinearLayout>
+        <TextView
+            android:text="偏移量:"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <LinearLayout
+            android:layout_marginTop="5dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="5dp"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:text="水平方向"
+                android:layout_gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:id="@+id/tv_fgText_Xprogress"
+                android:textSize="18sp"
+                android:textColor="@color/colorPrimary"
+                android:paddingLeft="10dp"
+                android:layout_width="40dp"
+                android:layout_height="wrap_content" />
+            <SeekBar
+                android:id="@+id/sb_fgText_X"
+                android:layout_margin="5dp"
+                android:layout_gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_marginTop="5dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="10dp"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:text="垂直方向"
+                android:layout_gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:id="@+id/tv_fgText_Yprogress"
+                android:textSize="18sp"
+                android:textColor="@color/colorPrimary"
+                android:paddingLeft="10dp"
+                android:layout_width="40dp"
+                android:layout_height="wrap_content" />
+            <SeekBar
+                android:id="@+id/sb_fgText_Y"
+                android:layout_margin="5dp"
+                android:layout_gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>
+
+

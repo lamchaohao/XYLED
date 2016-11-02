@@ -21,7 +21,7 @@
         <activity android:name=".ui.Socket" />
         <activity
             android:name=".ui.HomeActivity"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar" android:windowSoftInputMode="adjustPan">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -32,8 +32,8 @@
             android:name=".ui.ConnectWifiActivity"
             android:label="@string/title_activity_connect_wifi"
             android:theme="@style/AppTheme" />
-        <activity android:name=".ui.OTGActivity"></activity>
-        <activity android:name=".ui.TypefaceListActivity"></activity>
+        <activity android:name=".ui.OTGActivity" />
+        <activity android:name=".ui.TypefaceListActivity" />
     </application>
 
 </manifest>
