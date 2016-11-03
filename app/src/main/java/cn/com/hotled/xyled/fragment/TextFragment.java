@@ -50,45 +50,13 @@ import cn.com.hotled.xyled.R;
 import cn.com.hotled.xyled.adapter.TextButtonAdapter;
 import cn.com.hotled.xyled.adapter.TypefaceListAdapter;
 import cn.com.hotled.xyled.bean.TextButton;
+import cn.com.hotled.xyled.util.DensityUtil;
+import cn.com.hotled.xyled.view.TextToolPopupWindow;
 import cn.com.hotled.xyled.view.WheelView;
 
 
 public class TextFragment extends Fragment {
 
-//    @BindView(R.id.bt_fgText_TextSize)
-//    Button bt_TextSize;
-//    @BindView(R.id.bt_fgText_Font)
-//    Button bt_setFont;
-//    @BindView(R.id.ib_fgText_setBold)
-//    ImageButton ib_setBold;
-//    @BindView(R.id.ib_fgText_setItalic)
-//    ImageButton ib_setItalic;
-//    @BindView(R.id.ib_fgText_setUnderLine)
-//    ImageButton ib_setUnderLine;
-//    @BindView(R.id.ib_fgText_textColorRed)
-//    ImageButton ib_RedText;
-//    @BindView(R.id.ib_fgText_textColorGreen)
-//    ImageButton ib_GreenText;
-//    @BindView(R.id.ib_fgText_textColorBlue)
-//    ImageButton ib_BlueText;
-//    @BindView(R.id.ib_fgText_textColorMore)
-//    ImageButton ib_moreColor;
-//    @BindView(R.id.ib_fgText_textBgRed)
-//    ImageButton ib_RedTextBg;
-//    @BindView(R.id.ib_fgText_textBgGreen)
-//    ImageButton ib_GreenTextBg;
-//    @BindView(R.id.ib_fgText_textBgBlue)
-//    ImageButton ib_BlueTextBg;
-//    @BindView(R.id.ib_fgText_textBgMore)
-//    ImageButton ib_MoreTextBg;
-//    @BindView(R.id.sb_fgText_X)
-//    SeekBar sb_X;
-//    @BindView(R.id.sb_fgText_Y)
-//    SeekBar sb_Y;
-//    @BindView(R.id.tv_fgText_Xprogress)
-//    TextView tv_Xprogress;
-//    @BindView(R.id.tv_fgText_Yprogress)
-//    TextView tv_Yprogress;
     @BindView(R.id.et_fgText_input)
     EditText et_input;
     @BindView(R.id.rv_fgText_showResult)
@@ -101,7 +69,7 @@ public class TextFragment extends Fragment {
     private TextButton mTextButton;
     private PopupWindow mPopupWindow;
     private LinearLayout ll_fgText;
-
+    public List<TextButton> mSelectedTextList=new ArrayList<>();
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -110,7 +78,6 @@ public class TextFragment extends Fragment {
         ButterKnife.bind(this,inflate);
         initRecyclerView();
         setEditorListener();
-//        initSeekBar();
         return inflate;
     }
 
@@ -120,11 +87,39 @@ public class TextFragment extends Fragment {
         textButtonAdapter.setItemOnClickListener(new TextButtonAdapter.OnItemOnClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                if (mTextButton!=null)
-                    mTextButton.setSelected(false);//把之前选中的取消选中
-                mButton= (Button) view;
-                mTextButton = mTextButtonList.get(position);
-                mTextButton.setSelected(true);
+                if (TextButtonAdapter.SELECT_MODE){
+                    //多选模式
+                    if (mTextButtonList.get(position).isSelected()){
+                        //如果是已选，则改为未选
+                        mTextButtonList.get(position).setSelected(false);
+                        mSelectedTextList.remove(mTextButtonList.get(position));
+                    }else {
+                        mTextButtonList.get(position).setSelected(true);
+                        mSelectedTextList.add(mTextButtonList.get(position));
+                    }
+                }else {
+                    //单选模式
+                    if (mTextButton!=null)
+                        mTextButton.setSelected(false);//把之前选中的取消选中
+                    mButton= (Button) view;
+                    mTextButton = mTextButtonList.get(position);
+                    mTextButton.setSelected(true);
+                }
+            }
+        });
+        textButtonAdapter.setItemOnLongClickListener(new TextButtonAdapter.OnItemLongClickListener() {
+            @Override
+            public void onLongClick(View view, int position) {
+                if (TextButtonAdapter.SELECT_MODE){
+
+                }else {
+                    mSelectedTextList.clear();
+                    for (int i=0;i<mTextButtonList.size();i++){
+                        mTextButtonList.get(i).setSelected(false);
+                        textButtonAdapter.notifyItemChanged(i);//设置回背景
+                    }
+
+                }
             }
         });
         recyclerView.setAdapter(textButtonAdapter);
@@ -173,48 +168,9 @@ public class TextFragment extends Fragment {
             }
         });
 
-
-
     }
 
-//    private void initSeekBar() {
-//        sb_X.setProgress(50);
-//        sb_Y.setProgress(50);
-//        tv_Xprogress.setText(0+"");
-//        tv_Yprogress.setText(0+"");
-//        sb_X.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-//            @Override
-//            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-//                tv_Xprogress.setText(progress-50+"");
-//            }
-//
-//            @Override
-//            public void onStartTrackingTouch(SeekBar seekBar) {
-//
-//            }
-//
-//            @Override
-//            public void onStopTrackingTouch(SeekBar seekBar) {
-//
-//            }
-//        });
-//        sb_Y.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-//            @Override
-//            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-//                tv_Yprogress.setText(progress-50+"");
-//            }
-//
-//            @Override
-//            public void onStartTrackingTouch(SeekBar seekBar) {
-//
-//            }
-//
-//            @Override
-//            public void onStopTrackingTouch(SeekBar seekBar) {
-//
-//            }
-//        });
-//    }
+
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
@@ -222,190 +178,26 @@ public class TextFragment extends Fragment {
         ButterKnife.bind(getActivity());
     }
 
-//    @OnClick(R.id.ib_fgText_setBold)
-//    public void setBold(){
-//        ImageFragment imageFragment = new ImageFragment();
-//        getFragmentManager().beginTransaction().replace(R.id.ll_test,imageFragment,"imageFragment").show(imageFragment).commit();
-//    }
-//    @OnClick(R.id.ib_fgText_setItalic)
-//    public void setItalic(){
-//
-//    }
-//    @OnClick(R.id.ib_fgText_setUnderLine)
-//    public void setUnderLine(){
-//
-//    }
-//    @OnClick(R.id.ib_fgText_textColorRed)
-//    public void setTextColorRed(){
-//        setTextColor(Color.RED);
-//    }
-//    @OnClick(R.id.ib_fgText_textColorGreen)
-//    public void setTextColorGreen(){
-//        setTextColor(Color.GREEN);
-//    }
-//    @OnClick(R.id.ib_fgText_textColorBlue)
-//    public void setTextColorBlue(){
-//        setTextColor(Color.BLUE);
-//    }
-//    @OnClick(R.id.ib_fgText_textColorMore)
-//    public void setTextColorMore(){
-//        // TODO: 2016/10/26
-//        ColorPickerDialogBuilder.with(getContext())
-//                .setTitle("选择字体颜色")
-//                .initialColor(Color.RED)
-//                .wheelType(ColorPickerView.WHEEL_TYPE.FLOWER)
-//                .density(12)
-//                .setOnColorSelectedListener(new OnColorSelectedListener() {
-//                    @Override
-//                    public void onColorSelected(int i) {
-//                        Toast.makeText(getContext(), "ColorSelected:"+Integer.toHexString(i), Toast.LENGTH_SHORT).show();
-//                        setTextColor(i);
-//                    }
-//                })
-//                .setPositiveButton("确定", new ColorPickerClickListener() {
-//                    @Override
-//                    public void onClick(DialogInterface dialogInterface, int i, Integer[] integers) {
-//
-//
-//                    }
-//                })
-//                .setNegativeButton("取消", new DialogInterface.OnClickListener() {
-//                    @Override
-//                    public void onClick(DialogInterface dialog, int which) {
-//                        dialog.dismiss();
-//                    }
-//                })
-//                .build().show();
-//
-//    }
-//    @OnClick(R.id.ib_fgText_textBgRed)
-//    public void setTextBgRed(){
-//        setTextBackgroud(Color.RED);
-//    }
-//    @OnClick(R.id.ib_fgText_textBgGreen)
-//    public void setTextBgGreen(){
-//        setTextBackgroud(Color.GREEN);
-//    }
-//    @OnClick(R.id.ib_fgText_textBgBlue)
-//    public void setTextBgBlue(){
-//        setTextBackgroud(Color.BLUE);
-//    }
-//    @OnClick(R.id.ib_fgText_textBgMore)
-//    public void setTextBgMore(){
-//        // TODO: 2016/10/26
-//        ColorPickerDialogBuilder.with(getContext())
-//                .setTitle("选择字体背景颜色")
-//                .initialColor(Color.RED)
-//                .wheelType(ColorPickerView.WHEEL_TYPE.FLOWER)
-//                .density(12)
-//                .setOnColorSelectedListener(new OnColorSelectedListener() {
-//                    @Override
-//                    public void onColorSelected(int i) {
-//                        Toast.makeText(getContext(), "ColorSelected:"+Integer.toHexString(i), Toast.LENGTH_SHORT).show();
-//                        setTextBackgroud(i);//设置字体背景颜色
-//                    }
-//                })
-//                .setPositiveButton("确定", new ColorPickerClickListener() {
-//                    @Override
-//                    public void onClick(DialogInterface dialogInterface, int i, Integer[] integers) {
-//
-//                    }
-//                })
-//                .setNegativeButton("取消", new DialogInterface.OnClickListener() {
-//                    @Override
-//                    public void onClick(DialogInterface dialog, int which) {
-//                        dialog.dismiss();
-//                    }
-//                })
-//                .build().show();
-//    }
-//
-//    @OnClick(R.id.bt_fgText_TextSize)
-//    public void setTextSize(){
-//        String[] textSizePxList=new String[100];
-//        for (int i=0;i<100;i++){
-//            textSizePxList[i]=i+1+"";
-//        }
-//
-//        View outerView = LayoutInflater.from(getContext()).inflate(R.layout.wheel_view, null);
-//        WheelView wv = (WheelView) outerView.findViewById(R.id.wheelview);
-//        wv.setOffset(2);
-//        wv.setItems(Arrays.asList(textSizePxList));
-//        wv.setSeletion(3);
-//        wv.setOnWheelViewListener(new WheelView.OnWheelViewListener() {
-//            @Override
-//            public void onSelected(int selectedIndex, String item) {
-//                    bt_TextSize.setText("size:"+item);
-//                    mButton.setTextSize(selectedIndex+1);
-//                    mTextButton.setTextSize(selectedIndex+1);
-//                Log.i("textFragm",selectedIndex+"");
-//            }
-//        });
-//
-//        new AlertDialog.Builder(getContext())
-//                .setTitle("WheelView in Dialog")
-//                .setView(outerView)
-//                .setPositiveButton("OK", null)
-//                .show();
-//
-//    }
-//
-//    /**
-//     * 设置文本字体
-//     */
-//    @OnClick(R.id.bt_fgText_Font)
-//    public void setFont(){
-//        File file =new File("/system/fonts");
-//        if (file.exists()){
-//            Toast.makeText(getContext(), "exists", Toast.LENGTH_SHORT).show();
-//        }
-//        File[] files = file.listFiles();
-//        for (int i=0;i<files.length;i++){
-//            Log.i("textFragm",files[i].getName().toString());
-//        }
-//        View view = LayoutInflater.from(getContext()).inflate(R.layout.typeface_list, null);
-//        ListView typeFaceListView = (ListView) view.findViewById(R.id.typeFaceListView);
-//        typeFaceListView.setAdapter(new TypefaceListAdapter(files,getContext()));
-//        new AlertDialog.Builder(getContext())
-//                .setTitle("Choose Typeface")
-//                .setView(view)
-//                .setPositiveButton("OK", null)
-//                .show();
-//
-//    }
-//
-//    /**
-//     * 设置字体背景颜色
-//     * @param color
-//     */
-//    private void setTextBackgroud(int color){
-//        mButton.setBackgroundColor(color);
-//        mTextButton.setTextBackgroudColor(color);
-//    }
-//
-//    /**
-//     * 设置字体颜色
-//     * @param color
-//     */
-//    private void setTextColor(int color){
-//        mButton.setTextColor(color);
-//        mTextButton.setTextColor(color);
-//    }
 
 
     @OnClick(R.id.ib_fgText_settool)
     public void setToolBox(){
-//        int visibility = sv_fgText_tool.getVisibility();
-//        if (visibility==View.VISIBLE){
-//            sv_fgText_tool.setVisibility(View.GONE);
-//        }else{
-//            sv_fgText_tool.setVisibility(View.VISIBLE);
-//        }
-        if (mPopupWindow==null||mPopupWindow.isShowing()){
-            LayoutInflater layoutInflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            View inflate = layoutInflater.inflate(R.layout.popupwind_textfragment, null);
-            mPopupWindow=new PopupWindow(inflate, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
+        if (mPopupWindow==null||!mPopupWindow.isShowing()){
+
+            mPopupWindow=new TextToolPopupWindow(getContext());
+            //上滑一段距离
+            int popWinHeight = DensityUtil.dp2px(getContext(), 250);
+            final int top = ll_fgText.getTop();
+            ll_fgText.scrollTo(0,popWinHeight-top);
             mPopupWindow.showAtLocation(ll_fgText, Gravity.BOTTOM,0,0);
+            mPopupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
+                @Override
+                public void onDismiss() {
+                    //消失后下滑
+                    ll_fgText.scrollTo(0,top);
+                }
+            });
         }else if (mPopupWindow!=null&&mPopupWindow.isShowing()){
             mPopupWindow.dismiss();
         }

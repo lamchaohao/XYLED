@@ -2,7 +2,7 @@
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content">
     <LinearLayout
         android:id="@+id/ll_test"
         android:orientation="vertical"
@@ -18,14 +18,14 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
             <Button
-                android:id="@+id/bt_fgText_TextSize"
+                android:id="@+id/bt_fgText_textSize"
                 android:layout_weight="1"
                 android:text="TextSize"
                 android:background="@drawable/recycler_bg"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content" />
             <Button
-                android:id="@+id/bt_fgText_Font"
+                android:id="@+id/bt_fgText_font"
                 android:layout_weight="1"
                 android:text="sans-serif"
                 android:fontFamily="sans-serif"

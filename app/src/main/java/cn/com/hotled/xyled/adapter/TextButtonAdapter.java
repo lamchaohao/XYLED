@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.Toast;
 
 import java.util.List;
 
@@ -19,9 +20,11 @@ import cn.com.hotled.xyled.bean.TextButton;
  */
 
 public class TextButtonAdapter extends RecyclerView.Adapter{
+    public static  boolean SELECT_MODE = false;
     private Context mContext;
     private List<TextButton> mTextButtonList;
     private OnItemOnClickListener onItemOnClickListener;
+    private OnItemLongClickListener onItemLongClickListener;
     private FrameLayout oldFramelayout;
     private int oldPostion;
 
@@ -32,6 +35,9 @@ public class TextButtonAdapter extends RecyclerView.Adapter{
     }
     public interface OnItemOnClickListener{
         void onItemClick(View view , int position);
+    }
+    public interface OnItemLongClickListener{
+        void onLongClick(View view,int position);
     }
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -46,7 +52,6 @@ public class TextButtonAdapter extends RecyclerView.Adapter{
         holder.setIsRecyclable(true);
         final TextButtonViewHolder tbViewHolder= (TextButtonViewHolder) holder;
         TextButton textButton = mTextButtonList.get(position);
-        //// TODO: 2016/11/1 textbutton中的button与viewholder的button是否一致？
         tbViewHolder.button.setAllCaps(false);                          //设置区分大小写
         tbViewHolder.button.setText(textButton.getText());              //设置文本
         tbViewHolder.button.setTextColor(textButton.getTextColor());    //设置字体颜色
@@ -68,18 +73,50 @@ public class TextButtonAdapter extends RecyclerView.Adapter{
                 @Override
                 public void onClick(View v) {
                     int pos = tbViewHolder.getLayoutPosition();
-                    if (oldFramelayout!=null){
-                        oldFramelayout.setBackgroundResource(R.drawable.textbutton_unselected);
+                    onItemOnClickListener.onItemClick(v,pos);//这里设置了是否选择
+                    if (SELECT_MODE){
+                        //多选模式
+                        if (mTextButtonList.get(pos).isSelected()){
+                            //如果已经选择了
+                            tbViewHolder.frameLayout.setBackgroundResource(R.drawable.textbutton_selected);
+                        }else {
+                            //还未选择
+                            tbViewHolder.frameLayout.setBackgroundResource(R.drawable.textbutton_unselected);
+                        }
+                    }else {
+                        //单选模式
+                        if (oldFramelayout!=null){
+                            oldFramelayout.setBackgroundResource(R.drawable.textbutton_unselected);
+                        }
+                        tbViewHolder.frameLayout.setBackgroundResource(R.drawable.textbutton_selected);
+                        //重新设置oldFramelayout
+                        oldFramelayout=tbViewHolder.frameLayout;
+                        oldPostion=pos;
                     }
-                    onItemOnClickListener.onItemClick(v,pos);
-                    tbViewHolder.frameLayout.setBackgroundResource(R.drawable.textbutton_selected);
-                    //重新设置oldFramelayout
-                    oldFramelayout=tbViewHolder.frameLayout;
-                    oldPostion=pos;
+
                 }
             });
         }
+        if (onItemLongClickListener!=null){
+            tbViewHolder.button.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+                    if (!SELECT_MODE){
+                        Toast.makeText(mContext, "进入多选模式", Toast.LENGTH_SHORT).show();
+                        SELECT_MODE=true;
+                    }else {
+                        Toast.makeText(mContext, "退出多选模式", Toast.LENGTH_SHORT).show();
+                        SELECT_MODE=false;
+                        tbViewHolder.frameLayout.setBackgroundResource(R.drawable.textbutton_unselected);
+                    }
+                    int pos = tbViewHolder.getLayoutPosition();
+                    onItemLongClickListener.onLongClick(v,pos);//提示完后，再调用此接口
 
+                    return true;
+                }
+            });
+        }
+        tbViewHolder.button.setTag(tbViewHolder.frameLayout);
 
     }
 
@@ -89,6 +126,9 @@ public class TextButtonAdapter extends RecyclerView.Adapter{
     }
     public void setItemOnClickListener(OnItemOnClickListener itemOnClickListener){
         this.onItemOnClickListener=itemOnClickListener;
+    }
+    public void setItemOnLongClickListener(OnItemLongClickListener longClickListener){
+        onItemLongClickListener=longClickListener;
     }
     class TextButtonViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         FrameLayout frameLayout;
