@@ -3,7 +3,13 @@ package cn.com.hotled.xyled.fragment;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Rect;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -25,6 +31,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.PopupWindow;
@@ -51,12 +58,16 @@ import cn.com.hotled.xyled.adapter.TextButtonAdapter;
 import cn.com.hotled.xyled.adapter.TypefaceListAdapter;
 import cn.com.hotled.xyled.bean.TextButton;
 import cn.com.hotled.xyled.util.DensityUtil;
+import cn.com.hotled.xyled.view.Info;
+import cn.com.hotled.xyled.view.PhotoView;
 import cn.com.hotled.xyled.view.TextToolPopupWindow;
 import cn.com.hotled.xyled.view.WheelView;
 
 
 public class TextFragment extends Fragment {
 
+    @BindView(R.id.pv_fgText_photo)
+    PhotoView photoView;
     @BindView(R.id.et_fgText_input)
     EditText et_input;
     @BindView(R.id.rv_fgText_showResult)
@@ -70,15 +81,46 @@ public class TextFragment extends Fragment {
     private PopupWindow mPopupWindow;
     private LinearLayout ll_fgText;
     public List<TextButton> mSelectedTextList=new ArrayList<>();
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View inflate = inflater.inflate(R.layout.fragment_text, container, false);
         ll_fgText = (LinearLayout) inflate.findViewById(R.id.ll_fgText);
         ButterKnife.bind(this,inflate);
+        initPhotoView();
         initRecyclerView();
         setEditorListener();
         return inflate;
+    }
+
+    private void initPhotoView() {
+        //启用图片缩放功能
+        photoView.enable();
+        Bitmap bitmap = BitmapFactory.decodeResource(getContext().getResources(), R.drawable.monitor);
+
+        //设置缩放倍数
+        photoView.setMaxScale(8);
+        //获取图片信息
+        Info info = photoView.getInfo();
+        //
+//        photoView.animaFrom(info);
+
+        photoView.setScaleType(ImageView.ScaleType.FIT_XY);
+        Canvas canvas=new Canvas();
+        Paint paint=new Paint(Paint.ANTI_ALIAS_FLAG);
+        paint.setColor(Color.RED);
+        paint.setTypeface(Typeface.MONOSPACE);
+        paint.setTextSize(26);
+        Bitmap.Config config = bitmap.getConfig();
+        Bitmap copy = bitmap.copy(config, true);
+        canvas.setBitmap(copy);
+        Rect bounds = new Rect();
+        Paint.FontMetricsInt fontMetrics = paint.getFontMetricsInt();
+        int baseline = (photoView.getMeasuredHeight() - fontMetrics.bottom + fontMetrics.top) / 6 - fontMetrics.top;
+        canvas.drawText("格力中央空调，工厂底线直销，只需1888",photoView.getMeasuredWidth() / 2 - bounds.width() / 2,baseline,paint);
+
+        photoView.setImageBitmap(copy);
     }
 
     private void initRecyclerView() {
@@ -187,15 +229,15 @@ public class TextFragment extends Fragment {
 
             mPopupWindow=new TextToolPopupWindow(getContext());
             //上滑一段距离
-            int popWinHeight = DensityUtil.dp2px(getContext(), 250);
-            final int top = ll_fgText.getTop();
-            ll_fgText.scrollTo(0,popWinHeight-top);
-            mPopupWindow.showAtLocation(ll_fgText, Gravity.BOTTOM,0,0);
+//            int popWinHeight = DensityUtil.dp2px(getContext(), 250);
+//            final int top = ll_fgText.getTop();
+//            ll_fgText.scrollTo(0,popWinHeight-top);
+            mPopupWindow.showAtLocation(ll_fgText, Gravity.TOP,0,0);
             mPopupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
                 @Override
                 public void onDismiss() {
                     //消失后下滑
-                    ll_fgText.scrollTo(0,top);
+//                    ll_fgText.scrollTo(0,top);
                 }
             });
         }else if (mPopupWindow!=null&&mPopupWindow.isShowing()){

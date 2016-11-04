@@ -50,7 +50,7 @@
                 android:id="@+id/ib_fgText_setBold"
                 android:padding="10dp"
                 android:layout_weight="1"
-                android:src="@drawable/ic_format_bold_black_24dp"
+                android:src="@drawable/ic_format_bold_black_48dp"
                 android:background="@drawable/recycler_bg"
                 android:layout_width="0dp"
                 android:layout_height="match_parent" />
@@ -58,7 +58,7 @@
             <ImageButton
                 android:id="@+id/ib_fgText_setItalic"
                 android:layout_weight="1"
-                android:src="@drawable/ic_format_italic_black_24dp"
+                android:src="@drawable/ic_format_italic_black_48dp"
                 android:background="@drawable/recycler_bg"
                 android:layout_width="0dp"
                 android:layout_height="match_parent" />
@@ -68,7 +68,7 @@
                 android:text="sans-serif"
                 android:fontFamily="sans-serif"
                 android:background="@drawable/recycler_bg"
-                android:src="@drawable/ic_format_underlined_black_24dp"
+                android:src="@drawable/ic_format_underlined_black_48dp"
                 android:layout_width="0dp"
                 android:layout_height="match_parent" />
         </LinearLayout>
@@ -88,21 +88,21 @@
                 android:id="@+id/ib_fgText_textColorRed"
                 android:padding="10dp"
                 android:layout_weight="1"
-                android:src="@drawable/ic_text_format_red_600_24dp"
+                android:src="@drawable/ic_text_format_red_600_48dp"
                 android:background="@drawable/recycler_bg"
                 android:layout_width="0dp"
                 android:layout_height="match_parent" />
             <ImageButton
                 android:id="@+id/ib_fgText_textColorGreen"
                 android:layout_weight="1"
-                android:src="@drawable/ic_text_format_green_600_24dp"
+                android:src="@drawable/ic_text_format_green_600_48dp"
                 android:background="@drawable/recycler_bg"
                 android:layout_width="0dp"
                 android:layout_height="match_parent" />
             <ImageButton
                 android:id="@+id/ib_fgText_textColorBlue"
                 android:layout_weight="1"
-                android:src="@drawable/ic_text_format_blue_600_24dp"
+                android:src="@drawable/ic_text_format_blue_600_48dp"
                 android:background="@drawable/recycler_bg"
                 android:layout_width="0dp"
                 android:layout_height="match_parent" />

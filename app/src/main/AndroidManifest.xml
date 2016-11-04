@@ -21,7 +21,7 @@
         <activity android:name=".ui.Socket" />
         <activity
             android:name=".ui.HomeActivity"
-            android:theme="@style/AppTheme.NoActionBar" android:windowSoftInputMode="adjustPan">
+            android:theme="@style/AppTheme.NoActionBar" android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

@@ -5,10 +5,11 @@
     android:layout_height="match_parent"
     android:id="@+id/ll_fgText"
     tools:context="cn.com.hotled.xyled.fragment.TextFragment">
-    <ImageView
-        android:src="@drawable/ic_menu_send"
+    <cn.com.hotled.xyled.view.PhotoView
+        android:id="@+id/pv_fgText_photo"
         android:layout_width="match_parent"
-        android:layout_height="120dp" />
+        android:layout_height="180dp" />
+
 
     <android.support.v7.widget.RecyclerView
         android:layout_weight="1"
@@ -35,7 +36,7 @@
             android:layout_gravity="center"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
-    </LinearLayout>
+     </LinearLayout>
 
 
 

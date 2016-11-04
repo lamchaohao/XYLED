@@ -1,6 +1,7 @@
 package cn.com.hotled.xyled.view;
 
 
+import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -47,24 +48,29 @@ public class TextToolPopupWindow extends PopupWindow implements View.OnClickList
     ImageButton ib_GreenTextBg;
     ImageButton ib_BlueTextBg;
     ImageButton ib_MoreTextBg;
-    SeekBar sb_X;
-    SeekBar sb_Y;
-    TextView tv_Xprogress;
-    TextView tv_Yprogress;
+
     Context mContext;
+    private ImageButton ib_trainX;
+    private ImageButton ib_trainY;
+
     public TextToolPopupWindow(Context context) {
         super(context);
         mContext=context;
         LayoutInflater layoutInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View inflate = layoutInflater.inflate(R.layout.popupwind_textfragment, null);
+        View inflate = layoutInflater.inflate(R.layout.popupwin_textfg_horizon, null);
         initView(inflate);
-
+        setScrollBar(inflate);
         setContentView(inflate);
         setWidth(ViewGroup.LayoutParams.MATCH_PARENT);
-        setHeight(DensityUtil.dp2px(mContext,250));
+        setHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
         setFocusable(true);
         setBackgroundDrawable(new ColorDrawable(Color.parseColor("#FAFAFA")));
 
+    }
+
+    @TargetApi(16)
+    private void setScrollBar(View inflate) {
+        inflate.setScrollBarSize(5);
     }
 
     private void initView(View inflate) {
@@ -81,10 +87,8 @@ public class TextToolPopupWindow extends PopupWindow implements View.OnClickList
         ib_GreenTextBg= (ImageButton) inflate.findViewById(R.id.ib_fgText_textBgGreen);
         ib_BlueTextBg= (ImageButton) inflate.findViewById(R.id.ib_fgText_textBgBlue);
         ib_MoreTextBg= (ImageButton) inflate.findViewById(R.id.ib_fgText_textBgMore);
-        sb_X= (SeekBar) inflate.findViewById(R.id.sb_fgText_X);
-        sb_Y= (SeekBar) inflate.findViewById(R.id.sb_fgText_Y);
-        tv_Xprogress= (TextView) inflate.findViewById(R.id.tv_fgText_Xprogress);
-        tv_Yprogress= (TextView) inflate.findViewById(R.id.tv_fgText_Yprogress);
+        ib_trainX = (ImageButton) inflate.findViewById(R.id.ib_fgText_trainX);
+        ib_trainY = (ImageButton) inflate.findViewById(R.id.ib_fgText_trainY);
 
         bt_TextSize.setOnClickListener(this);
         bt_setFont.setOnClickListener(this);
@@ -98,47 +102,11 @@ public class TextToolPopupWindow extends PopupWindow implements View.OnClickList
         ib_GreenTextBg.setOnClickListener(this);
         ib_BlueTextBg.setOnClickListener(this);
         ib_MoreTextBg.setOnClickListener(this);
-        initSeekBar();
+        ib_trainX.setOnClickListener(this);
+        ib_trainY.setOnClickListener(this);
     }
 
-    private void initSeekBar() {
-        sb_X.setProgress(50);
-        sb_Y.setProgress(50);
-        tv_Xprogress.setText(0+"");
-        tv_Yprogress.setText(0+"");
-        sb_X.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                tv_Xprogress.setText(progress-50+"");
-            }
 
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-
-            }
-        });
-        sb_Y.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                tv_Yprogress.setText(progress-50+"");
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-
-            }
-        });
-    }
 
 
     public void setBold(){
@@ -291,7 +259,10 @@ public class TextToolPopupWindow extends PopupWindow implements View.OnClickList
             case R.id.ib_fgText_textBgMore:
                 setTextBgMore();
                 break;
-
+            case R.id.ib_fgText_trainX:
+                break;
+            case R.id.ib_fgText_trainY:
+                break;
         }
     }
 }

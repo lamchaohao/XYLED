@@ -6,7 +6,7 @@
     <ImageView
         android:id="@+id/iv_typeFace_content"
         android:padding="10dp"
-        android:src="@drawable/ic_text_fields_black_24dp"
+        android:src="@drawable/ic_text_fields_black_36dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
     <TextView
