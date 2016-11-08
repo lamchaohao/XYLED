@@ -12,6 +12,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.io.File;
+import java.util.List;
 
 import cn.com.hotled.xyled.R;
 
@@ -21,15 +22,15 @@ import cn.com.hotled.xyled.R;
 
 public class TypefaceListAdapter extends BaseAdapter {
     Context mContext;
-    File[] typeFaceList;
-    public TypefaceListAdapter(File[] typefaceList, Context context){
+    List<File> typeFaceList;
+    public TypefaceListAdapter(List<File> typefaceList, Context context){
         this.typeFaceList=typefaceList;
         mContext=context;
     }
 
     @Override
     public int getCount() {
-        return typeFaceList.length;
+        return typeFaceList.size();
     }
 
     @Override
@@ -56,8 +57,8 @@ public class TypefaceListAdapter extends BaseAdapter {
             viewHolder.imageView= (ImageView) ll_typeface_content.findViewById(R.id.iv_typeFace_content);
             ll_typeface_content.setTag(viewHolder);
         }
-        viewHolder.textView.setText(typeFaceList[position].getName());
-        viewHolder.textView.setTypeface(Typeface.createFromFile(typeFaceList[position]));
+        viewHolder.textView.setText(typeFaceList.get(position).getName());
+        viewHolder.textView.setTypeface(Typeface.createFromFile(typeFaceList.get(position)));
 
         return ll_typeface_content;
     }
