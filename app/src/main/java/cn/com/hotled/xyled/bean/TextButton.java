@@ -3,6 +3,8 @@ package cn.com.hotled.xyled.bean;
 import android.graphics.Typeface;
 import android.widget.Button;
 
+import java.io.File;
+
 /**
  * Created by Lam on 2016/11/1.
  */
@@ -10,7 +12,7 @@ import android.widget.Button;
 public class TextButton {
     private Button button;
     private String text;
-    private Typeface typeface;
+    private File typeface;
     private int textSize;
     private int textColor;
     private int textBackgroudColor;
@@ -120,11 +122,11 @@ public class TextButton {
         isSelected = selected;
     }
 
-    public Typeface getTypeface() {
+    public File getTypeface() {
         return typeface;
     }
 
-    public void setTypeface(Typeface typeface) {
+    public void setTypeface(File typeface) {
         this.typeface = typeface;
     }
 }

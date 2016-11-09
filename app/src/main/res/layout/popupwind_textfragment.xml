@@ -130,21 +130,21 @@
                 android:id="@+id/ib_fgText_textBgRed"
                 android:padding="10dp"
                 android:layout_weight="1"
-                android:src="@drawable/ic_text_fields_red_bg_24dp"
+                android:src="@drawable/ic_text_fields_red_bg_36dp"
                 android:background="@drawable/recycler_bg"
                 android:layout_width="0dp"
                 android:layout_height="match_parent" />
             <ImageButton
                 android:id="@+id/ib_fgText_textBgGreen"
                 android:layout_weight="1"
-                android:src="@drawable/ic_text_fields_green_bg_24dp"
+                android:src="@drawable/ic_text_fields_green_bg_36dp"
                 android:background="@drawable/recycler_bg"
                 android:layout_width="0dp"
                 android:layout_height="match_parent" />
             <ImageButton
                 android:id="@+id/ib_fgText_textBgBlue"
                 android:layout_weight="1"
-                android:src="@drawable/ic_text_fields_blue_bg_24dp"
+                android:src="@drawable/ic_text_fields_blue_bg_36dp"
                 android:background="@drawable/recycler_bg"
                 android:layout_width="0dp"
                 android:layout_height="match_parent" />

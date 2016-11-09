@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal"
+    android:id="@+id/ll_typeface_content"
+    android:background="@drawable/recycler_bg"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content">
     <ImageView
         android:id="@+id/iv_typeFace_content"
         android:padding="10dp"
@@ -12,6 +14,7 @@
     <TextView
         android:padding="10dp"
         android:textSize="20sp"
+        android:layout_gravity="center"
         android:id="@+id/tv_typeFace_content"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />

@@ -1,13 +1,12 @@
 package cn.com.hotled.xyled.fragment;
 
-import android.app.AlertDialog;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -17,37 +16,19 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
-import android.text.SpannableString;
-import android.text.Spanned;
 import android.text.TextWatcher;
-import android.text.style.BackgroundColorSpan;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewParent;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.PopupWindow;
-import android.widget.ScrollView;
-import android.widget.SeekBar;
-import android.widget.TextView;
-import android.widget.Toast;
 
-import com.flask.colorpicker.ColorPickerView;
-import com.flask.colorpicker.OnColorSelectedListener;
-import com.flask.colorpicker.builder.ColorPickerClickListener;
-import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
-
-import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import butterknife.BindView;
@@ -55,13 +36,9 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import cn.com.hotled.xyled.R;
 import cn.com.hotled.xyled.adapter.TextButtonAdapter;
-import cn.com.hotled.xyled.adapter.TypefaceListAdapter;
 import cn.com.hotled.xyled.bean.TextButton;
-import cn.com.hotled.xyled.util.DensityUtil;
-import cn.com.hotled.xyled.view.Info;
 import cn.com.hotled.xyled.view.PhotoView;
 import cn.com.hotled.xyled.view.TextToolPopupWindow;
-import cn.com.hotled.xyled.view.WheelView;
 
 
 public class TextFragment extends Fragment {
@@ -76,11 +53,16 @@ public class TextFragment extends Fragment {
     ImageButton ib_fgText_settool;
     Button mButton;
     List<TextButton> mTextButtonList=new ArrayList<>();
-    private TextButtonAdapter textButtonAdapter;
+    public TextButtonAdapter textButtonAdapter;
     private TextButton mTextButton;
     private PopupWindow mPopupWindow;
     private LinearLayout ll_fgText;
-    public List<TextButton> mSelectedTextList=new ArrayList<>();
+    private Canvas canvas;
+    private Bitmap targetBitmap;
+    private Paint paint;
+    private int RECOMAND_SIZE=26;
+    private int mPosition;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -97,36 +79,29 @@ public class TextFragment extends Fragment {
     private void initPhotoView() {
         //启用图片缩放功能
         photoView.enable();
-        Bitmap bitmap = BitmapFactory.decodeResource(getContext().getResources(), R.drawable.monitor);
 
         //设置缩放倍数
-        photoView.setMaxScale(8);
+        photoView.setMaxScale(4);
         //获取图片信息
-        Info info = photoView.getInfo();
-        //
+//        Info info = photoView.getInfo();
 //        photoView.animaFrom(info);
 
-        photoView.setScaleType(ImageView.ScaleType.FIT_XY);
-        Canvas canvas=new Canvas();
-        Paint paint=new Paint(Paint.ANTI_ALIAS_FLAG);
-        paint.setColor(Color.RED);
-        paint.setTypeface(Typeface.MONOSPACE);
-        paint.setTextSize(26);
-        Bitmap.Config config = bitmap.getConfig();
-        Bitmap copy = bitmap.copy(config, true);
-        canvas.setBitmap(copy);
-        Rect bounds = new Rect();
-        Paint.FontMetricsInt fontMetrics = paint.getFontMetricsInt();
-        int baseline = (photoView.getMeasuredHeight() - fontMetrics.bottom + fontMetrics.top) / 6 - fontMetrics.top;
-        canvas.drawText("格力中央空调，工厂底线直销，只需1888",photoView.getMeasuredWidth() / 2 - bounds.width() / 2,baseline,paint);
+        Bitmap bitmap = BitmapFactory.decodeResource(getContext().getResources(), R.drawable.monitor);
+        canvas = new Canvas();
 
-        photoView.setImageBitmap(copy);
+        paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+
+        targetBitmap = bitmap.copy(bitmap.getConfig(),true);
+        canvas.setBitmap(targetBitmap);
+        photoView.setScaleType(ImageView.ScaleType.FIT_XY);
+        photoView.setImageBitmap(targetBitmap);
     }
 
     private void initRecyclerView() {
         recyclerView.setLayoutManager(new GridLayoutManager(getContext(),10, LinearLayoutManager.VERTICAL,false));
         textButtonAdapter = new TextButtonAdapter(getContext(),mTextButtonList);
         textButtonAdapter.setItemOnClickListener(new TextButtonAdapter.OnItemOnClickListener() {
+
             @Override
             public void onItemClick(View view, int position) {
                 if (TextButtonAdapter.SELECT_MODE){
@@ -134,35 +109,20 @@ public class TextFragment extends Fragment {
                     if (mTextButtonList.get(position).isSelected()){
                         //如果是已选，则改为未选
                         mTextButtonList.get(position).setSelected(false);
-                        mSelectedTextList.remove(mTextButtonList.get(position));
                     }else {
                         mTextButtonList.get(position).setSelected(true);
-                        mSelectedTextList.add(mTextButtonList.get(position));
                     }
                 }else {
                     //单选模式
                     if (mTextButton!=null)
                         mTextButton.setSelected(false);//把之前选中的取消选中
                     mButton= (Button) view;
+                    mPosition = position;
                     mTextButton = mTextButtonList.get(position);
                     mTextButton.setSelected(true);
                 }
             }
-        });
-        textButtonAdapter.setItemOnLongClickListener(new TextButtonAdapter.OnItemLongClickListener() {
-            @Override
-            public void onLongClick(View view, int position) {
-                if (TextButtonAdapter.SELECT_MODE){
 
-                }else {
-                    mSelectedTextList.clear();
-                    for (int i=0;i<mTextButtonList.size();i++){
-                        mTextButtonList.get(i).setSelected(false);
-                        textButtonAdapter.notifyItemChanged(i);//设置回背景
-                    }
-
-                }
-            }
         });
         recyclerView.setAdapter(textButtonAdapter);
     }
@@ -196,8 +156,8 @@ public class TextFragment extends Fragment {
                     //将其分割，取出每个字符
                     String subStr = substring.substring(i-1, i);
                     //每个字符，对应一个按钮，加入buttonlist
-                    //// TODO: 2016/10/31 buttonTextList 展示出来是倒叙的，最后一个放在最前面 2016/11/1 已解决
-                    TextButton tb=new TextButton(subStr,16,Color.BLACK,Color.WHITE,false,false,false);
+                    // TODO: 2016/10/31 buttonTextList 展示出来是倒叙的，最后一个放在最前面 2016/11/1 已解决
+                    TextButton tb=new TextButton(subStr,28,Color.RED,Color.WHITE,false,false,false);
                     mTextButtonList.add(start,tb);
 
                 }
@@ -207,11 +167,42 @@ public class TextFragment extends Fragment {
             @Override
             public void afterTextChanged(Editable s) {
                 textButtonAdapter.notifyDataSetChanged();
+                drawText();
             }
         });
 
     }
 
+    public void drawText() {
+        //先擦除原来的文字
+        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+        canvas.drawPaint(paint);
+        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
+        //画图
+        paint.setColor(Color.RED);
+        paint.setTypeface(Typeface.MONOSPACE);
+        Rect rect=null;
+        int x=0;
+        int y=100;
+        for(TextButton tb : mTextButtonList){
+            x+=tb.getTextSize();
+            paint.setColor(tb.getTextColor());
+            paint.setTextSize(tb.getTextSize());
+            if (tb.getTypeface()!=null)
+                paint.setTypeface(Typeface.createFromFile(tb.getTypeface()));
+            else
+                paint.setTypeface(Typeface.DEFAULT);
+            rect=new Rect(x,y-tb.getTextSize(),x+tb.getTextSize(),y);
+            Paint bgPaint=new Paint(Paint.ANTI_ALIAS_FLAG);
+            bgPaint.setColor(tb.getTextBackgroudColor());
+            canvas.drawRect(rect,bgPaint);
+            canvas.drawText(tb.getText(),x,100,paint);
+
+        }
+//        canvas.drawText(text,0,100,paint);
+        photoView.setImageBitmap(targetBitmap);
+
+    }
 
 
     @Override
@@ -227,28 +218,30 @@ public class TextFragment extends Fragment {
 
         if (mPopupWindow==null||!mPopupWindow.isShowing()){
 
-            mPopupWindow=new TextToolPopupWindow(getContext());
-            //上滑一段距离
-//            int popWinHeight = DensityUtil.dp2px(getContext(), 250);
-//            final int top = ll_fgText.getTop();
-//            ll_fgText.scrollTo(0,popWinHeight-top);
+            mPopupWindow=new TextToolPopupWindow(getContext(),mTextButtonList,this);
             mPopupWindow.showAtLocation(ll_fgText, Gravity.TOP,0,0);
-            mPopupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
-                @Override
-                public void onDismiss() {
-                    //消失后下滑
-//                    ll_fgText.scrollTo(0,top);
-                }
-            });
         }else if (mPopupWindow!=null&&mPopupWindow.isShowing()){
             mPopupWindow.dismiss();
         }
 
     }
 
+
     @Override
     public void onDestroy() {
         super.onDestroy();
 
+    }
+
+    public TextButton getmTextButton() {
+        return mTextButton;
+    }
+
+    public int getRECOMAND_SIZE() {
+        return RECOMAND_SIZE;
+    }
+
+    public int getPosition() {
+        return mPosition;
     }
 }

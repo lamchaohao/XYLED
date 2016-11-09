@@ -32,7 +32,6 @@
             android:name=".ui.ConnectWifiActivity"
             android:label="@string/title_activity_connect_wifi"
             android:theme="@style/AppTheme" />
-        <activity android:name=".ui.OTGActivity" />
         <activity android:name=".ui.TypefaceListActivity" />
     </application>
 

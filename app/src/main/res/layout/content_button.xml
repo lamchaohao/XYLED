@@ -5,7 +5,7 @@
     android:layout_height="wrap_content">
     <Button
         android:id="@+id/content_button"
-        android:layout_margin="1dp"
+        android:layout_margin="2dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 </FrameLayout>

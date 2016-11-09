@@ -5,17 +5,17 @@ import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.ListView;
 import android.widget.PopupWindow;
-import android.widget.SeekBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.flask.colorpicker.ColorPickerView;
@@ -24,11 +24,18 @@ import com.flask.colorpicker.builder.ColorPickerClickListener;
 import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import cn.com.hotled.xyled.R;
-import cn.com.hotled.xyled.adapter.TypefaceListAdapter;
-import cn.com.hotled.xyled.util.DensityUtil;
+import cn.com.hotled.xyled.adapter.TextButtonAdapter;
+import cn.com.hotled.xyled.adapter.TypefaceAdapter;
+import cn.com.hotled.xyled.bean.TextButton;
+import cn.com.hotled.xyled.bean.TypefaceFile;
+import cn.com.hotled.xyled.decoration.WifiItemDecoration;
+import cn.com.hotled.xyled.fragment.TextFragment;
+import cn.com.hotled.xyled.ui.TypefaceListActivity;
 
 /**
  * Created by Lam on 2016/11/3.
@@ -52,12 +59,18 @@ public class TextToolPopupWindow extends PopupWindow implements View.OnClickList
     Context mContext;
     private ImageButton ib_trainX;
     private ImageButton ib_trainY;
+    List<TextButton> mTextButtonList;
+    TextFragment mTextFragment;
+    private TypefaceAdapter typefaceAdapter;
+    private File typeFile;
 
-    public TextToolPopupWindow(Context context) {
+    public TextToolPopupWindow(Context context, List<TextButton> textButtons, TextFragment textFragment) {
         super(context);
         mContext=context;
+        mTextButtonList=textButtons;
+        mTextFragment=textFragment;
         LayoutInflater layoutInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View inflate = layoutInflater.inflate(R.layout.popupwin_textfg_horizon, null);
+        View inflate = layoutInflater.inflate(R.layout.popupwin_textfg_horizon_double, null);
         initView(inflate);
         setScrollBar(inflate);
         setContentView(inflate);
@@ -65,7 +78,7 @@ public class TextToolPopupWindow extends PopupWindow implements View.OnClickList
         setHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
         setFocusable(true);
         setBackgroundDrawable(new ColorDrawable(Color.parseColor("#FAFAFA")));
-
+        setAnimationStyle(R.style.popupwin_anim);
     }
 
     @TargetApi(16)
@@ -109,57 +122,155 @@ public class TextToolPopupWindow extends PopupWindow implements View.OnClickList
 
 
 
-    public void setBold(){
+    private void setBold(){
+        mContext.startActivity(new Intent(mContext, TypefaceListActivity.class));
     }
-    public void setItalic(){
+    private void setItalic(){
+
     }
-    public void setUnderLine(){
+    private void setUnderLine(){
+
     }
-    public void setTextColorRed(){
+
+    private void setTextColor(int color){
+        if (TextButtonAdapter.SELECT_MODE){
+            //多选
+            for (TextButton tb:mTextButtonList){
+                if (tb.isSelected())
+                    tb.setTextColor(color);
+            }
+            mTextFragment.textButtonAdapter.notifyDataSetChanged();
+        }else {
+            //单选
+            if (mTextFragment.getmTextButton()!=null){
+                mTextFragment.getmTextButton().setTextColor(color);
+                mTextFragment.textButtonAdapter.notifyItemChanged(mTextFragment.getPosition());
+            }
+
+        }
+        mTextFragment.drawText();
+
     }
-    public void setTextColorGreen(){
+
+    private void setTextBgColor(int color){
+        if (TextButtonAdapter.SELECT_MODE){
+            //多选
+            for (TextButton tb:mTextButtonList){
+                if (tb.isSelected())
+                    tb.setTextBackgroudColor(color);
+                mTextFragment.textButtonAdapter.notifyDataSetChanged();
+            }
+        }else {
+            //单选
+            if (mTextFragment.getmTextButton()!=null){
+                mTextFragment.getmTextButton().setTextBackgroudColor(color);
+                mTextFragment.textButtonAdapter.notifyItemChanged(mTextFragment.getPosition());
+            }
+        }
+        mTextFragment.drawText();
+
     }
-    public void setTextColorBlue(){
-    }
+
         /**
      * 设置文本字体
      */
     public void setFont(){
         File file =new File("/system/fonts");
         File[] files = file.listFiles();
+        final List<TypefaceFile> fileList=new ArrayList<>();
+        for (int i=0;i<files.length;i++){
+            String name = files[i].getName();
+            if(name.contains("-Regular")&&!name.contains("MiuiEx")){
+                fileList.add(new TypefaceFile(files[i],false));
+            }
+        }
         View view = LayoutInflater.from(mContext).inflate(R.layout.typeface_list, null);
-        ListView typeFaceListView = (ListView) view.findViewById(R.id.typeFaceListView);
-        typeFaceListView.setAdapter(new TypefaceListAdapter(files,mContext));
+        RecyclerView typefaceRecycler = (RecyclerView) view.findViewById(R.id.typeFaceListView);
+        typefaceRecycler.setLayoutManager(new LinearLayoutManager(mContext));
+        typefaceAdapter = new TypefaceAdapter(fileList, mContext);
+        typefaceRecycler.setAdapter(typefaceAdapter);
+        typefaceRecycler.addItemDecoration(new WifiItemDecoration(mContext,WifiItemDecoration.VERTICAL_LIST));
+        typefaceAdapter.setOnItemClickListener(new TypefaceAdapter.OnItemOnClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+                //1.先获取选择了哪个字体
+                typeFile = fileList.get(position).getFile();
+            }
+        });
+
+
         new AlertDialog.Builder(mContext)
                 .setTitle("Choose Typeface")
                 .setView(view)
-                .setPositiveButton("OK", null)
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        if (TextButtonAdapter.SELECT_MODE){
+                            //多选
+                                for (TextButton tb:mTextButtonList){
+                                    //2.将字体文件设置进入
+                                    if (tb.isSelected())
+                                        tb.setTypeface(typeFile);
+                                    mTextFragment.textButtonAdapter.notifyDataSetChanged();
+                                }
+                        }else {
+                            //单选
+                            if (mTextFragment.getmTextButton()!=null)
+                                mTextFragment.getmTextButton().setTypeface(typeFile);
+                            mTextFragment.textButtonAdapter.notifyItemChanged(mTextFragment.getPosition());//更新
+
+                        }
+                        dialog.dismiss();
+                        mTextFragment.drawText();
+                    }
+                })
+                .setNegativeButton("cancle",null)
                 .show();
 
     }
 
     public void setTextSize(){
-        String[] textSizePxList=new String[100];
-        for (int i=0;i<100;i++){
-            textSizePxList[i]=i+1+"";
+        String[] textSizePxList=new String[200];
+        for (int i=1;i<=200;i++){
+            textSizePxList[i-1]=i+"";
         }
 
         View outerView = LayoutInflater.from(mContext).inflate(R.layout.wheel_view, null);
         WheelView wv = (WheelView) outerView.findViewById(R.id.wheelview);
-        wv.setOffset(2);
+        wv.setOffset(2);//偏移量
         wv.setItems(Arrays.asList(textSizePxList));
-        wv.setSeletion(3);
+        if (TextButtonAdapter.SELECT_MODE){
+            wv.setSeletion(mTextFragment.getRECOMAND_SIZE()-1);
+        }else {
+            //取之前设置的字体大小的值
+            if (mTextFragment.getmTextButton()!=null)
+                wv.setSeletion(mTextFragment.getmTextButton().getTextSize());
+            else //如果没有点击就设置，则取推荐字体大小
+                wv.setSeletion(mTextFragment.getRECOMAND_SIZE()-1);
+        }
         wv.setOnWheelViewListener(new WheelView.OnWheelViewListener() {
             @Override
             public void onSelected(int selectedIndex, String item) {
                     bt_TextSize.setText("size:"+item);
-                // TODO: 2016/11/3 还没正式设置字体大小
+                if (TextButtonAdapter.SELECT_MODE){
+                    //多选
+                    for (TextButton tb:mTextButtonList){
+                        if (tb.isSelected())
+                            tb.setTextSize(selectedIndex);
+                    }
+                }else {
+                    //单选
+                    if (mTextFragment.getmTextButton()!=null)
+                        mTextFragment.getmTextButton().setTextSize(selectedIndex);
 
+                }
+                mTextFragment.drawText();
             }
         });
 
         new AlertDialog.Builder(mContext)
-                .setTitle("WheelView in Dialog")
+                .setTitle("设置文字大小")
                 .setView(outerView)
                 .setPositiveButton("OK", null)
                 .show();
@@ -175,13 +286,13 @@ public class TextToolPopupWindow extends PopupWindow implements View.OnClickList
                     @Override
                     public void onColorSelected(int i) {
                         Toast.makeText(mContext, "ColorSelected:"+Integer.toHexString(i), Toast.LENGTH_SHORT).show();
-                        // TODO: 2016/11/3 还没正式设置字体颜色
+
                     }
                 })
                 .setPositiveButton("确定", new ColorPickerClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i, Integer[] integers) {
-
+                        setTextColor(i);
 
                     }
                 })
@@ -206,13 +317,13 @@ public class TextToolPopupWindow extends PopupWindow implements View.OnClickList
                     @Override
                     public void onColorSelected(int i) {
                         Toast.makeText(mContext, "ColorSelected:"+Integer.toHexString(i), Toast.LENGTH_SHORT).show();
-                        // TODO: 2016/11/3 还没正式设置字体颜色 //设置字体背景颜色
+
                     }
                 })
                 .setPositiveButton("确定", new ColorPickerClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i, Integer[] integers) {
-
+                        setTextBgColor(i);
                     }
                 })
                 .setNegativeButton("取消", new DialogInterface.OnClickListener() {
@@ -234,7 +345,7 @@ public class TextToolPopupWindow extends PopupWindow implements View.OnClickList
                 setFont();
                 break;
             case R.id.ib_fgText_setBold:
-                Toast.makeText(mContext, "test 加粗", Toast.LENGTH_SHORT).show();
+                setBold();
                 break;
             case R.id.ib_fgText_setItalic:
                 Toast.makeText(mContext, "test ib_fgText_setItalic", Toast.LENGTH_SHORT).show();
@@ -242,19 +353,25 @@ public class TextToolPopupWindow extends PopupWindow implements View.OnClickList
             case R.id.ib_fgText_setUnderLine:
                 break;
             case R.id.ib_fgText_textColorRed:
+                setTextColor(Color.RED);
                 break;
             case R.id.ib_fgText_textColorGreen:
+                setTextColor(Color.GREEN);
                 break;
             case R.id.ib_fgText_textColorBlue:
+                setTextColor(Color.BLUE);
                 break;
             case R.id.ib_fgText_textColorMore:
-                setTextBgMore();
+                setTextColorMore();
                 break;
             case R.id.ib_fgText_textBgRed:
+                setTextBgColor(Color.RED);
                 break;
             case R.id.ib_fgText_textBgGreen:
+                setTextBgColor(Color.GREEN);
                 break;
             case R.id.ib_fgText_textBgBlue:
+                setTextBgColor(Color.BLUE);
                 break;
             case R.id.ib_fgText_textBgMore:
                 setTextBgMore();
