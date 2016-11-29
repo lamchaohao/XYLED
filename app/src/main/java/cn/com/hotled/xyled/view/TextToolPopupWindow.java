@@ -5,18 +5,19 @@ import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Environment;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.PopupWindow;
-import android.widget.Toast;
 
 import com.flask.colorpicker.ColorPickerView;
 import com.flask.colorpicker.OnColorSelectedListener;
@@ -35,34 +36,34 @@ import cn.com.hotled.xyled.bean.TextButton;
 import cn.com.hotled.xyled.bean.TypefaceFile;
 import cn.com.hotled.xyled.decoration.WifiItemDecoration;
 import cn.com.hotled.xyled.fragment.TextFragment;
-import cn.com.hotled.xyled.ui.TypefaceListActivity;
 
 /**
  * Created by Lam on 2016/11/3.
  */
 
 public class TextToolPopupWindow extends PopupWindow implements View.OnClickListener{
-    Button bt_TextSize;
-    Button bt_setFont;
-    ImageButton ib_setBold;
-    ImageButton ib_setItalic;
-    ImageButton ib_setUnderLine;
-    ImageButton ib_RedText;
-    ImageButton ib_GreenText;
-    ImageButton ib_BlueText;
-    ImageButton ib_moreColor;
-    ImageButton ib_RedTextBg;
-    ImageButton ib_GreenTextBg;
-    ImageButton ib_BlueTextBg;
-    ImageButton ib_MoreTextBg;
+    private Button bt_TextSize;
+    private Button bt_setFont;
+    private ImageButton ib_setBold;
+    private ImageButton ib_setItalic;
+    private ImageButton ib_setUnderLine;
+    private ImageButton ib_RedText;
+    private ImageButton ib_GreenText;
+    private ImageButton ib_BlueText;
+    private ImageButton ib_moreColor;
+    private ImageButton ib_RedTextBg;
+    private ImageButton ib_GreenTextBg;
+    private ImageButton ib_BlueTextBg;
+    private ImageButton ib_MoreTextBg;
 
-    Context mContext;
+    private Context mContext;
     private ImageButton ib_trainX;
     private ImageButton ib_trainY;
-    List<TextButton> mTextButtonList;
-    TextFragment mTextFragment;
+    private List<TextButton> mTextButtonList;
+    private TextFragment mTextFragment;
     private TypefaceAdapter typefaceAdapter;
     private File typeFile;
+    private ImageButton mIb_selectAll;
 
     public TextToolPopupWindow(Context context, List<TextButton> textButtons, TextFragment textFragment) {
         super(context);
@@ -102,11 +103,13 @@ public class TextToolPopupWindow extends PopupWindow implements View.OnClickList
         ib_MoreTextBg= (ImageButton) inflate.findViewById(R.id.ib_fgText_textBgMore);
         ib_trainX = (ImageButton) inflate.findViewById(R.id.ib_fgText_trainX);
         ib_trainY = (ImageButton) inflate.findViewById(R.id.ib_fgText_trainY);
+        mIb_selectAll = (ImageButton) inflate.findViewById(R.id.ib_fgText_selectAll);
 
         bt_TextSize.setOnClickListener(this);
         bt_setFont.setOnClickListener(this);
         ib_setBold.setOnClickListener(this);
         ib_setItalic.setOnClickListener(this);
+        ib_setUnderLine.setOnClickListener(this);
         ib_RedText.setOnClickListener(this);
         ib_GreenText.setOnClickListener(this);
         ib_BlueText.setOnClickListener(this);
@@ -117,19 +120,66 @@ public class TextToolPopupWindow extends PopupWindow implements View.OnClickList
         ib_MoreTextBg.setOnClickListener(this);
         ib_trainX.setOnClickListener(this);
         ib_trainY.setOnClickListener(this);
+        mIb_selectAll.setOnClickListener(this);
     }
 
 
 
 
     private void setBold(){
-        mContext.startActivity(new Intent(mContext, TypefaceListActivity.class));
+        if (TextButtonAdapter.SELECT_MODE){
+            //多选
+            for (TextButton tb:mTextButtonList){
+                if (tb.isSelected())
+                    tb.setIsbold(!tb.isbold());
+            }
+            mTextFragment.textButtonAdapter.notifyDataSetChanged();
+        }else {
+            //单选
+            if (mTextFragment.getmTextButton()!=null){
+                mTextFragment.getmTextButton().setIsbold(!mTextFragment.getmTextButton().isbold());
+                mTextFragment.textButtonAdapter.notifyItemChanged(mTextFragment.getPosition());
+            }
+
+        }
+        mTextFragment.drawText();
     }
     private void setItalic(){
+        if (TextButtonAdapter.SELECT_MODE){
+            //多选
+            for (TextButton tb:mTextButtonList){
+                if (tb.isSelected())
+                    tb.setIlatic(!tb.isIlatic());
+            }
+            mTextFragment.textButtonAdapter.notifyDataSetChanged();
+        }else {
+            //单选
+            if (mTextFragment.getmTextButton()!=null){
+                mTextFragment.getmTextButton().setIlatic(!mTextFragment.getmTextButton().isIlatic());
+                mTextFragment.textButtonAdapter.notifyItemChanged(mTextFragment.getPosition());
+            }
+
+        }
+        mTextFragment.drawText();
 
     }
     private void setUnderLine(){
+        if (TextButtonAdapter.SELECT_MODE){
+            //多选
+            for (TextButton tb:mTextButtonList){
+                if (tb.isSelected())
+                    tb.setUnderline(!tb.isUnderline());
+            }
+            mTextFragment.textButtonAdapter.notifyDataSetChanged();
+        }else {
+            //单选
+            if (mTextFragment.getmTextButton()!=null){
+                mTextFragment.getmTextButton().setUnderline(!mTextFragment.getmTextButton().isUnderline());
+                mTextFragment.textButtonAdapter.notifyItemChanged(mTextFragment.getPosition());
+            }
 
+        }
+        mTextFragment.drawText();
     }
 
     private void setTextColor(int color){
@@ -153,19 +203,11 @@ public class TextToolPopupWindow extends PopupWindow implements View.OnClickList
     }
 
     private void setTextBgColor(int color){
-        if (TextButtonAdapter.SELECT_MODE){
-            //多选
-            for (TextButton tb:mTextButtonList){
-                if (tb.isSelected())
-                    tb.setTextBackgroudColor(color);
-                mTextFragment.textButtonAdapter.notifyDataSetChanged();
-            }
-        }else {
-            //单选
-            if (mTextFragment.getmTextButton()!=null){
-                mTextFragment.getmTextButton().setTextBackgroudColor(color);
-                mTextFragment.textButtonAdapter.notifyItemChanged(mTextFragment.getPosition());
-            }
+        for (TextButton tb:mTextButtonList){
+
+            tb.setTextBackgroudColor(color);
+            mTextFragment.textButtonAdapter.notifyDataSetChanged();
+
         }
         mTextFragment.drawText();
 
@@ -177,7 +219,16 @@ public class TextToolPopupWindow extends PopupWindow implements View.OnClickList
     public void setFont(){
         File file =new File("/system/fonts");
         File[] files = file.listFiles();
+        File downloadFontDir = new File(Environment.getExternalStorageDirectory()+"/fonts/xyledfonts");
+        if (!downloadFontDir.exists()){
+            downloadFontDir.mkdir();
+        }
+        Log.i("popup", "setFont: "+downloadFontDir.getAbsolutePath());
+        File[] downloadFonts = downloadFontDir.listFiles();
         final List<TypefaceFile> fileList=new ArrayList<>();
+        for (File downloadFont : downloadFonts) {
+            fileList.add(new TypefaceFile(downloadFont,false));
+        }
         for (int i=0;i<files.length;i++){
             String name = files[i].getName();
             if(name.contains("-Regular")&&!name.contains("MiuiEx")){
@@ -241,13 +292,13 @@ public class TextToolPopupWindow extends PopupWindow implements View.OnClickList
         wv.setOffset(2);//偏移量
         wv.setItems(Arrays.asList(textSizePxList));
         if (TextButtonAdapter.SELECT_MODE){
-            wv.setSeletion(mTextFragment.getRECOMAND_SIZE()-1);
+            wv.setSeletion(mTextFragment.getRecomandSize()-1);
         }else {
             //取之前设置的字体大小的值
             if (mTextFragment.getmTextButton()!=null)
                 wv.setSeletion(mTextFragment.getmTextButton().getTextSize());
             else //如果没有点击就设置，则取推荐字体大小
-                wv.setSeletion(mTextFragment.getRECOMAND_SIZE()-1);
+                wv.setSeletion(mTextFragment.getRecomandSize()-1);
         }
         wv.setOnWheelViewListener(new WheelView.OnWheelViewListener() {
             @Override
@@ -285,7 +336,6 @@ public class TextToolPopupWindow extends PopupWindow implements View.OnClickList
                 .setOnColorSelectedListener(new OnColorSelectedListener() {
                     @Override
                     public void onColorSelected(int i) {
-                        Toast.makeText(mContext, "ColorSelected:"+Integer.toHexString(i), Toast.LENGTH_SHORT).show();
 
                     }
                 })
@@ -316,7 +366,6 @@ public class TextToolPopupWindow extends PopupWindow implements View.OnClickList
                 .setOnColorSelectedListener(new OnColorSelectedListener() {
                     @Override
                     public void onColorSelected(int i) {
-                        Toast.makeText(mContext, "ColorSelected:"+Integer.toHexString(i), Toast.LENGTH_SHORT).show();
 
                     }
                 })
@@ -335,6 +384,73 @@ public class TextToolPopupWindow extends PopupWindow implements View.OnClickList
                 .build().show();
     }
 
+
+    private void selectAll() {
+        if (TextButtonAdapter.SELECT_MODE) {
+            int count=-1;
+            int selectedItemCount=0;
+            for (TextButton textButton : mTextButtonList) {
+                count++;
+                if (!textButton.isSelected()) {
+                    textButton.setSelected(true);
+                    mTextFragment.textButtonAdapter.notifyItemChanged(count);
+                }else {
+                    //计算已经选择的个数
+                    selectedItemCount++;
+                }
+            }
+            if (selectedItemCount==mTextButtonList.size()){
+                //如果已经全选，则全不选
+                for (TextButton tb : mTextButtonList) {
+                    tb.setSelected(false);
+                }
+                mTextFragment.textButtonAdapter.notifyDataSetChanged();
+            }
+        }else {
+            TextButtonAdapter.SELECT_MODE=true;
+            Snackbar.make(mTextFragment.ib_fgText_settool,"进入多选模式",Snackbar.LENGTH_SHORT).show();
+            selectAll();
+        }
+    }
+
+    private void setTrainY() {
+        this.dismiss();//先消失，才能实时看到变化
+        View outerView = LayoutInflater.from(mContext).inflate(R.layout.alert_train_y, null);
+        RulerView ruler = (RulerView) outerView.findViewById(R.id.ruler_view_vertical);
+        ruler.setValue(mTextFragment.getBaseY());
+        ruler.setOnValueChangeListener(new RulerView.OnValueChangeListener() {
+            @Override
+            public void onValueChange(int value) {
+                mTextFragment.setBaseY(value);
+                mTextFragment.drawText();
+            }
+        });
+        new AlertDialog.Builder(mContext)
+                .setTitle("设置垂直方向偏移量")
+                .setView(outerView)
+                .setPositiveButton("OK", null)
+                .show();
+    }
+
+    private void setTrainX() {
+        this.dismiss();//先消失，才能实时看到变化
+        View outerView = LayoutInflater.from(mContext).inflate(R.layout.alert_train_x, null);
+        RulerView ruler = (RulerView) outerView.findViewById(R.id.ruler_view_horizon);
+        ruler.setValue(mTextFragment.getBaseX());
+        ruler.setOnValueChangeListener(new RulerView.OnValueChangeListener() {
+            @Override
+            public void onValueChange(int value) {
+                mTextFragment.setBaseX(value);
+                mTextFragment.drawText();
+            }
+        });
+        new AlertDialog.Builder(mContext)
+                .setTitle("设置水平方向偏移量")
+                .setView(outerView)
+                .setPositiveButton("OK", null)
+                .show();
+    }
+
     @Override
     public void onClick(View v) {
         switch (v.getId()){
@@ -348,9 +464,10 @@ public class TextToolPopupWindow extends PopupWindow implements View.OnClickList
                 setBold();
                 break;
             case R.id.ib_fgText_setItalic:
-                Toast.makeText(mContext, "test ib_fgText_setItalic", Toast.LENGTH_SHORT).show();
+                setItalic();
                 break;
             case R.id.ib_fgText_setUnderLine:
+                setUnderLine();
                 break;
             case R.id.ib_fgText_textColorRed:
                 setTextColor(Color.RED);
@@ -377,9 +494,15 @@ public class TextToolPopupWindow extends PopupWindow implements View.OnClickList
                 setTextBgMore();
                 break;
             case R.id.ib_fgText_trainX:
+                setTrainX();
                 break;
             case R.id.ib_fgText_trainY:
+                setTrainY();
+                break;
+            case R.id.ib_fgText_selectAll:
+                selectAll();
                 break;
         }
     }
+
 }

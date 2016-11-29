@@ -3,10 +3,25 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <TextView
-        android:text="正在开发..."
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+    <cn.com.hotled.xyled.view.PhotoView
+        android:id="@+id/pv_fgImage"
+        android:background="#EEEEEE"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"/>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <ImageView
+            android:id="@+id/iv_fgImage_add"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:paddingBottom="5dp"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:src="@drawable/ic_add_white_24dp"
+            android:background="@color/colorAccent"/>
+    </RelativeLayout>
+
 </LinearLayout>
 
 

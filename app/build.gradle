@@ -39,7 +39,8 @@ dependencies {
     compile 'com.android.support:design:24.2.1'
     compile 'com.afollestad.material-dialogs:core:0.9.0.2'
     compile 'com.android.support:support-v4:24.2.1'
+    compile 'com.github.QuadFlask:colorpicker:0.0.12'
     testCompile 'junit:junit:4.12'
     apt 'com.jakewharton:butterknife-compiler:8.4.0'
-    compile 'com.github.QuadFlask:colorpicker:0.0.12'
+    compile 'com.yalantis:ucrop:2.2.0'
 }

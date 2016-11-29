@@ -1,17 +1,17 @@
 package cn.com.hotled.xyled.fragment;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
-import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -37,11 +37,12 @@ import butterknife.OnClick;
 import cn.com.hotled.xyled.R;
 import cn.com.hotled.xyled.adapter.TextButtonAdapter;
 import cn.com.hotled.xyled.bean.TextButton;
+import cn.com.hotled.xyled.ui.BrowsePhotoActivity;
 import cn.com.hotled.xyled.view.PhotoView;
 import cn.com.hotled.xyled.view.TextToolPopupWindow;
 
 
-public class TextFragment extends Fragment {
+public class TextFragment extends BaseFragment {
 
     @BindView(R.id.pv_fgText_photo)
     PhotoView photoView;
@@ -50,7 +51,7 @@ public class TextFragment extends Fragment {
     @BindView(R.id.rv_fgText_showResult)
     RecyclerView recyclerView;
     @BindView(R.id.ib_fgText_settool)
-    ImageButton ib_fgText_settool;
+    public ImageButton ib_fgText_settool;
     Button mButton;
     List<TextButton> mTextButtonList=new ArrayList<>();
     public TextButtonAdapter textButtonAdapter;
@@ -62,6 +63,10 @@ public class TextFragment extends Fragment {
     private Paint paint;
     private int RECOMAND_SIZE=26;
     private int mPosition;
+    private int mWidth;
+    private int mHeight;
+    private int mBaseX = 15;
+    private int mBaseY = 25;
 
 
     @Override
@@ -81,20 +86,37 @@ public class TextFragment extends Fragment {
         photoView.enable();
 
         //设置缩放倍数
-        photoView.setMaxScale(4);
+        photoView.setMaxScale(8);
         //获取图片信息
 //        Info info = photoView.getInfo();
 //        photoView.animaFrom(info);
 
-        Bitmap bitmap = BitmapFactory.decodeResource(getContext().getResources(), R.drawable.monitor);
-        canvas = new Canvas();
+        //使用decodeResource解析bitmap，会生成自适应手机屏幕尺寸的bitmap，mi4亲测会放大三倍
+        canvas=new Canvas();
+        //启用抗锯齿效果
+        paint = new Paint();
+        mWidth = 64;
+        // TODO: 2016/11/29 临时改为16高
+        mHeight = 32;
 
-        paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        targetBitmap = Bitmap.createBitmap(mWidth, mHeight, Bitmap.Config.ARGB_8888);
 
-        targetBitmap = bitmap.copy(bitmap.getConfig(),true);
-        canvas.setBitmap(targetBitmap);
-        photoView.setScaleType(ImageView.ScaleType.FIT_XY);
+        if (targetBitmap!=null)
+            canvas.setBitmap(targetBitmap);
+        photoView.setScaleType(ImageView.ScaleType.FIT_CENTER);
         photoView.setImageBitmap(targetBitmap);
+        photoView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getContext(), BrowsePhotoActivity.class);
+                intent.putExtra("bitmap",targetBitmap);
+                ActivityOptionsCompat options =
+                        ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity(),
+                                photoView, getString(R.string.shareNames));
+                ActivityCompat.startActivity(getActivity(), intent, options.toBundle());
+            }
+        });
+
     }
 
     private void initRecyclerView() {
@@ -157,7 +179,7 @@ public class TextFragment extends Fragment {
                     String subStr = substring.substring(i-1, i);
                     //每个字符，对应一个按钮，加入buttonlist
                     // TODO: 2016/10/31 buttonTextList 展示出来是倒叙的，最后一个放在最前面 2016/11/1 已解决
-                    TextButton tb=new TextButton(subStr,28,Color.RED,Color.WHITE,false,false,false);
+                    TextButton tb=new TextButton(subStr,RECOMAND_SIZE,Color.RED,Color.BLACK,false,false,false);
                     mTextButtonList.add(start,tb);
 
                 }
@@ -173,36 +195,161 @@ public class TextFragment extends Fragment {
 
     }
 
-    public void drawText() {
+    public void drawText(){
+        //先计算宽度
+        float drawWidth = computeWidth();
+        //如果图片比所设置的宽，则需加长
+        if (drawWidth>64) {
+            mWidth = (int) drawWidth;
+            targetBitmap = Bitmap.createBitmap(mWidth, mHeight, Bitmap.Config.ARGB_8888);
+            if (targetBitmap != null)
+                canvas.setBitmap(targetBitmap);
+            photoView.setImageBitmap(targetBitmap);
+        }
+        startDrawText(drawWidth);
+    }
+
+    public void startDrawText(float computeWidth) {
         //先擦除原来的文字
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
         canvas.drawPaint(paint);
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
         //画图
         paint.setColor(Color.RED);
-        paint.setTypeface(Typeface.MONOSPACE);
-        Rect rect=null;
-        int x=0;
-        int y=100;
+        paint.setTypeface(Typeface.DEFAULT);
+
+        int index=0;
+        //背景
+        drawBgColor(computeWidth);
+
+        int drawWidth=mBaseX;
+        float oldWidth=0;
         for(TextButton tb : mTextButtonList){
-            x+=tb.getTextSize();
+            //字体颜色
             paint.setColor(tb.getTextColor());
+            //字体大小
             paint.setTextSize(tb.getTextSize());
-            if (tb.getTypeface()!=null)
-                paint.setTypeface(Typeface.createFromFile(tb.getTypeface()));
-            else
+            if (tb.getTypeface()!=null) {
+                Typeface typeface = Typeface.createFromFile(tb.getTypeface());
+                paint.setTypeface(typeface);
+                if (tb.isbold()) {//粗体
+                    paint.setTypeface(Typeface.create(typeface,Typeface.BOLD));
+                }
+                if (tb.isIlatic()) {//斜体
+                    paint.setTypeface(Typeface.create(typeface,Typeface.ITALIC));
+                }
+                if (tb.isbold()&&tb.isIlatic()){//粗斜体
+                    paint.setTypeface(Typeface.create(typeface,Typeface.BOLD_ITALIC));
+                }
+            }
+            else {
                 paint.setTypeface(Typeface.DEFAULT);
-            rect=new Rect(x,y-tb.getTextSize(),x+tb.getTextSize(),y);
-            Paint bgPaint=new Paint(Paint.ANTI_ALIAS_FLAG);
-            bgPaint.setColor(tb.getTextBackgroudColor());
-            canvas.drawRect(rect,bgPaint);
-            canvas.drawText(tb.getText(),x,100,paint);
+
+                if (tb.isbold()) {//粗体
+                    paint.setTypeface(Typeface.create(Typeface.DEFAULT,Typeface.BOLD));
+                }
+                if (tb.isIlatic()) {//斜体
+                    paint.setTypeface(Typeface.create(Typeface.DEFAULT,Typeface.ITALIC));
+                }
+                if (tb.isbold()&&tb.isIlatic()){//粗斜体
+                    paint.setTypeface(Typeface.create(Typeface.DEFAULT,Typeface.BOLD_ITALIC));
+                }
+
+
+            }
+            if (tb.isUnderline()) {//下划线
+                paint.setUnderlineText(true);
+            }else {
+                paint.setUnderlineText(false);
+            }
+
+            paint.setTextAlign(Paint.Align.CENTER);
+            float[] widths=new float[1];
+            paint.getTextWidths(tb.getText(),widths);
+            //不再使用textSize作为间隔宽度，那样会使得英文之间的间隔太大
+
+            if (oldWidth<widths[0]&&index!=0){
+                drawWidth+=(widths[0]-oldWidth)/2;
+            }
+            oldWidth=widths[0];
+            canvas.drawText(tb.getText(), drawWidth, mBaseY,paint);
+            drawWidth+=widths[0];
+//            Log.i("textfragment", "startDrawText: index="+index+", width="+widths[0]+", mbaseX="+mBaseX+", drawWidth="+drawWidth+", oldWidth= "+oldWidth);
+            index++;
 
         }
-//        canvas.drawText(text,0,100,paint);
-        photoView.setImageBitmap(targetBitmap);
+    }
+
+    private void drawBgColor(float width) {
+        for (TextButton tb : mTextButtonList) {
+            // 背景颜色      left  top  right  bottom
+            Paint bgPaint=new Paint(Paint.ANTI_ALIAS_FLAG);
+            bgPaint.setColor(tb.getTextBackgroudColor());
+            canvas.drawRect(0,0,width,mHeight,bgPaint);
+
+        }
 
     }
+
+    private float computeWidth(){
+        int index=0;
+        float drawWidth=mBaseX;
+        float oldWidth=0;
+        for (TextButton tb : mTextButtonList) {
+            paint.setColor(tb.getTextColor());
+            //字体大小
+            paint.setTextSize(tb.getTextSize());
+            if (tb.getTypeface()!=null) {
+                Typeface typeface = Typeface.createFromFile(tb.getTypeface());
+                paint.setTypeface(typeface);
+                if (tb.isbold()) {//粗体
+                    paint.setTypeface(Typeface.create(typeface,Typeface.BOLD));
+                }
+                if (tb.isIlatic()) {//斜体
+                    paint.setTypeface(Typeface.create(typeface,Typeface.ITALIC));
+                }
+                if (tb.isbold()&&tb.isIlatic()){//粗斜体
+                    paint.setTypeface(Typeface.create(typeface,Typeface.BOLD_ITALIC));
+                }
+
+
+            }
+            else {
+                if (tb.isbold()) {//粗体
+                    paint.setTypeface(Typeface.create(Typeface.DEFAULT,Typeface.BOLD));
+                }
+                if (tb.isIlatic()) {//斜体
+                    paint.setTypeface(Typeface.create(Typeface.DEFAULT,Typeface.ITALIC));
+                }
+                if (tb.isbold()&&tb.isIlatic()){//粗斜体
+                    paint.setTypeface(Typeface.create(Typeface.DEFAULT,Typeface.BOLD_ITALIC));
+                }
+                paint.setUnderlineText(false);
+
+            }
+            if (tb.isUnderline()) {//下划线
+                paint.setUnderlineText(true);
+            }else {
+                paint.setUnderlineText(false);
+            }
+
+            paint.setTextAlign(Paint.Align.CENTER);
+            float[] widths=new float[1];
+            paint.getTextWidths(tb.getText(),widths);
+            //不再使用textSize作为间隔宽度，那样会使得英文之间的间隔太大
+
+            drawWidth+=widths[0];
+            if (oldWidth<widths[0]&&index!=0){
+                drawWidth+=(widths[0]-oldWidth)/2;
+            }
+            oldWidth=widths[0];
+//            Log.i("textfragment compute", "startDrawText: index="+index+", width="+widths[0]+", mbaseX="+mBaseX+", drawWidth="+drawWidth+", oldWidth= "+oldWidth);
+            index++;
+        }
+        return drawWidth;
+    }
+
+
 
 
     @Override
@@ -237,11 +384,32 @@ public class TextFragment extends Fragment {
         return mTextButton;
     }
 
-    public int getRECOMAND_SIZE() {
+    public int getRecomandSize() {
         return RECOMAND_SIZE;
     }
 
     public int getPosition() {
         return mPosition;
+    }
+
+    public void setBaseX(int baseX) {
+        mBaseX = baseX;
+    }
+
+    public void setBaseY(int baseY) {
+        mBaseY = baseY;
+    }
+
+    public int getBaseX() {
+        return mBaseX;
+    }
+
+    public int getBaseY() {
+        return mBaseY;
+    }
+
+    @Override
+    public Bitmap getBitmap() {
+        return targetBitmap;
     }
 }

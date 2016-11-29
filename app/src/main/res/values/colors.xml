@@ -3,6 +3,8 @@
     <color name="colorPrimary">#3dc8be</color>
     <color name="colorPrimaryDark">#1f6c67</color>
     <color name="colorAccent">#FF4081</color>
+    <color name="status_bar_color">#3dc8be</color>
+    <color name="buttonSelect">#80DEEA</color>
     <color name="maincolor_50">#f4fcfb</color>
     <color name="maincolor_100">#b9ebe8</color>
     <color name="maincolor_200">#8ddfd9</color>
@@ -17,4 +19,6 @@
     <color name="maincolor_A200">#b9ebe8</color>
     <color name="maincolor_A400">#3dc8be</color>
     <color name="maincolor_A700">#25847e</color>
+    <color name="window_background">#FFF5F5F5</color>
+    <color name="black_overlay">#66000000</color>
 </resources>

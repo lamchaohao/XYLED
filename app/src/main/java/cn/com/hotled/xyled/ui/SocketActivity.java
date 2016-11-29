@@ -1,19 +1,19 @@
 package cn.com.hotled.xyled.ui;
 
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.InetAddress;
+import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 
@@ -22,12 +22,14 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import cn.com.hotled.xyled.R;
 
-public class Socket extends AppCompatActivity {
+public class SocketActivity extends AppCompatActivity {
 
     @BindView(R.id.socket_address)
     EditText socket_address;
     @BindView(R.id.socket_port)
     EditText socket_port;
+    @BindView(R.id.socket_cmd)
+    EditText socket_cmd;
     @BindView(R.id.inputText)
     EditText inputText;
     @BindView(R.id.send)
@@ -60,36 +62,59 @@ public class Socket extends AppCompatActivity {
     class SendMessage extends Thread{
         @Override
         public void run() {
-            DatagramSocket client=null;
-            String recvStr=null;
+            Socket client=null;
             try {
-                client = new DatagramSocket();
                 String inputStr = messageText;
-                byte[] sendBuf = inputStr.getBytes();
+
                 InetAddress addr = InetAddress.getByName(socketAddress);
                 int port = Integer.parseInt(socketPort);
-                DatagramPacket sendPacket
-                        = new DatagramPacket(sendBuf ,sendBuf.length , addr , port);
-                client.send(sendPacket);
-                byte[] recvBuf = new byte[100];
-                DatagramPacket recvPacket
-                        = new DatagramPacket(recvBuf , recvBuf.length);
-                client.receive(recvPacket);
-                client.close();
 
-                recvStr = new String(recvPacket.getData() , 0 ,recvPacket.getLength());
+                client = new Socket(addr,port);
+
+                byte[] sendBuf = new byte[512];
+                byte[] readBuf = new byte[128];
+                sendBuf[0]=12;
+                sendBuf[1]=34;
+                sendBuf[2]=56;
+                sendBuf[3]=78;
+                sendBuf[4]=10;
+                //写入指令
+                String cmdStr = socket_cmd.getText().toString();
+                if (!cmdStr.equals("")){
+                    int cmdInt = Integer.parseInt(cmdStr);
+                    sendBuf[11]= (byte) cmdInt;
+                }
+                byte[] inputStrBytes = inputStr.getBytes();
+                for (int i=0,index=16;i<inputStrBytes.length;i++,index++){
+                    sendBuf[index]=inputStrBytes[i];
+                }
+                OutputStream os = client.getOutputStream();
+                InputStream is = client.getInputStream();
+
+                os.write(sendBuf);
+                is.read(readBuf);
+
                 Message msg=new Message();
                 Bundle b=new Bundle();
-                b.putString("result",recvStr);
+                String recStr = new String(readBuf,"GBK");
+                b.putString("result",recStr);
                 msg.setData(b);
                 msgHandler.sendMessage(msg);
-                Log.i("handler","can execute to here");
+                Log.i("handler-rec",recStr);
             } catch (SocketException e) {
                 e.printStackTrace();
             } catch (UnknownHostException e) {
                 e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
+            }finally {
+                if (client!=null){
+                    try {
+                        client.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
 
         }
@@ -98,11 +123,10 @@ public class Socket extends AppCompatActivity {
     class RecievMsgHandler extends Handler {
         @Override
         public void handleMessage(Message msg) {
-            Toast.makeText(Socket.this,"handleMessage...",Toast.LENGTH_LONG).show();
             Bundle data = msg.getData();
             String result = data.getString("result");
             Log.i("handle","rec"+result);
-            socket_tvShow.setText("收到 "+result);
+            socket_tvShow.setText("收到的信息 : "+result);
         }
     }
 

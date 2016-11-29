@@ -79,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
     void getNetWordId(){
         int netWordId = mWifiAdmin.getNetWordId();
         tv_state.setText(netWordId+"");
-        startActivity(new Intent(this,Socket.class));
+        startActivity(new Intent(this,SocketActivity.class));
     }
 
     @OnClick(R.id.bt_getMacAddress)

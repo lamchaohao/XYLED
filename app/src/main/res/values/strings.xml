@@ -1,13 +1,17 @@
 <resources>
-    <string name="app_name">XYLED</string>
+    <string name="app_name">新翼LED</string>
     <string name="title_activity_home">HomeActivity</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <string name="action_settings">Settings</string>
+    <string name="action_send">send</string>
     <string name="title_activity_connect_wifi">ConnectWifiActivity</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_browse_photo">Hello</string>
+    <string name="shareNames">share_startActivity</string>
+
 </resources>

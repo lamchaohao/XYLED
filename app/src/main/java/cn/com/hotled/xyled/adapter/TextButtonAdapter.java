@@ -9,7 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.FrameLayout;
-import android.widget.Toast;
 
 import java.util.List;
 
@@ -56,10 +55,12 @@ public class TextButtonAdapter extends RecyclerView.Adapter{
             tbViewHolder.button.setTypeface(Typeface.DEFAULT, Typeface.BOLD);//设置粗体
         if (textButton.isIlatic())
             tbViewHolder.button.setTypeface(Typeface.DEFAULT, Typeface.ITALIC);//设置斜体
+        if (textButton.isbold()&&textButton.isIlatic())
+            tbViewHolder.button.setTypeface(Typeface.DEFAULT, Typeface.BOLD_ITALIC);//设置粗体斜体
         if (textButton.isUnderline())
             tbViewHolder.button.getPaint().setFlags(Paint.UNDERLINE_TEXT_FLAG);//设置下划线
         if (textButton.getTypeface() != null)
-            tbViewHolder.button.setTypeface(Typeface.createFromFile(textButton.getTypeface()));
+            tbViewHolder.button.setTypeface(Typeface.createFromFile(textButton.getTypeface()));//设置字体
         if (textButton.isSelected()) {
             //选中状态
             tbViewHolder.frameLayout.setBackgroundResource(R.drawable.textbutton_selected);
@@ -111,15 +112,7 @@ public class TextButtonAdapter extends RecyclerView.Adapter{
                         }).show();
                         SELECT_MODE=true;
                     }else {
-                        Snackbar.make(tbViewHolder.button,"退出多选模式",Snackbar.LENGTH_SHORT).setAction("全选", new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                for (int i=0;i<mTextButtonList.size();i++){
-                                    mTextButtonList.get(i).setSelected(true);//全选
-                                    notifyItemChanged(i);//设置回背景
-                                }
-                            }
-                        }).show();
+                        Snackbar.make(tbViewHolder.button,"退出多选模式",Snackbar.LENGTH_SHORT).show();
                         for (int i=0;i<mTextButtonList.size();i++){
                             mTextButtonList.get(i).setSelected(false);//全部设置未未选择
                             notifyItemChanged(i);//设置回背景

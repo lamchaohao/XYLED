@@ -5,11 +5,13 @@
     android:layout_height="match_parent"
     android:id="@+id/ll_fgText"
     tools:context="cn.com.hotled.xyled.fragment.TextFragment">
+
     <cn.com.hotled.xyled.view.PhotoView
         android:id="@+id/pv_fgText_photo"
         android:layout_width="match_parent"
-        android:layout_height="180dp" />
-
+        android:layout_height="180dp"
+        android:background="#EEEEEE"
+        android:transitionName="@string/shareNames"/>
 
     <android.support.v7.widget.RecyclerView
         android:layout_weight="1"
@@ -28,27 +30,16 @@
             android:id="@+id/et_fgText_input"
             android:hint="请输入文本"
             android:maxLines="3"
+            android:layout_gravity="bottom"
             android:layout_width="0dp"
-            android:layout_height="wrap_content" />
+            android:layout_height="match_parent" />
         <ImageButton
             android:id="@+id/ib_fgText_settool"
-            android:src="@drawable/ic_settings_black_24dp"
+            android:src="@drawable/ic_palette_black_36dp"
             android:layout_gravity="center"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
      </LinearLayout>
 
-
-
-    <!--<ScrollView-->
-        <!--android:layout_weight="1"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="0dp">-->
-        <!--<LinearLayout-->
-            <!--android:orientation="vertical"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content">-->
-        <!--</LinearLayout>-->
-    <!--</ScrollView>-->
 
 </LinearLayout>

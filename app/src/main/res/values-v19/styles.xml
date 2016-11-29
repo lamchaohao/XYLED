@@ -1,0 +1,10 @@
+<resources>
+    <style name="AppTheme.NoActionBar" parent="@style/AppTheme">
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:windowIsTranslucent">true</item>
+    </style>
+    <style name="popupwin_anim">
+        <item name="android:windowEnterAnimation" >@anim/popupwindow_in</item>
+        <item name="android:windowExitAnimation">@anim/popupwindow_out</item>
+    </style>
+</resources>

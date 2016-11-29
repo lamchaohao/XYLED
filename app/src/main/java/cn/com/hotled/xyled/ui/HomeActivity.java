@@ -1,39 +1,39 @@
 package cn.com.hotled.xyled.ui;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+import android.os.Environment;
+import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.ViewPager;
-import android.view.View;
-import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Button;
+import android.view.View;
 import android.widget.EditText;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.ImageView;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
 import cn.com.hotled.xyled.R;
 import cn.com.hotled.xyled.adapter.TabFragmentAdapter;
+import cn.com.hotled.xyled.fragment.BaseFragment;
 import cn.com.hotled.xyled.fragment.ImageFragment;
 import cn.com.hotled.xyled.fragment.TextFragment;
+import cn.com.hotled.xyled.util.MoveTextUtil;
+import cn.com.hotled.xyled.util.TcpSend;
 
-public class HomeActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+public class HomeActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
 
     TabLayout tabLayout;
@@ -42,6 +42,8 @@ public class HomeActivity extends AppCompatActivity
     private TextFragment textFragment;
     private ImageFragment imageFragment;
     private List<String> titleList;
+    private ImageView mIv_shareRemote;
+    private TabFragmentAdapter mAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,7 +62,22 @@ public class HomeActivity extends AppCompatActivity
         //Toolbar----------------------------------------------
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
+        mIv_shareRemote = (ImageView) toolbar.findViewById(R.id.iv_appbar_home_shareRemote);
+        mIv_shareRemote.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                BaseFragment fragment = (BaseFragment) mAdapter.getItem(viewPager.getCurrentItem());
+                // TODO: 2016/11/29 临时改为16高
+                MoveTextUtil moveUtil =new MoveTextUtil(fragment.getBitmap(),64,32);
+                moveUtil.startGenFile();
+            }
+        });
+        findViewById(R.id.iv_itemManage_home).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(HomeActivity.this,ItemManageActivity.class));
+            }
+        });
         //DrawerLayout-------------------------------------------------------------------
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -82,8 +99,8 @@ public class HomeActivity extends AppCompatActivity
         titleList.add("文字");
         titleList.add("图片");
         viewPager= (ViewPager) findViewById(R.id.vp_home);
-        TabFragmentAdapter adapter=new TabFragmentAdapter(getSupportFragmentManager(),fragmentList,titleList);
-        viewPager.setAdapter(adapter);
+        mAdapter = new TabFragmentAdapter(getSupportFragmentManager(),fragmentList,titleList);
+        viewPager.setAdapter(mAdapter);
         //Tablayout-------------------------------------------
         tabLayout= (TabLayout) findViewById(R.id.tl_home);
         tabLayout.setupWithViewPager(viewPager,true);
@@ -134,15 +151,41 @@ public class HomeActivity extends AppCompatActivity
         } else if (id == R.id.nav_slideshow) {
 
         } else if (id == R.id.nav_manage) {
-
+            startActivity(new Intent(this,SocketActivity.class));
         } else if (id == R.id.nav_share) {
 
         } else if (id == R.id.nav_send) {
-
+            sendFile();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+
+    private void sendFile() {
+        final File file = new File(Environment.getExternalStorageDirectory()+"/amap/COLOR_01.PRG");
+        View view = LayoutInflater.from(this).inflate(R.layout.tcp_send, null);
+        final EditText et_tcpIp = (EditText) view.findViewById(R.id.et_tcpIp);
+        final EditText et_tcpPort = (EditText) view.findViewById(R.id.et_tcpPort);
+        et_tcpIp.setText("192.168.1.100");
+        et_tcpPort.setText("10010");
+        new AlertDialog.Builder(this)
+                .setTitle("设置服务器IP与端口")
+                .setView(view)
+                .setPositiveButton("发送文件", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String tcpIP = et_tcpIp.getText().toString();
+                        String tcpPort = et_tcpPort.getText().toString();
+                        TcpSend tcpSend=new TcpSend(HomeActivity.this,tcpIP,Integer.parseInt(tcpPort),file);
+                        tcpSend.send();
+                        dialog.dismiss();
+                    }
+                })
+                .setNegativeButton("cancle",null)
+                .show();
+
+    }
+
 }
