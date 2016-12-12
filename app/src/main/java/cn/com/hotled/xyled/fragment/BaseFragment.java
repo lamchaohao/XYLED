@@ -9,4 +9,6 @@ import android.support.v4.app.Fragment;
 
 public abstract class BaseFragment extends Fragment{
     public abstract Bitmap getBitmap();
+    public abstract float getFrameTime();
+    public abstract float getStayTime();
 }

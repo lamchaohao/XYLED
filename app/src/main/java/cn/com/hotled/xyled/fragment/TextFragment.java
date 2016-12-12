@@ -37,7 +37,7 @@ import butterknife.OnClick;
 import cn.com.hotled.xyled.R;
 import cn.com.hotled.xyled.adapter.TextButtonAdapter;
 import cn.com.hotled.xyled.bean.TextButton;
-import cn.com.hotled.xyled.ui.BrowsePhotoActivity;
+import cn.com.hotled.xyled.activity.BrowsePhotoActivity;
 import cn.com.hotled.xyled.view.PhotoView;
 import cn.com.hotled.xyled.view.TextToolPopupWindow;
 
@@ -67,7 +67,8 @@ public class TextFragment extends BaseFragment {
     private int mHeight;
     private int mBaseX = 15;
     private int mBaseY = 25;
-
+    private float mFrameTime;
+    private float mStayTime;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -263,7 +264,7 @@ public class TextFragment extends BaseFragment {
                 paint.setUnderlineText(false);
             }
 
-            paint.setTextAlign(Paint.Align.CENTER);
+            paint.setTextAlign(Paint.Align.LEFT);
             float[] widths=new float[1];
             paint.getTextWidths(tb.getText(),widths);
             //不再使用textSize作为间隔宽度，那样会使得英文之间的间隔太大
@@ -408,8 +409,29 @@ public class TextFragment extends BaseFragment {
         return mBaseY;
     }
 
+
+
+    public void setFrameTime(float frameTime) {
+        mFrameTime = frameTime;
+    }
+
+
+    public void setStayTime(float stayTime) {
+        mStayTime = stayTime;
+    }
+
     @Override
     public Bitmap getBitmap() {
         return targetBitmap;
+    }
+
+    @Override
+    public float getFrameTime() {
+        return mFrameTime;
+    }
+
+    @Override
+    public float getStayTime() {
+        return mStayTime;
     }
 }

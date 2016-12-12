@@ -16,37 +16,44 @@
         android:icon="@drawable/logo"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
-        <activity android:name=".ui.MainActivity"/>
-        <activity android:name=".ui.SocketActivity" android:theme="@style/AppTheme"/>
+        android:theme="@style/AppTheme.NoActionBar">
         <activity
-            android:name=".ui.HomeActivity"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="adjustResize">
+            android:name=".activity.MainActivity"
+            android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+        <activity android:name=".activity.SocketActivity"/>
         <activity
-            android:name=".ui.ConnectWifiActivity"
-            android:theme="@style/AppTheme"/>
-        <activity android:name=".ui.TypefaceListActivity"/>
-        <activity android:name=".ui.TestActivity">
+            android:name=".activity.HomeActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustResize">
         </activity>
-        <activity android:name=".ui.MoveTestActivity"/>
+        <activity android:name=".activity.ConnectWifiActivity"/>
+        <activity android:name=".activity.TypefaceListActivity"/>
+        <activity android:name=".activity.TestActivity">
+        </activity>
+        <activity android:name=".activity.MoveTestActivity"/>
         <activity
-            android:name=".ui.BrowsePhotoActivity"
+            android:name=".activity.BrowsePhotoActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:theme="@style/FullscreenTheme">
         </activity>
-        <activity android:name=".ui.ItemManageActivity">
+        <activity android:name=".activity.ItemManageActivity">
         </activity>
         <activity
             android:name="com.yalantis.ucrop.UCropActivity"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
+        <activity
+            android:name=".activity.EasyTextActivity"
+            android:windowSoftInputMode="stateHidden">
+        </activity>
+        <activity android:name=".activity.AddScreenActivity">
+        </activity>
     </application>
 
 </manifest>

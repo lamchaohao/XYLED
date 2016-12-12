@@ -18,6 +18,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.PopupWindow;
+import android.widget.SeekBar;
+import android.widget.TextView;
 
 import com.flask.colorpicker.ColorPickerView;
 import com.flask.colorpicker.OnColorSelectedListener;
@@ -47,6 +49,7 @@ public class TextToolPopupWindow extends PopupWindow implements View.OnClickList
     private ImageButton ib_setBold;
     private ImageButton ib_setItalic;
     private ImageButton ib_setUnderLine;
+    private ImageButton ib_setFrameTime;
     private ImageButton ib_RedText;
     private ImageButton ib_GreenText;
     private ImageButton ib_BlueText;
@@ -55,15 +58,17 @@ public class TextToolPopupWindow extends PopupWindow implements View.OnClickList
     private ImageButton ib_GreenTextBg;
     private ImageButton ib_BlueTextBg;
     private ImageButton ib_MoreTextBg;
-
-    private Context mContext;
     private ImageButton ib_trainX;
     private ImageButton ib_trainY;
+    private ImageButton mIb_selectAll;
+
+    private Context mContext;
+
     private List<TextButton> mTextButtonList;
     private TextFragment mTextFragment;
     private TypefaceAdapter typefaceAdapter;
     private File typeFile;
-    private ImageButton mIb_selectAll;
+
 
     public TextToolPopupWindow(Context context, List<TextButton> textButtons, TextFragment textFragment) {
         super(context);
@@ -93,6 +98,7 @@ public class TextToolPopupWindow extends PopupWindow implements View.OnClickList
         ib_setBold= (ImageButton) inflate.findViewById(R.id.ib_fgText_setBold);
         ib_setItalic= (ImageButton) inflate.findViewById(R.id.ib_fgText_setItalic);
         ib_setUnderLine= (ImageButton) inflate.findViewById(R.id.ib_fgText_setUnderLine);
+        ib_setFrameTime= (ImageButton) inflate.findViewById(R.id.ib_fgText_setFrameTime);
         ib_RedText= (ImageButton) inflate.findViewById(R.id.ib_fgText_textColorRed);
         ib_GreenText= (ImageButton) inflate.findViewById(R.id.ib_fgText_textColorGreen);
         ib_BlueText= (ImageButton) inflate.findViewById(R.id.ib_fgText_textColorBlue);
@@ -110,6 +116,7 @@ public class TextToolPopupWindow extends PopupWindow implements View.OnClickList
         ib_setBold.setOnClickListener(this);
         ib_setItalic.setOnClickListener(this);
         ib_setUnderLine.setOnClickListener(this);
+        ib_setFrameTime.setOnClickListener(this);
         ib_RedText.setOnClickListener(this);
         ib_GreenText.setOnClickListener(this);
         ib_BlueText.setOnClickListener(this);
@@ -180,6 +187,69 @@ public class TextToolPopupWindow extends PopupWindow implements View.OnClickList
 
         }
         mTextFragment.drawText();
+    }
+
+    private void setFrameTime() {
+        View view = LayoutInflater.from(mContext).inflate(R.layout.content_setframetime, null);
+        SeekBar sb_speed = (SeekBar) view.findViewById(R.id.sb_frameTime_speed);
+        final TextView tv_speed = (TextView) view.findViewById(R.id.tv_frameTime_speed);
+        SeekBar sb_stay = (SeekBar) view.findViewById(R.id.sb_frameTime_stayTime);
+        final TextView tv_stayTime = (TextView) view.findViewById(R.id.tv_frameTime_stayTime);
+        final float[] frameTime = {0};
+        final float[] stayTime = {0};
+
+        sb_speed.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                    int i = (progress * 20);
+                    tv_speed.setText("速度:"+i+"ms/帧");
+                    frameTime[0] = (float) (progress*2.56);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+        sb_stay.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                    int i = progress*20;
+                    tv_stayTime.setText("停留时间:"+i+"ms");
+                    stayTime[0] = (float) (progress*2.56);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+        sb_speed.setProgress((int) (mTextFragment.getFrameTime()/2.56));
+        sb_stay.setProgress((int) (mTextFragment.getStayTime()/2.56));
+
+        new AlertDialog.Builder(mContext)
+                .setTitle("设置时间")
+                .setView(view)
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        mTextFragment.setFrameTime(frameTime[0]);
+                        mTextFragment.setStayTime(stayTime[0]);
+                    }
+                })
+                .show();
+
     }
 
     private void setTextColor(int color){
@@ -469,6 +539,9 @@ public class TextToolPopupWindow extends PopupWindow implements View.OnClickList
             case R.id.ib_fgText_setUnderLine:
                 setUnderLine();
                 break;
+            case R.id.ib_fgText_setFrameTime:
+                setFrameTime();
+                break;
             case R.id.ib_fgText_textColorRed:
                 setTextColor(Color.RED);
                 break;
@@ -504,5 +577,7 @@ public class TextToolPopupWindow extends PopupWindow implements View.OnClickList
                 break;
         }
     }
+
+
 
 }

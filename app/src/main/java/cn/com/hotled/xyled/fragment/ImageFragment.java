@@ -108,6 +108,16 @@ public class ImageFragment extends BaseFragment {
         return mBitmap;
     }
 
+    @Override
+    public float getFrameTime() {
+        return 0;
+    }
+
+    @Override
+    public float getStayTime() {
+        return 0;
+    }
+
 
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name

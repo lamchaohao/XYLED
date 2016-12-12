@@ -72,7 +72,13 @@
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent" />
 
-
+                    <ImageButton
+                        android:id="@+id/ib_fgText_setFrameTime"
+                        android:padding="10dp"
+                        android:background="@drawable/recycler_bg"
+                        android:src="@drawable/ic_access_time_black_48dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent" />
 
             </LinearLayout>
         <LinearLayout

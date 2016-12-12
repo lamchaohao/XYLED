@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="cn.com.hotled.xyled.ui.ConnectWifiActivity">
+    tools:context="cn.com.hotled.xyled.activity.ConnectWifiActivity">
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/rcv_connw_show"

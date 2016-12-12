@@ -9,7 +9,7 @@
     android:fitsSystemWindows="true"
     android:clipToPadding="true"
               android:background="#C5E1A5"
-    tools:context="cn.com.hotled.xyled.ui.SocketActivity">
+    tools:context="cn.com.hotled.xyled.activity.SocketActivity">
 
     <EditText
         android:id="@+id/socket_address"

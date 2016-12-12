@@ -1,8 +1,12 @@
 package cn.com.hotled.xyled.util;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -44,7 +48,9 @@ public class MoveTextUtil {
     private byte[] mTextContent;
     private Bitmap mBitmap;
 
-    private byte frameTime;
+    private byte mFrameTime;
+    private byte mStayTime;
+
     private byte picStyle;
 
     private List<byte[]> mTimeAxisList;
@@ -54,12 +60,25 @@ public class MoveTextUtil {
     private int mScreenHeight;
     private byte[] mBlackBG;
     private int mFrameCount;
+    private Context mContext;
+    private Handler genFileHandler ;
 
-
-    public MoveTextUtil(Bitmap bitmap,int screenWidth,int screenHeight) {
+    public MoveTextUtil(Context context,Bitmap bitmap, int screenWidth, int screenHeight, float frameTime, float stayTime) {
+        mContext=context;
         mBitmap = bitmap;
         mScreenWidth=screenWidth;
         mScreenHeight=screenHeight;
+        mFrameTime= (byte) frameTime;
+        mStayTime= (byte) stayTime;
+        genFileHandler = new Handler(){
+            @Override
+            public void handleMessage(Message msg) {
+                if (msg.arg1==100){
+                    Toast.makeText(mContext, "此节目文件已生成", Toast.LENGTH_SHORT).show();
+                }
+            }
+        };
+
     }
     private void initFileHead() {
         fileHeadLength=4;
@@ -108,6 +127,11 @@ public class MoveTextUtil {
                 i++;
             }
         }
+        compress(mTextContent);
+    }
+
+    private void compress(byte[] content){
+
     }
 
 
@@ -121,7 +145,6 @@ public class MoveTextUtil {
             for (int j = 0; j < mScreenHeight; j++) {
                 mBlackBG[index]=12;//
                 index++;
-                Log.i("move","initBlackBG_index="+index);//initBlackBG_index=2048
             }
         }
     }
@@ -156,13 +179,12 @@ public class MoveTextUtil {
         int attrStartAddress=mHeadBytes.length+mFileHeadPart.length+mItemPart.length-4096;
         //文字地址
         int textContentAddressInt=mHeadBytes.length+mFileHeadPart.length+mItemPart.length+mTextAttrs.length+mBlackBG.length-4096;
-        frameTime = 40;
         picStyle= 1;//1BIT地址指向(0=图层,1=跳转地址),7BIT未用
         Log.i("move","frameCount=="+mFrameCount+"bitmap.getwidth=="+mBitmap.getWidth());
         for (int i = 0; i<mFrameCount; i++){
             byte[] timeAxis=new byte[16];
             //时间
-            timeAxis[0]=frameTime;
+            timeAxis[0]=mFrameTime;
             timeAxis[1] = picStyle;
             //字属性地址
 
@@ -314,6 +336,9 @@ public class MoveTextUtil {
             }
             fos.flush();
             Log.i("move","genfile done--------------------------------");
+            Message msg= new Message();
+            msg.arg1=100;
+            genFileHandler.sendMessage(msg);
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();

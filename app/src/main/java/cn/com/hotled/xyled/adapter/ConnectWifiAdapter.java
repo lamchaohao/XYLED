@@ -1,12 +1,7 @@
 package cn.com.hotled.xyled.adapter;
 
-import android.content.Context;
-import android.net.NetworkInfo;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiInfo;
-import android.net.wifi.WifiManager;
-import android.os.Handler;
-import android.os.Message;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
@@ -17,7 +12,7 @@ import android.widget.TextView;
 import java.util.List;
 
 import cn.com.hotled.xyled.R;
-import cn.com.hotled.xyled.ui.ConnectWifiActivity;
+import cn.com.hotled.xyled.activity.ConnectWifiActivity;
 import cn.com.hotled.xyled.util.WifiAdmin;
 
 /**
