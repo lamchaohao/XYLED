@@ -131,18 +131,18 @@ public class TextFragment extends BaseFragment {
                     //多选模式
                     if (mTextButtonList.get(position).isSelected()){
                         //如果是已选，则改为未选
-                        mTextButtonList.get(position).setSelected(false);
+                        mTextButtonList.get(position).setIsSelected(false);
                     }else {
-                        mTextButtonList.get(position).setSelected(true);
+                        mTextButtonList.get(position).setIsSelected(true);
                     }
                 }else {
                     //单选模式
                     if (mTextButton!=null)
-                        mTextButton.setSelected(false);//把之前选中的取消选中
+                        mTextButton.setIsSelected(false);//把之前选中的取消选中
                     mButton= (Button) view;
                     mPosition = position;
                     mTextButton = mTextButtonList.get(position);
-                    mTextButton.setSelected(true);
+                    mTextButton.setIsSelected(true);
                 }
             }
 

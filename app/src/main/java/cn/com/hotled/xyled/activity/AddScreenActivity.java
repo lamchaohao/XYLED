@@ -8,6 +8,7 @@ import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputEditText;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
@@ -19,10 +20,12 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import cn.com.hotled.xyled.App;
 import cn.com.hotled.xyled.R;
 import cn.com.hotled.xyled.adapter.CardSeriesAdapter;
 import cn.com.hotled.xyled.bean.LedCard;
 import cn.com.hotled.xyled.bean.LedScreen;
+import cn.com.hotled.xyled.dao.DaoSession;
 
 public class AddScreenActivity extends BaseActivity {
 
@@ -108,10 +111,20 @@ public class AddScreenActivity extends BaseActivity {
             return;
         }
 
-        LedScreen screen=new LedScreen(screenName,Integer.parseInt(widthStr),Integer.parseInt(heightStr),tvCardName.getText().toString(),null);
+        LedScreen screen=new LedScreen(screenName,Integer.parseInt(widthStr),Integer.parseInt(heightStr),tvCardName.getText().toString(),address);
+
+        DaoSession daoSession = ((App) getApplication()).getDaoSession();
+        daoSession.getLedScreenDao().insert(screen);
+
         Intent intent = new Intent();
         intent.putExtra("screen",screen);
         setResult(RESULT_OK,intent);
         onBackPressed();
+    }
+
+    @Override
+    public void onCreateCustomToolBar(Toolbar toolbar) {
+        super.onCreateCustomToolBar(toolbar);
+        toolbar.setTitle("增加屏幕");
     }
 }

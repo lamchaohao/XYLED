@@ -2,7 +2,6 @@ package cn.com.hotled.xyled.adapter;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,7 +14,7 @@ import java.util.List;
 
 import cn.com.hotled.xyled.R;
 import cn.com.hotled.xyled.bean.LedScreen;
-import cn.com.hotled.xyled.bean.Program;
+import cn.com.hotled.xyled.bean.ProgramType;
 
 /**
  * Created by Lam on 2016/12/2.
@@ -50,7 +49,6 @@ public class ScreenAdapter extends RecyclerView.Adapter {
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, final int position) {
-        Log.i("onBindViewHolder()","position=="+position);
         int itemViewType = getItemViewType(position);
         ScreenViewHolder viewHolder= (ScreenViewHolder) holder;
         switch (itemViewType){
@@ -59,13 +57,14 @@ public class ScreenAdapter extends RecyclerView.Adapter {
                 viewHolder.screenNameView.setText(mScreenList.get(getScreenPosition(position)).getScreenName());
                 viewHolder.sizeView.setText(mScreenList.get(getScreenPosition(position)).getWidth()+"x"+mScreenList.get(getScreenPosition(position)).getHeight());
                 viewHolder.cardView.setText(mScreenList.get(getScreenPosition(position)).getCardName());
+                viewHolder.locationView.setText(mScreenList.get(getScreenPosition(position)).getLocation());
                 break;
             case PROGRAM_TYPE:
                 viewHolder.screenParent.setVisibility(View.GONE);
-                Program.ProgramType programType = mScreenList.get(getScreenPosition(position)).getProgramList().get(getProgramPosition(position)).getProgramType();
-                if (programType== Program.ProgramType.Text)
+                ProgramType programType = mScreenList.get(getScreenPosition(position)).getProgramList().get(getProgramPosition(position)).getProgramType();
+                if (programType== ProgramType.Text)
                     viewHolder.progmIcon.setImageResource(R.drawable.ic_text_fields_green_600_36dp);
-                else if (programType== Program.ProgramType.Pic)
+                else if (programType== ProgramType.Pic)
                     viewHolder.progmIcon.setImageResource(R.drawable.ic_photo_deep_orange_500_36dp);
                 viewHolder.textView.setText(mScreenList.get(getScreenPosition(position)).getProgramList().get(getProgramPosition(position)).getProgramName());
                 break;
@@ -74,7 +73,7 @@ public class ScreenAdapter extends RecyclerView.Adapter {
             viewHolder.viewParent.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mOnItemClickListener.onClick(v,position,mScreenTypePositionList.contains(position));
+                    mOnItemClickListener.onClick(v,position,mScreenTypePositionList.contains(position),getScreenPosition(position),getProgramPosition(position));
                 }
             });
         }
@@ -120,7 +119,6 @@ public class ScreenAdapter extends RecyclerView.Adapter {
 
         int index=0;
         int itemCount=0;
-        Log.i("getItemCount()","isDataSetChanged=="+isDataSetChanged);
         if (isDataSetChanged) {
             mScreenTypePositionList.clear();
             for (LedScreen ledScreen : mScreenList) {
@@ -146,8 +144,6 @@ public class ScreenAdapter extends RecyclerView.Adapter {
             }
             isDataSetChanged=false;
         }
-        Log.i("getItemCount()","itemcount=="+itemCount);
-        Log.i("getItemCount()","mScreenTypePositionList=="+mScreenTypePositionList.toString());
         return itemCount;
     }
 
@@ -172,6 +168,7 @@ public class ScreenAdapter extends RecyclerView.Adapter {
         TextView screenNameView;
         TextView sizeView;
         TextView cardView;
+        TextView locationView;
         ImageView progmIcon;
         TextView textView;
         LinearLayout screenParent;
@@ -183,6 +180,7 @@ public class ScreenAdapter extends RecyclerView.Adapter {
             programParent= (LinearLayout) itemView.findViewById(R.id.ll_contentScreen_program);
             icon= (ImageView) itemView.findViewById(R.id.iv_screenCatag_screen);
             screenNameView = (TextView) itemView.findViewById(R.id.tv_screenCatag_name);
+            locationView = (TextView) itemView.findViewById(R.id.tv_screenCatag_location);
             sizeView = (TextView) itemView.findViewById(R.id.tv_screenCatag_size);
             cardView = (TextView) itemView.findViewById(R.id.tv_screenCatag_card);
             progmIcon = (ImageView) itemView.findViewById(R.id.iv_screenProgm_program);
@@ -197,7 +195,7 @@ public class ScreenAdapter extends RecyclerView.Adapter {
     }
 
     public interface OnItemClickListener{
-        void onClick(View v,int position,boolean isScreenParent);
+        void onClick(View v,int position,boolean isScreenParent,int screenPosition,int programPosition);
     }
 
     public interface OnItemLongClickListener{

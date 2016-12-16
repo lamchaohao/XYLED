@@ -156,13 +156,13 @@ public class TextToolPopupWindow extends PopupWindow implements View.OnClickList
             //多选
             for (TextButton tb:mTextButtonList){
                 if (tb.isSelected())
-                    tb.setIlatic(!tb.isIlatic());
+                    tb.setIsIlatic(!tb.isIlatic());
             }
             mTextFragment.textButtonAdapter.notifyDataSetChanged();
         }else {
             //单选
             if (mTextFragment.getmTextButton()!=null){
-                mTextFragment.getmTextButton().setIlatic(!mTextFragment.getmTextButton().isIlatic());
+                mTextFragment.getmTextButton().setIsIlatic(!mTextFragment.getmTextButton().isIlatic());
                 mTextFragment.textButtonAdapter.notifyItemChanged(mTextFragment.getPosition());
             }
 
@@ -175,13 +175,13 @@ public class TextToolPopupWindow extends PopupWindow implements View.OnClickList
             //多选
             for (TextButton tb:mTextButtonList){
                 if (tb.isSelected())
-                    tb.setUnderline(!tb.isUnderline());
+                    tb.setIsUnderline(!tb.isUnderline());
             }
             mTextFragment.textButtonAdapter.notifyDataSetChanged();
         }else {
             //单选
             if (mTextFragment.getmTextButton()!=null){
-                mTextFragment.getmTextButton().setUnderline(!mTextFragment.getmTextButton().isUnderline());
+                mTextFragment.getmTextButton().setIsUnderline(!mTextFragment.getmTextButton().isUnderline());
                 mTextFragment.textButtonAdapter.notifyItemChanged(mTextFragment.getPosition());
             }
 
@@ -462,7 +462,7 @@ public class TextToolPopupWindow extends PopupWindow implements View.OnClickList
             for (TextButton textButton : mTextButtonList) {
                 count++;
                 if (!textButton.isSelected()) {
-                    textButton.setSelected(true);
+                    textButton.setIsSelected(true);
                     mTextFragment.textButtonAdapter.notifyItemChanged(count);
                 }else {
                     //计算已经选择的个数
@@ -472,7 +472,7 @@ public class TextToolPopupWindow extends PopupWindow implements View.OnClickList
             if (selectedItemCount==mTextButtonList.size()){
                 //如果已经全选，则全不选
                 for (TextButton tb : mTextButtonList) {
-                    tb.setSelected(false);
+                    tb.setIsSelected(false);
                 }
                 mTextFragment.textButtonAdapter.notifyDataSetChanged();
             }

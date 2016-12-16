@@ -47,11 +47,6 @@ public class CompressAlgorithm {
                 lastPoint=content[index];
                 index++;
             }
-            if (x>=0&&x<=13){
-                for (int i = 0; i < colPixelList.size(); i++) {
-                    System.out.println("x="+x+",colPixelList.get("+i+")"+colPixelList.get(i));
-                }
-            }
             colByteCount[x]=(byte) colPixelList.size();//每一列的有多少个字节
             for (int i = 0; i < colPixelList.size(); i++) {
                 compressContentList.add(colPixelList.get(i));
@@ -61,7 +56,6 @@ public class CompressAlgorithm {
         for (int i = 0; i < colByteCount.length; i++) {
             System.out.print(colByteCount[i]+" ");
         }
-        System.out.println("colByteCount.length== "+colByteCount.length);
         return compressContentList;
     }
 
@@ -73,28 +67,24 @@ public class CompressAlgorithm {
                 break;
             case 1:
                 colPixelList.add(lastPoint);
-                System.out.println("x=="+x+",y=="+y+",case 1 用了--00--compress, sameCount=="+sameCount+",content[index]="+content[index]);
                 break;
             case 2:
                     byte twoSame = lastPoint;
                     twoSame+=64;//使用高二位压缩,01xxxxxx==64
                     colPixelList.add(twoSame);
                     lastCompressStyle=64;
-                    System.out.println("x=="+x+",y=="+y+",case 2 用了--01--compress, sameCount=="+sameCount+",lastPoint="+lastPoint+",twoSame="+twoSame);
                 break;
             case 3:
                     byte threeSame = lastPoint;
                     threeSame+=128;//使用高二位压缩,10xxxxxx==128
                     colPixelList.add(threeSame);
                     lastCompressStyle=128;
-                    System.out.println("x=="+x+",y=="+y+",case 3 用了--10--compress, sameCount=="+sameCount+",lastPoint="+lastPoint+",threeSame="+threeSame);
                 break;
             case 4:
                 byte fourSame = lastPoint;
                 fourSame+=192;//使用高二位压缩,11xxxxxx==192
                 colPixelList.add(fourSame);
                 lastCompressStyle=192;
-                System.out.println("x=="+x+",y=="+y+",case 4 用了--11--compress, sameCount=="+sameCount+",lastPoint="+lastPoint+",fourSame="+fourSame);
                 break;
             case 5:
                 colPixelList.add(lastPoint);//先加一颗，剩下四颗进行压缩
@@ -102,7 +92,6 @@ public class CompressAlgorithm {
                 fiveSame+=192;//使用00xxxxxx+11xxxxxx压缩,11xxxxxx==192
                 colPixelList.add(fiveSame);
                 lastCompressStyle=192;
-                System.out.println("x=="+x+",y=="+y+",case 5 用了--11--compress, sameCount=="+sameCount+",lastPoint="+lastPoint+",fiveSame="+fiveSame);
                 break;
             case 6:
                 byte sixFirstPart = lastPoint;
@@ -112,7 +101,6 @@ public class CompressAlgorithm {
                 sixSecondPart+=192;//使用01xxxxxx+11xxxxxx压缩,11xxxxxx==192
                 colPixelList.add(sixSecondPart);
                 lastCompressStyle=192;
-                System.out.println("x=="+x+",y=="+y+",case 6用了--11--compress, sameCount=="+sameCount+",lastPoint="+lastPoint+",sixSecondPart="+sixSecondPart);
                 break;
             case 7:
                 byte sevenFirstPart = lastPoint;
@@ -122,7 +110,6 @@ public class CompressAlgorithm {
                 sevenSecondPart+=192;//使用10xxxxxx+11xxxxxx压缩,11xxxxxx==192
                 colPixelList.add(sevenSecondPart);
                 lastCompressStyle=192;
-                System.out.println("x=="+x+",y=="+y+",case 7 用了--11--compress, sameCount=="+sameCount+",lastPoint="+lastPoint+",sevenSecondPart="+sevenSecondPart);
                 break;
             case 8 :
                 byte eightFirstPart = lastPoint;
@@ -132,7 +119,6 @@ public class CompressAlgorithm {
                 eightSecondPart+=192;//使用11xxxxxx+11xxxxxx压缩,11xxxxxx==192
                 colPixelList.add(eightSecondPart);
                 lastCompressStyle=192;
-                System.out.println("x=="+x+",y=="+y+",case 8 用了--11--compress, sameCount=="+sameCount+",lastPoint="+lastPoint+",eightFirstPart="+eightFirstPart+".eightSecondPart="+eightSecondPart);
                 break;
             default:
                 if (sameCount>=9&&sameCount<=263) {
@@ -143,7 +129,6 @@ public class CompressAlgorithm {
                     //连续两次都为01xxxxxx，后一个byte代表后面还有多少个相同的颜色
                     byte nineMoreSecondPart = (byte) (sameCount-4-4);
                     colPixelList.add(nineMoreSecondPart);
-                    System.out.println("x=="+x+",y=="+y+",case default 用了--01--compress, sameCount=="+sameCount+",lastPoint="+lastPoint+",nineMoreSecondPart"+nineMoreSecondPart);
                 }else if (sameCount>=264) {
                     byte moreMoreFirstPart = lastPoint;
                     moreMoreFirstPart+=128;
@@ -152,7 +137,6 @@ public class CompressAlgorithm {
                     //连续两次都为01xxxxxx，后一个byte代表后面还有多少个相同的颜色
                     byte moreMoreSecondPart = (byte) (sameCount-6-258);
                     colPixelList.add(moreMoreSecondPart);
-                    System.out.println("x=="+x+",y=="+y+",case 264 用了--01--compress, sameCount=="+sameCount+",lastPoint="+lastPoint);
                 }
                 lastCompressStyle=0;
                 break;

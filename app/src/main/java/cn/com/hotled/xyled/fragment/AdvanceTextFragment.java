@@ -516,7 +516,7 @@ public class AdvanceTextFragment extends BaseFragment implements View.OnClickLis
     private void setUnderLine() {
         isUnderLine=!isUnderLine;
         for (TextButton tb:mTextButtonList){
-            tb.setUnderline(isUnderLine);
+            tb.setIsUnderline(isUnderLine);
         }
         drawText();
     }
@@ -524,7 +524,7 @@ public class AdvanceTextFragment extends BaseFragment implements View.OnClickLis
     private void setItalic() {
         isItalic=!isItalic;
         for (TextButton tb:mTextButtonList){
-            tb.setIlatic(isItalic);
+            tb.setIsIlatic(isItalic);
         }
         drawText();
     }

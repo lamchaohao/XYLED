@@ -1,12 +1,10 @@
 package cn.com.hotled.xyled.activity;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -18,7 +16,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import cn.com.hotled.xyled.R;
 import cn.com.hotled.xyled.adapter.MainFragmentAdapter;
-import cn.com.hotled.xyled.bean.LedScreen;
 import cn.com.hotled.xyled.fragment.MoreFragment;
 import cn.com.hotled.xyled.fragment.ScreenFragment;
 import cn.com.hotled.xyled.fragment.SettingFragment;
@@ -64,14 +61,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void initToolbar() {
         Toolbar mToolbar = (Toolbar) findViewById(R.id.toolbar_main);
-        final ImageView ivAdd = (ImageView) mToolbar.findViewById(R.id.iv_toolbar_add);
+        ImageView ivAdd = (ImageView) mToolbar.findViewById(R.id.iv_toolbar_add);
         mToolbarTitle = (TextView) mToolbar.findViewById(R.id.tv_toolbar_title);
-        ivAdd.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivityForResult(new Intent(MainActivity.this,AddScreenActivity.class),ADD_SCREEN_CODE);
-            }
-        });
         mToolbarTitle.setText("显示屏");
         setSupportActionBar(mToolbar);
     }
@@ -160,13 +151,5 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         tvMore.setTextColor(getResources().getColor(R.color.textSecondary));
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Log.i("result","requestCode"+requestCode+",resultCode=="+resultCode);
-        if (resultCode==RESULT_OK&&requestCode==ADD_SCREEN_CODE){
-            LedScreen screen = data.getParcelableExtra("screen");
-            Log.i("result",screen.toString());
-            mScreenFragment.addScreen(screen);
-        }
-    }
+
 }

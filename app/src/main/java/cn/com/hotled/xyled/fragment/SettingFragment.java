@@ -44,7 +44,7 @@ public class SettingFragment extends Fragment {
         View view = LayoutInflater.from(getContext()).inflate(R.layout.tcp_send, null);
         final EditText et_tcpIp = (EditText) view.findViewById(R.id.et_tcpIp);
         final EditText et_tcpPort = (EditText) view.findViewById(R.id.et_tcpPort);
-        et_tcpIp.setText("192.168.1.100");
+        et_tcpIp.setText("192.168.1.101");
         et_tcpPort.setText("10010");
         new AlertDialog.Builder(getContext())
                 .setTitle("设置服务器IP与端口")

@@ -31,6 +31,10 @@ buildscript {
         classpath 'org.greenrobot:greendao-gradle-plugin:3.2.1'
     }
 }
+greendao {
+    targetGenDir 'src/main/java/'
+    daoPackage 'cn.com.hotled.xyled.dao'
+}
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
@@ -47,4 +51,6 @@ dependencies {
     apt 'com.jakewharton:butterknife-compiler:8.4.0'
     compile 'com.yalantis:ucrop:2.2.0'
     compile 'org.greenrobot:greendao:3.2.0'
+    compile 'com.github.clans:fab:1.6.3'
+    compile 'com.android.support:cardview-v7:24.2.1'
 }

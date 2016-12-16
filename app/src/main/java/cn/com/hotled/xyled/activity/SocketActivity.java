@@ -59,6 +59,7 @@ public class SocketActivity extends BaseActivity {
         new SendMessage().start();
     }
 
+
     class SendMessage extends Thread{
         @Override
         public void run() {

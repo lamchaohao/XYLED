@@ -33,7 +33,6 @@ public class TcpSend {
         @Override
         public void handleMessage(Message msg) {
             int arg1 = msg.arg1;
-            Log.i("handler","arg1=="+arg1);
             mProgressBar.setProgress(arg1);
         }
     };
@@ -98,7 +97,7 @@ public class TcpSend {
                 float sumProgress = (progress / fileLength)*100;
                 Message msg=mHandler.obtainMessage();
                 msg.arg1= (int) sumProgress;
-                Log.i("sendFile","msg.arg1=="+msg.arg1+",sumProgress=="+sumProgress);
+
                 mHandler.sendMessage(msg);
             }
             Log.i("tcpSend","send file done");

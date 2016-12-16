@@ -104,7 +104,7 @@ public class ConnectWifiActivity extends BaseActivity {
                     }
                 }
                 if (isAdd){
-                    if (tempList.get(i).SSID!=null||tempList.get(i).SSID.equals(""))//防止有无名称的WiFi加入进来
+                    if (tempList.get(i).SSID!=null||!tempList.get(i).SSID.equals(""))//防止有无名称的WiFi加入进来
                     mWifiList.add(tempList.get(i));
                 }
             }
@@ -240,4 +240,5 @@ public class ConnectWifiActivity extends BaseActivity {
         super.onDestroy();
         unregisterReceiver(wifiStateReceiver);
     }
+
 }

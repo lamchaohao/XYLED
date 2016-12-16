@@ -64,14 +64,13 @@ public class MoveTextCompressUtil {
     private Handler genFileHandler ;
     private byte[] mColByteCount;
 
-    public MoveTextCompressUtil(Context context, Bitmap bitmap, int screenWidth, int screenHeight, float frameTime, float stayTime,int frameCount) {
+    public MoveTextCompressUtil(Context context, Bitmap bitmap, int screenWidth, int screenHeight, float frameTime, float stayTime) {
         mContext=context;
         mBitmap = bitmap;
         mScreenWidth=screenWidth;
         mScreenHeight=screenHeight;
         mFrameTime= (byte) frameTime;
         mStayTime= (byte) stayTime;
-        mFrameCount=frameCount;
         genFileHandler = new Handler(){
             @Override
             public void handleMessage(Message msg) {
@@ -146,7 +145,7 @@ public class MoveTextCompressUtil {
 
     private void initItemPart() {
         //帧数是图片的宽度加上后面张与屏宽一致的黑色图片
-//        mFrameCount = mBitmap.getWidth();
+        mFrameCount = mBitmap.getWidth();
         byte[] frameCountByte = intToByteArray(mFrameCount, 2);
         setInbyteArray(1,frameCountByte,mItemPart);
         int timeAxisAddress=mHeadBytes.length+mFileHeadPart.length+mItemPart.length+mTextAttrs.length+mBlackBG.length+mTextContent.length+mBlackBG.length-4096;

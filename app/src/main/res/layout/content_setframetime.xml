@@ -36,21 +36,5 @@
         android:padding="10dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <EditText
-            android:layout_weight="1"
-            android:id="@+id/et_frameTime_frameCount"
-            android:hint="请输入指定帧数"
-            android:inputType="number"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"/>
-        <Button
-            android:id="@+id/bt_frameTime_getCount"
-            android:text="确定"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-    </LinearLayout>
 
 </LinearLayout>

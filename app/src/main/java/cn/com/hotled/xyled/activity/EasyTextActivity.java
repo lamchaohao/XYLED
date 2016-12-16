@@ -12,12 +12,14 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Gravity;
@@ -31,6 +33,8 @@ import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.afollestad.materialdialogs.DialogAction;
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.flask.colorpicker.ColorPickerView;
 import com.flask.colorpicker.OnColorSelectedListener;
 import com.flask.colorpicker.builder.ColorPickerClickListener;
@@ -43,10 +47,14 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import cn.com.hotled.xyled.App;
 import cn.com.hotled.xyled.R;
 import cn.com.hotled.xyled.adapter.TypefaceAdapter;
+import cn.com.hotled.xyled.bean.Program;
 import cn.com.hotled.xyled.bean.TextButton;
 import cn.com.hotled.xyled.bean.TypefaceFile;
+import cn.com.hotled.xyled.dao.ProgramDao;
+import cn.com.hotled.xyled.dao.TextButtonDao;
 import cn.com.hotled.xyled.decoration.WifiItemDecoration;
 import cn.com.hotled.xyled.util.DensityUtil;
 import cn.com.hotled.xyled.util.MoveTextCompressUtil;
@@ -112,7 +120,15 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
     private File mTypeFile;
     private float mFrameTime;
     private float mStayTime;
-    private int mFrameCount;
+    private long mProgramId;
+    private TextButtonDao mTextButtonDao;
+    private boolean isTextChanged;
+    private boolean isLoadData;
+    private List<TextButton> mOldTextButtonList;
+    private ProgramDao mProgramDao;
+    private Program mProgram;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -121,6 +137,48 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
         initPhotoView();
         initOnclickEven();
         initEditText();
+        loadData();
+    }
+
+    private void loadData() {
+        mProgramId = getIntent().getLongExtra("programId", -1);
+        mTextButtonDao = ((App) getApplication()).getDaoSession().getTextButtonDao();
+        mProgramDao = ((App) getApplication()).getDaoSession().getProgramDao();
+        if (mProgramId!=-1){
+            isLoadData=true;
+            mTextButtonList = mTextButtonDao.queryBuilder().where(TextButtonDao.Properties.ProgramId.eq(mProgramId)).list();
+            mOldTextButtonList = mTextButtonDao.queryBuilder().where(TextButtonDao.Properties.ProgramId.eq(mProgramId)).list();
+
+            mProgram = mProgramDao.queryBuilder().where(ProgramDao.Properties.Id.eq(mProgramId)).list().get(0);
+            if (mProgram.getBaseX()!=0)
+                mBaseX = mProgram.getBaseX();
+            if (mProgram.getBaseY()!=0)
+                mBaseY =mProgram.getBaseY();
+            mFrameTime=mProgram.getFrameTime();
+            mStayTime = mProgram.getStayTime();
+            if (mTextButtonList==null||mTextButtonList.size()==0){
+                mTextButtonList = new ArrayList<>();
+            }
+            StringBuilder sb=new StringBuilder();
+            for (int i = 0; i < mTextButtonList.size(); i++) {
+                if (i==mTextButtonList.size()-1){
+                    TextButton textButton = mTextButtonList.get(0);
+                    mTextBgColor=textButton.getTextBackgroudColor();
+                    mTextColor=textButton.getTextColor();
+                    mTextSize = textButton.getTextSize();
+                    isUnderLine = textButton.getIsUnderline();
+                    isItalic = textButton.getIsIlatic();
+                    isBold = textButton.getIsbold();
+                    mTypeFile = textButton.getTypeface();
+                }
+                sb.append(mTextButtonList.get(i).getText());
+            }
+
+            mEt_input.setText(sb.toString());
+
+            drawText();
+        }
+        isLoadData=false;
     }
 
     private void initEditText(){
@@ -133,7 +191,7 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
                 //count 被改变的旧内容数
                 //这里的s表示改变之前的内容，通常start和count组合，可以在s中读取本次改变字段中被改变的内容。而after表示改变后新的内容的数量。
                 //先移除buttonlist中的button
-                if (count!=0){
+                if (count!=0&&!isLoadData){
                     for (int i=count;i>0;i--){
                         mTextButtonList.remove(start+i-1);
                     }
@@ -147,22 +205,27 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
                 //before 改变前的内容数量，by lam 也可称为被改变的数量
                 //这里的s 表示改变之后的内容，通常start和count组合，可以在s中读取本次改变字段中新的内容。而before表示被改变的内容的数量。
                 //获取到新增的字符串
-                String substring = s.toString().substring(start, start + count);
-                for (int i=substring.length();i>0;i--){
-                    //将其分割，取出每个字符
-                    String subStr = substring.substring(i-1, i);
-                    //每个字符，对应一个按钮，加入buttonlist
-                    // TODO: 2016/10/31 buttonTextList 展示出来是倒叙的，最后一个放在最前面 2016/11/1 已解决
-                    TextButton tb=new TextButton(subStr,mTextSize,mTextColor,mTextBgColor,false,false,false);
-                    mTextButtonList.add(start,tb);
+                if (!isLoadData){
+                    String substring = s.toString().substring(start, start + count);
+                    for (int i=substring.length();i>0;i--){
+                        //将其分割，取出每个字符
+                        String subStr = substring.substring(i-1, i);
+                        //每个字符，对应一个按钮，加入buttonlist
+                        // TODO: 2016/10/31 buttonTextList 展示出来是倒叙的，最后一个放在最前面 2016/11/1 已解决
+                        TextButton tb=new TextButton(subStr,mTextSize,mTextColor,mTextBgColor,false,false,false);
 
+                        mTextButtonList.add(start,tb);
+
+                    }
                 }
 
             }
 
             @Override
             public void afterTextChanged(Editable s) {
-                drawText();
+                if (!isLoadData) {
+                    drawText();
+                }
             }
         });
     }
@@ -225,6 +288,9 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
         StringBuilder sb=new StringBuilder();
         for (TextButton textButton : mTextButtonList) {
             sb.append(textButton.getText());
+        }
+        if (!isLoadData){
+            isTextChanged=true;//改变了需要提醒保存
         }
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
         canvas.drawPaint(paint);
@@ -420,15 +486,6 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
         final TextView tv_speed = (TextView) view.findViewById(R.id.tv_frameTime_speed);
         SeekBar sb_stay = (SeekBar) view.findViewById(R.id.sb_frameTime_stayTime);
         final TextView tv_stayTime = (TextView) view.findViewById(R.id.tv_frameTime_stayTime);
-        final EditText etFrameCount = (EditText) view.findViewById(R.id.et_frameTime_frameCount);
-        View btGetCount = view.findViewById(R.id.bt_frameTime_getCount);
-        btGetCount.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String countStr = etFrameCount.getText().toString();
-                mFrameCount=Integer.parseInt(countStr);
-            }
-        });
         final float[] frameTime = {0};
         final float[] stayTime = {0};
 
@@ -442,12 +499,12 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
 
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
-
+                    isTextChanged=true;
             }
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-
+                    isTextChanged=true;
             }
         });
 
@@ -488,7 +545,7 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
     private void setUnderLine() {
         isUnderLine=!isUnderLine;
         for (TextButton tb:mTextButtonList){
-            tb.setUnderline(isUnderLine);
+            tb.setIsUnderline(isUnderLine);
         }
         drawText();
     }
@@ -496,7 +553,7 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
     private void setItalic() {
         isItalic=!isItalic;
         for (TextButton tb:mTextButtonList){
-            tb.setIlatic(isItalic);
+            tb.setIsIlatic(isItalic);
         }
         drawText();
     }
@@ -519,9 +576,10 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
         Log.i("popup", "setFont: "+downloadFontDir.getAbsolutePath());
         File[] downloadFonts = downloadFontDir.listFiles();
         final List<TypefaceFile> fileList=new ArrayList<>();
-        for (File downloadFont : downloadFonts) {
-            fileList.add(new TypefaceFile(downloadFont,false));
-        }
+        if(downloadFonts!=null)
+            for (File downloadFont : downloadFonts) {
+                fileList.add(new TypefaceFile(downloadFont,false));
+            }
         for (int i=0;i<files.length;i++){
             String name = files[i].getName();
             if(name.contains("-Regular")&&!name.contains("MiuiEx")){
@@ -549,15 +607,18 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        for (TextButton tb:mTextButtonList){
-                            //2.将字体文件设置进入
-                            tb.setTypeface(mTypeFile);
+                        if (mTypeFile!=null){
+                            for (TextButton tb:mTextButtonList){
+                                //2.将字体文件设置进入
+                                tb.setTypeface(mTypeFile);
+                            }
+                            int lastIndexOf = mTypeFile.getName().lastIndexOf(".");
+                            String fontFile = mTypeFile.getName().substring(0, lastIndexOf);
+                            mBt_setFont.setText(fontFile);
+                            dialog.dismiss();
+                            drawText();
                         }
-                        int lastIndexOf = mTypeFile.getName().lastIndexOf(".");
-                        String fontFile = mTypeFile.getName().substring(0, lastIndexOf);
-                        mBt_setFont.setText(fontFile);
-                        dialog.dismiss();
-                        drawText();
+
                     }
                 })
                 .setNegativeButton("cancle",null)
@@ -665,29 +726,108 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
         return targetBitmap;
     }
 
-    public int getFrameCount() {
-        if (mFrameCount==0)
-            return targetBitmap.getWidth();
-        return mFrameCount;
+    @Override
+    public void onBackPressed() {
+        if (isTextChanged){
+            new AlertDialog.Builder(this)
+                    .setTitle("节目内容已改变，是否保存")
+                    .setNegativeButton("不保存", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            EasyTextActivity.super.onBackPressed();
+                        }
+                    })
+                    .setPositiveButton("保存", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            int index = 0;
+                            for (TextButton textButton : mTextButtonList) {
+                                if (textButton.getId()==0)
+                                    textButton.setId(System.currentTimeMillis()*2+index);
+                                textButton.setSortNumber(index);
+                                textButton.setProgramId(mProgramId);
+                                index++;
+                            }
+                            mTextButtonDao.deleteInTx(mOldTextButtonList);
+                            mTextButtonDao.insertOrReplaceInTx(mTextButtonList);
+                            mProgram.setBaseY(mBaseY);
+                            mProgram.setBaseX(mBaseX);
+                            mProgram.setStayTime(getStayTime());
+                            mProgram.setFrameTime(getFrameTime());
+                            mProgramDao.insertOrReplace(mProgram);
+
+                            EasyTextActivity.super.onBackPressed();
+                        }
+                    })
+                    .show();
+        }else {
+            EasyTextActivity.super.onBackPressed();
+        }
+
     }
 
     @Override
-    public void onCreateCustomToolBar(Toolbar toolbar) {
+    public void onCreateCustomToolBar(final Toolbar toolbar) {
         super.onCreateCustomToolBar(toolbar);
         ImageView imageView=new ImageView(this);
+        ImageView ivEdit=new ImageView(this);
         Toolbar.LayoutParams prams =new Toolbar.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         prams.gravity= Gravity.RIGHT;
         prams.rightMargin= DensityUtil.dp2px(this,10);
+
         imageView.setImageResource(R.drawable.ic_attach_file_white_24dp);
+        ivEdit.setImageResource(R.drawable.ic_mode_edit_white_24dp);
+
         imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                MoveTextCompressUtil moveUtil =new MoveTextCompressUtil(EasyTextActivity.this,getTargetBitmap(),64,32,getFrameTime(),getStayTime(),getFrameCount());
+                MoveTextCompressUtil moveUtil =new MoveTextCompressUtil(EasyTextActivity.this,getTargetBitmap(),64,32,getFrameTime(),getStayTime());
 //                MoveTextUtil moveUtil =new MoveTextUtil(EasyTextActivity.this,getTargetBitmap(),64,32,getFrameTime(),getStayTime());
-
                 moveUtil.startGenFile();
             }
         });
+        //更改节目名称
+        ivEdit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                MaterialDialog.Builder builder = new MaterialDialog.Builder(EasyTextActivity.this);
+                builder.title("修改节目名称")
+                        .inputType(InputType.TYPE_CLASS_TEXT)
+                        .input("请输入节目名称", mProgram.getProgramName(), new MaterialDialog.InputCallback() {
+                            @Override
+                            public void onInput(@NonNull MaterialDialog dialog, CharSequence input) {
+                                mProgram.setProgramName(input.toString());
+                                isTextChanged=true;
+                                toolbar.setTitle(input.toString());
+                                setSupportActionBar(toolbar);
+                                dialog.dismiss();
+                                Intent intent = new Intent();
+                                intent.putExtra("newProgramName",input.toString());
+                                setResult(RESULT_OK,intent);
+                            }
+                        })
+                        .positiveText("确定")
+                        .onPositive(new MaterialDialog.SingleButtonCallback() {
+                            @Override
+                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+
+                            }
+                        })
+                        .negativeText("取消")
+                        .onNegative(new MaterialDialog.SingleButtonCallback() {
+                            @Override
+                            public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                                dialog.dismiss();
+                            }
+                        }).show();
+
+            }
+        });
         toolbar.addView(imageView,prams);
+        toolbar.addView(ivEdit,prams);
+        String programName = getIntent().getStringExtra("programName");
+        toolbar.setTitle(programName);
     }
+
+
 }

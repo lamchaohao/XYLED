@@ -48,12 +48,13 @@ public abstract class BaseActivity extends AppCompatActivity {
     public void setContentView(@LayoutRes int layoutResID) {
         super.setContentView(layoutResID);
         mToolBarHelper = new ToolBarHelper(this,layoutResID) ;
-        toolbar = mToolBarHelper.getToolBar() ;
+        toolbar = mToolBarHelper.getToolBar();
+        toolbar.setTitleTextColor(Color.WHITE);
         setContentView(mToolBarHelper.getContentView());
+        /*自定义的一些操作*/
+       onCreateCustomToolBar(toolbar);
         /*把 toolbar 设置到Activity 中*/
         setSupportActionBar(toolbar);
-        /*自定义的一些操作*/
-        onCreateCustomToolBar(toolbar) ;
     }
 
     public void onCreateCustomToolBar(Toolbar toolbar){
@@ -63,9 +64,10 @@ public abstract class BaseActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home){
-            finish();
+            onBackPressed();
             return true ;
         }
         return super.onOptionsItemSelected(item);
     }
+
 }

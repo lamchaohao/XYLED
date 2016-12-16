@@ -105,7 +105,7 @@ public class TextButtonAdapter extends RecyclerView.Adapter{
                             @Override
                             public void onClick(View v) {
                                 for (int i=0;i<mTextButtonList.size();i++){
-                                    mTextButtonList.get(i).setSelected(true);//全选
+                                    mTextButtonList.get(i).setIsSelected(true);//全选
                                     notifyItemChanged(i);//设置回背景
                                 }
                             }
@@ -114,7 +114,7 @@ public class TextButtonAdapter extends RecyclerView.Adapter{
                     }else {
                         Snackbar.make(tbViewHolder.button,"退出多选模式",Snackbar.LENGTH_SHORT).show();
                         for (int i=0;i<mTextButtonList.size();i++){
-                            mTextButtonList.get(i).setSelected(false);//全部设置未未选择
+                            mTextButtonList.get(i).setIsSelected(false);//全部设置未未选择
                             notifyItemChanged(i);//设置回背景
                         }
                         SELECT_MODE=false;
