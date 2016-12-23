@@ -80,7 +80,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         findViewById(R.id.iv_itemManage_home).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(HomeActivity.this,ItemManageActivity.class));
+                startActivity(new Intent(HomeActivity.this,ProgramManageActivity.class));
             }
         });
         //DrawerLayout-------------------------------------------------------------------

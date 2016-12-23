@@ -8,40 +8,84 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
     android:clipToPadding="true"
-              android:background="#C5E1A5"
     tools:context="cn.com.hotled.xyled.activity.SocketActivity">
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <EditText
+            android:layout_weight="1"
+            android:id="@+id/socket_address"
+            android:text="192.168.3.1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="ipAddress"/>
+        <EditText
+            android:layout_marginLeft="5dp"
+            android:layout_weight="1"
+            android:text="16389"
+            android:hint="端口"
+            android:id="@+id/socket_port"
+            android:inputType="number"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
 
-    <EditText
-        android:id="@+id/socket_address"
-        android:text="192.168.3.1"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rv_message"
+        android:layout_weight="1"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="ipAddress"/>
-    <EditText
-        android:hint="端口"
-        android:id="@+id/socket_port"
-        android:inputType="number"
+        android:layout_height="400dp">
+
+    </android.support.v7.widget.RecyclerView>
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-    <EditText
-        android:hint="指令"
-        android:id="@+id/socket_cmd"
-        android:inputType="number"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-    <EditText
-        android:id="@+id/inputText"
-        android:hint="input your word"
-        android:layout_width="match_parent"
-        android:layout_height="200dp" />
-    <Button
-        android:id="@+id/send"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="send"/>
-    <TextView
-        android:id="@+id/socket_tvShow"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content">
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <EditText
+                android:id="@+id/inputText"
+                android:hint="input your word"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+            <Button
+                android:id="@+id/send"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="send"/>
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" >
+                <Button
+                    android:id="@+id/socket_test"
+                    android:layout_weight="1"
+                    android:text="Test"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+                <Button
+                    android:id="@+id/socket_rest"
+                    android:layout_weight="1"
+                    android:text="Rest"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+                <Button
+                    android:id="@+id/socket_pause"
+                    android:layout_weight="1"
+                    android:text="Pause"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+                <Button
+                    android:id="@+id/socket_resume"
+                    android:layout_weight="1"
+                    android:text="Resume"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+
 
 </LinearLayout>

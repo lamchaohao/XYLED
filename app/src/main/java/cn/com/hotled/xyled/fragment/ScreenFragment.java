@@ -18,14 +18,14 @@ import android.widget.Toast;
 import com.github.clans.fab.FloatingActionButton;
 import com.github.clans.fab.FloatingActionMenu;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import cn.com.hotled.xyled.App;
 import cn.com.hotled.xyled.R;
 import cn.com.hotled.xyled.activity.AddScreenActivity;
 import cn.com.hotled.xyled.activity.EasyTextActivity;
-import cn.com.hotled.xyled.activity.ItemManageActivity;
+import cn.com.hotled.xyled.activity.ProgramManageActivity;
 import cn.com.hotled.xyled.adapter.ScreenAdapter;
 import cn.com.hotled.xyled.bean.LedScreen;
 import cn.com.hotled.xyled.bean.Program;
@@ -44,6 +44,7 @@ public class ScreenFragment extends Fragment implements View.OnClickListener{
     private static final String TAG = "ScreenFragment";
     private static final int ADD_SCREEN_CODE = 366;
     private static final int EASY_TEXT_REQUEST_CODE = 0x23;
+    private static final int ITEM_MANAGE_REQUEST_CODE = 0x24;
     private RecyclerView mRecyclerView;
     private List<LedScreen> mScreenList;
     private ScreenAdapter mAdapter;
@@ -53,6 +54,12 @@ public class ScreenFragment extends Fragment implements View.OnClickListener{
     private int mScreenPosition;
     private int mProgramPosition;
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        //1.加节目
+        loadData();
+    }
 
     @Nullable
     @Override
@@ -64,10 +71,8 @@ public class ScreenFragment extends Fragment implements View.OnClickListener{
 
     private void initView(View view) {
         initActionButton(view);
+
         mRecyclerView = (RecyclerView) view.findViewById(R.id.rv_fragmScreen);
-        //1.加节目
-        mScreenList = new ArrayList<>();
-        loadData();
         mAdapter = new ScreenAdapter(getContext(), mScreenList);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         mRecyclerView.setAdapter(mAdapter);
@@ -82,9 +87,10 @@ public class ScreenFragment extends Fragment implements View.OnClickListener{
                     mProgramPosition = programPosition;
                     startActivityForResult(intent,EASY_TEXT_REQUEST_CODE);
                 }else {
-                    Intent intent = new Intent(getContext(), ItemManageActivity.class);
+                    mScreenPosition = screenPosition;
+                    Intent intent = new Intent(getContext(), ProgramManageActivity.class);
                     intent.putExtra("screenId",mScreenList.get(screenPosition).getId());
-                    startActivity(intent);
+                    startActivityForResult(intent,ITEM_MANAGE_REQUEST_CODE);
                 }
             }
         });
@@ -120,6 +126,18 @@ public class ScreenFragment extends Fragment implements View.OnClickListener{
                                 }else{
                                     Program program = mScreenList.get(screenPosition).getProgramList().get(programPosition);
                                     ((App) getActivity().getApplication()).getDaoSession().getProgramDao().delete(program);
+                                    //删除一个节目后，要重新排序sortNum，不然会引发indexoutofbound,app就无法启动
+                                    List<Program> programList = ((App) getActivity().getApplication()).getDaoSession().getProgramDao().queryBuilder().list();
+                                    int sortNumber = program.getSortNumber();
+                                    for (Program program1 : programList) {//在被删除的节目的sortnum后的，sortNUm都减一，保持队列
+                                        if (program1.getSortNumber()>sortNumber) {
+                                            int currentSortNum = program1.getSortNumber();
+                                            currentSortNum--;
+                                            program1.setSortNumber(currentSortNum);
+                                        }
+                                    }
+                                    ((App) getActivity().getApplication()).getDaoSession().getProgramDao().insertOrReplaceInTx(programList);
+
                                     List<TextButton> programs = ((App) getActivity().getApplication()).getDaoSession().getTextButtonDao().queryBuilder().where(TextButtonDao.Properties.ProgramId.eq(program.getId())).list();
                                     ((App) getActivity().getApplication()).getDaoSession().getTextButtonDao().deleteInTx(programs);
                                     mScreenList.get(screenPosition).getProgramList().remove(programPosition);
@@ -141,7 +159,16 @@ public class ScreenFragment extends Fragment implements View.OnClickListener{
 
     private void loadData() {
         mScreenList = ((App) (getActivity().getApplication())).getDaoSession().getLedScreenDao().queryBuilder().list();
-
+        for (LedScreen screen : mScreenList) {
+            List<Program> programList = screen.getProgramList();
+            Program[] sortProgramList = new Program[programList.size()];
+            for (int i = 0; i < programList.size(); i++) {
+                sortProgramList[programList.get(i).getSortNumber()]=programList.get(i);
+            }
+            screen.getProgramList().clear();
+            List<Program> programs = Arrays.asList(sortProgramList);
+            screen.getProgramList().addAll(programs);
+        }
     }
 
     private void initActionButton(View view) {
@@ -198,7 +225,7 @@ public class ScreenFragment extends Fragment implements View.OnClickListener{
                                Program program = new Program();
                                program.setProgramName("new Text"+size);
                                program.setScreenId(mScreenList.get(selectItem).getId());
-                               program.setSortNumber(mScreenList.get(selectItem).getProgramList().size()-1);
+                               program.setSortNumber(mScreenList.get(selectItem).getProgramList().size());
                                program.setProgramType(ProgramType.Text);
                                ((App) getActivity().getApplication()).getDaoSession().getProgramDao().insert(program);
                                mScreenList.get(selectItem).getProgramList().add(program);
@@ -224,6 +251,19 @@ public class ScreenFragment extends Fragment implements View.OnClickListener{
         }else if (resultCode==RESULT_OK&&requestCode==EASY_TEXT_REQUEST_CODE){
             String newProgramName = data.getStringExtra("newProgramName");
             mScreenList.get(mScreenPosition).getProgramList().get(mProgramPosition).setProgramName(newProgramName);
+            mAdapter.notifyDataSetChanged();
+        }else if(resultCode==RESULT_OK&&requestCode==ITEM_MANAGE_REQUEST_CODE){
+            mScreenList.get(mScreenPosition).getProgramList().clear();
+            List<Program> list = ((App) getActivity().getApplication()).getDaoSession().getProgramDao().queryBuilder().where(ProgramDao.Properties.ScreenId.eq(mScreenList.get(mScreenPosition).getId())).list();
+
+            Program[] sortProgramList = new Program[list.size()];
+            for (int i = 0; i < list.size(); i++) {
+                sortProgramList[list.get(i).getSortNumber()]=list.get(i);
+            }
+            mScreenList.get(mScreenPosition).getProgramList().clear();
+            List<Program> programs = Arrays.asList(sortProgramList);
+
+            mScreenList.get(mScreenPosition).getProgramList().addAll(programs);
             mAdapter.notifyDataSetChanged();
         }
     }

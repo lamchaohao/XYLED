@@ -2,6 +2,7 @@ package cn.com.hotled.xyled.fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -38,6 +39,12 @@ public class MoreFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 getContext().startActivity(new Intent(getContext(), ConnectWifiActivity.class));
+            }
+        });
+        view.findViewById(R.id.ll_enterSetting).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
             }
         });
     }

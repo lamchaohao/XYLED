@@ -33,7 +33,7 @@ import static android.graphics.Color.BLACK;
  * Created by Lam on 2016/12/15.
  */
 
-public class MutilMoveCompressUtil {
+public class WifiMutilMoveCompressUtil {
 
     private static final int BLACK_BG_COL_BYTE_COUNT = 3;
     private byte[] mHeadBytes;
@@ -88,7 +88,7 @@ public class MutilMoveCompressUtil {
     private List<Bitmap> mBitmapList;
     private int mTempColbyteCount;
 
-    public MutilMoveCompressUtil(Activity context, List<Program> programs, int screenWidth, int screenHeight, float frameTime, float stayTime) {
+    public WifiMutilMoveCompressUtil(Activity context, List<Program> programs, int screenWidth, int screenHeight, float frameTime, float stayTime) {
         mContext=context;
         mProgramList = programs;
         mScreenWidth=screenWidth;
@@ -488,7 +488,7 @@ public class MutilMoveCompressUtil {
 
 
     public void startGenFile(){
-        new Thread(new MutilMoveCompressUtil.GenFileThread()).start();
+        new Thread(new WifiMutilMoveCompressUtil.GenFileThread()).start();
     }
 
     class GenFileThread implements Runnable{
@@ -533,8 +533,8 @@ public class MutilMoveCompressUtil {
         try {
             fos=new FileOutputStream(mColorPRG,true);
             // TODO: 2016/12/23 为测试WiFi，先不写入4096字节头
-            fos.write(mHeadBytes);//写入4096头
-            Log.i("move","写入头文件4096 byte...");
+//            fos.write(mHeadBytes);//写入4096头
+//            Log.i("move","写入头文件4096 byte...");
 
             fos.write(mFileHeadPart);
             Log.i("move","写入文件总头mFileHeadPart"+mFileHeadPart.length+"byte");

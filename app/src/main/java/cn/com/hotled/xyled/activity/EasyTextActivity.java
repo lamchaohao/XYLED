@@ -523,7 +523,7 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-
+                isTextChanged=true;
             }
         });
         sb_speed.setProgress((int) (getFrameTime()/2.56));

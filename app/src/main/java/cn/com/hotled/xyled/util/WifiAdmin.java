@@ -1,13 +1,10 @@
 package cn.com.hotled.xyled.util;
 
-import android.app.Activity;
 import android.content.Context;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
-import android.util.Log;
-import android.widget.Toast;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -21,7 +18,7 @@ import java.util.List;
 public class WifiAdmin {
 
     //定义一个WifiManager对象
-    private WifiManager mWifiManager;
+    public WifiManager mWifiManager;
     //定义一个WifiInfo对象
     private WifiInfo mWifiInfo;
     //扫描出的网络连接列表
@@ -63,17 +60,21 @@ public class WifiAdmin {
     }
 
     //打开wifi
-    public void openWifi(){
+    public boolean openWifi(){
+        boolean success=false;
         if(!mWifiManager.isWifiEnabled()){
-            mWifiManager.setWifiEnabled(true);
+            success = mWifiManager.setWifiEnabled(true);
         }
+        return success;
     }
 
     //关闭wifi
-    public void closeWifi(){
-        if(!mWifiManager.isWifiEnabled()){
-            mWifiManager.setWifiEnabled(false);
+    public boolean closeWifi(){
+        boolean success = false;
+        if(mWifiManager.isWifiEnabled()){
+            success  = mWifiManager.setWifiEnabled(false);
         }
+        return success;
     }
 
     //锁定wifiLock
@@ -172,19 +173,19 @@ public class WifiAdmin {
 
 
 
-    public int createWifiInfo2(ScanResult wifiinfo, String pwd) {
+    public int createWifiInfo2(ScanResult wifiInfo, String pwd) {
         WifiCipherType type;
 
-        if (wifiinfo.capabilities.contains("WPA2-PSK")) {
+        if (wifiInfo.capabilities.contains("WPA2-PSK")) {
             // WPA2-PSK加密
             type = WifiCipherType.WIFI_CIPHER_WPA2_PSK;
-        } else if (wifiinfo.capabilities.contains("WPA-PSK")) {
+        } else if (wifiInfo.capabilities.contains("WPA-PSK")) {
             // WPA-PSK加密
             type = WifiCipherType.WIFI_CIPHER_WPA_PSK;
-        } else if (wifiinfo.capabilities.contains("WPA-EAP")) {
+        } else if (wifiInfo.capabilities.contains("WPA-EAP")) {
             // WPA-EAP加密
             type = WifiCipherType.WIFI_CIPHER_WPA_EAP;
-        } else if (wifiinfo.capabilities.contains("WEP")) {
+        } else if (wifiInfo.capabilities.contains("WEP")) {
             // WEP加密
             type = WifiCipherType.WIFI_CIPHER_WEP;
         } else {
@@ -192,8 +193,8 @@ public class WifiAdmin {
             type = WifiCipherType.WIFI_CIPHER_NOPASS;
         }
 
-        WifiConfiguration config = createWifiInfo(wifiinfo.SSID,
-                wifiinfo.BSSID, pwd, type);
+        WifiConfiguration config = createWifiInfo(wifiInfo.SSID,
+                wifiInfo.BSSID, pwd, type);
         if (config != null) {
             return mWifiManager.addNetwork(config);
         } else {

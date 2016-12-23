@@ -13,30 +13,32 @@ import android.widget.TextView;
 import java.util.List;
 
 import cn.com.hotled.xyled.R;
-import cn.com.hotled.xyled.activity.ConnectWifiActivity;
+import cn.com.hotled.xyled.activity.MutilConnectActivity;
 import cn.com.hotled.xyled.util.WifiAdmin;
 
 /**
  * Created by Lam on 2016/10/18.
  */
 
-public class ConnectWifiAdapter extends RecyclerView.Adapter {
+public class MutilConnAdapter extends RecyclerView.Adapter {
 
 
-    ConnectWifiActivity mContextAct;
+    MutilConnectActivity mContextAct;
     List<ScanResult> mWifiList;
     public OnItemOnClickListener mOnItemClickLitener;
     public WifiInfo wifiInfo;
     WifiAdmin mWifiAdmin;
+
+
     /**
      * 点击事件监听借口
      */
     public interface OnItemOnClickListener{
-        void onItemClick(View view ,int position);
-        void onItemLongClick(View view ,int position);
+        void onItemClick(View view, int position);
+        void onItemLongClick(View view, int position);
     }
 
-    public ConnectWifiAdapter(ConnectWifiActivity context, List<ScanResult> wifiList, WifiAdmin wifiAdmin) {
+    public MutilConnAdapter(MutilConnectActivity context, List<ScanResult> wifiList, WifiAdmin wifiAdmin) {
         mContextAct=context;
         mWifiList=wifiList;
         mWifiAdmin=wifiAdmin;
@@ -121,16 +123,16 @@ public class ConnectWifiAdapter extends RecyclerView.Adapter {
             switch (mContextAct.getWifiStatuCode()){
                 default:
                     tv_wifiState.setText("已连接by default");
-                case ConnectWifiActivity.WIFI_STATE_CONNECTING:
+                case MutilConnectActivity.WIFI_STATE_CONNECTING:
                     tv_wifiState.setText("正在连接");
                     break;
-                case ConnectWifiActivity.WIFI_STATE_CONNECTED:
+                case MutilConnectActivity.WIFI_STATE_CONNECTED:
                     tv_wifiState.setText("已连接");
                     break;
-                case ConnectWifiActivity.WIFI_STATE_DISCONNECTING:
+                case MutilConnectActivity.WIFI_STATE_DISCONNECTING:
                     tv_wifiState.setText("正在断开");
                     break;
-                case ConnectWifiActivity.WIFI_STATE_DISCONNECTED:
+                case MutilConnectActivity.WIFI_STATE_DISCONNECTED:
                     tv_wifiState.setText("已断开");
                     break;
             }
