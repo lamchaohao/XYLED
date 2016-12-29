@@ -149,7 +149,7 @@ public class SendTest {
         Log.w("tcpSend","mac = "+macInt1+":"+macInt2+":"+macInt3+":"+macInt4);
         try {
             socket = new Socket(targetIP,targetPort);
-            socket.setSoTimeout(5000);
+//            socket.setSoTimeout(3000);
             fis = new FileInputStream(mFile);
             os = socket.getOutputStream();
             byte[] buf = new byte[512];
@@ -303,7 +303,7 @@ public class SendTest {
                         writeSB.append(s);
                     }
                     Log.w("tcpSend","writeSB == "+writeSB.toString());
-                    setInbyteArray(0,writeCMD,sendPack);//暂停指令
+                    setInbyteArray(0,writeCMD,sendPack);//写指令
                     setInbyteArray(16,buf,sendPack);//文件数据
 
                     Log.w("tcpSend","flashAddress == "+flashAddress+",serialNum= "+serialNum);
@@ -358,7 +358,6 @@ public class SendTest {
                 msg.what=UPDATE_PROGRESS;
                 mHandler.sendMessage(msg);
                 Log.w("tcpSend","sumProgress == "+msg.arg1);
-                //发送完之后，reset
 
                 socket.getInputStream().read(feedBackData);
 

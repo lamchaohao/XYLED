@@ -265,7 +265,7 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
         // TODO: 2016/11/29 临时改为16高
         mHeight = 32;
 
-        targetBitmap = Bitmap.createBitmap(mWidth, mHeight, Bitmap.Config.ARGB_8888);
+        targetBitmap = Bitmap.createBitmap(mWidth, mHeight, Bitmap.Config.ARGB_4444);
 
         if (targetBitmap!=null)
             canvas.setBitmap(targetBitmap);
@@ -340,7 +340,7 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
         float drawWidth = computeWidth(sb.toString());
         if (drawWidth>64) {
             mWidth = (int) drawWidth;
-            targetBitmap = Bitmap.createBitmap(mWidth, mHeight, Bitmap.Config.ARGB_8888);
+            targetBitmap = Bitmap.createBitmap(mWidth, mHeight, Bitmap.Config.ARGB_4444);
             if (targetBitmap != null)
                 canvas.setBitmap(targetBitmap);
             mPhotoView.setImageBitmap(targetBitmap);

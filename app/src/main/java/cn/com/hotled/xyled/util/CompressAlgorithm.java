@@ -53,9 +53,7 @@ public class CompressAlgorithm {
             }
         }
         System.out.println(compressContentList);
-        for (int i = 0; i < colByteCount.length; i++) {
-            System.out.print(colByteCount[i]+" ");
-        }
+
         return compressContentList;
     }
 
