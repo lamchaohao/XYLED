@@ -223,6 +223,7 @@ public class ScreenFragment extends Fragment implements View.OnClickListener{
                                int size = mScreenList.get(selectItem).getProgramList().size();
                                size++;
                                Program program = new Program();
+                               program.setId(System.currentTimeMillis());
                                program.setProgramName("new Text"+size);
                                program.setScreenId(mScreenList.get(selectItem).getId());
                                program.setSortNumber(mScreenList.get(selectItem).getProgramList().size());

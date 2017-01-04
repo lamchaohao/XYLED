@@ -40,12 +40,17 @@ public class ProgramDao extends AbstractDao<Program, Long> {
         public final static Property BaseY = new Property(5, int.class, "baseY", false, "BASE_Y");
         public final static Property FrameTime = new Property(6, float.class, "frameTime", false, "FRAME_TIME");
         public final static Property StayTime = new Property(7, float.class, "stayTime", false, "STAY_TIME");
-        public final static Property ProgramType = new Property(8, String.class, "programType", false, "PROGRAM_TYPE");
-        public final static Property PicFile = new Property(9, String.class, "picFile", false, "PIC_FILE");
+        public final static Property FlowBoundFile = new Property(8, String.class, "flowBoundFile", false, "FLOW_BOUND_FILE");
+        public final static Property FlowEffect = new Property(9, int.class, "flowEffect", false, "FLOW_EFFECT");
+        public final static Property FlowSpeed = new Property(10, int.class, "flowSpeed", false, "FLOW_SPEED");
+        public final static Property UseFlowBound = new Property(11, boolean.class, "useFlowBound", false, "USE_FLOW_BOUND");
+        public final static Property ProgramType = new Property(12, String.class, "programType", false, "PROGRAM_TYPE");
+        public final static Property PicFile = new Property(13, String.class, "picFile", false, "PIC_FILE");
     }
 
     private DaoSession daoSession;
 
+    private final FileConverter flowBoundFileConverter = new FileConverter();
     private final ProgramTypeConverter programTypeConverter = new ProgramTypeConverter();
     private final FileConverter picFileConverter = new FileConverter();
     private Query<Program> ledScreen_ProgramListQuery;
@@ -71,8 +76,12 @@ public class ProgramDao extends AbstractDao<Program, Long> {
                 "\"BASE_Y\" INTEGER NOT NULL ," + // 5: baseY
                 "\"FRAME_TIME\" REAL NOT NULL ," + // 6: frameTime
                 "\"STAY_TIME\" REAL NOT NULL ," + // 7: stayTime
-                "\"PROGRAM_TYPE\" TEXT," + // 8: programType
-                "\"PIC_FILE\" TEXT);"); // 9: picFile
+                "\"FLOW_BOUND_FILE\" TEXT," + // 8: flowBoundFile
+                "\"FLOW_EFFECT\" INTEGER NOT NULL ," + // 9: flowEffect
+                "\"FLOW_SPEED\" INTEGER NOT NULL ," + // 10: flowSpeed
+                "\"USE_FLOW_BOUND\" INTEGER NOT NULL ," + // 11: useFlowBound
+                "\"PROGRAM_TYPE\" TEXT," + // 12: programType
+                "\"PIC_FILE\" TEXT);"); // 13: picFile
     }
 
     /** Drops the underlying database table. */
@@ -97,14 +106,22 @@ public class ProgramDao extends AbstractDao<Program, Long> {
         stmt.bindDouble(7, entity.getFrameTime());
         stmt.bindDouble(8, entity.getStayTime());
  
+        File flowBoundFile = entity.getFlowBoundFile();
+        if (flowBoundFile != null) {
+            stmt.bindString(9, flowBoundFileConverter.convertToDatabaseValue(flowBoundFile));
+        }
+        stmt.bindLong(10, entity.getFlowEffect());
+        stmt.bindLong(11, entity.getFlowSpeed());
+        stmt.bindLong(12, entity.getUseFlowBound() ? 1L: 0L);
+ 
         ProgramType programType = entity.getProgramType();
         if (programType != null) {
-            stmt.bindString(9, programTypeConverter.convertToDatabaseValue(programType));
+            stmt.bindString(13, programTypeConverter.convertToDatabaseValue(programType));
         }
  
         File picFile = entity.getPicFile();
         if (picFile != null) {
-            stmt.bindString(10, picFileConverter.convertToDatabaseValue(picFile));
+            stmt.bindString(14, picFileConverter.convertToDatabaseValue(picFile));
         }
     }
 
@@ -124,14 +141,22 @@ public class ProgramDao extends AbstractDao<Program, Long> {
         stmt.bindDouble(7, entity.getFrameTime());
         stmt.bindDouble(8, entity.getStayTime());
  
+        File flowBoundFile = entity.getFlowBoundFile();
+        if (flowBoundFile != null) {
+            stmt.bindString(9, flowBoundFileConverter.convertToDatabaseValue(flowBoundFile));
+        }
+        stmt.bindLong(10, entity.getFlowEffect());
+        stmt.bindLong(11, entity.getFlowSpeed());
+        stmt.bindLong(12, entity.getUseFlowBound() ? 1L: 0L);
+ 
         ProgramType programType = entity.getProgramType();
         if (programType != null) {
-            stmt.bindString(9, programTypeConverter.convertToDatabaseValue(programType));
+            stmt.bindString(13, programTypeConverter.convertToDatabaseValue(programType));
         }
  
         File picFile = entity.getPicFile();
         if (picFile != null) {
-            stmt.bindString(10, picFileConverter.convertToDatabaseValue(picFile));
+            stmt.bindString(14, picFileConverter.convertToDatabaseValue(picFile));
         }
     }
 
@@ -157,8 +182,12 @@ public class ProgramDao extends AbstractDao<Program, Long> {
             cursor.getInt(offset + 5), // baseY
             cursor.getFloat(offset + 6), // frameTime
             cursor.getFloat(offset + 7), // stayTime
-            cursor.isNull(offset + 8) ? null : programTypeConverter.convertToEntityProperty(cursor.getString(offset + 8)), // programType
-            cursor.isNull(offset + 9) ? null : picFileConverter.convertToEntityProperty(cursor.getString(offset + 9)) // picFile
+            cursor.isNull(offset + 8) ? null : flowBoundFileConverter.convertToEntityProperty(cursor.getString(offset + 8)), // flowBoundFile
+            cursor.getInt(offset + 9), // flowEffect
+            cursor.getInt(offset + 10), // flowSpeed
+            cursor.getShort(offset + 11) != 0, // useFlowBound
+            cursor.isNull(offset + 12) ? null : programTypeConverter.convertToEntityProperty(cursor.getString(offset + 12)), // programType
+            cursor.isNull(offset + 13) ? null : picFileConverter.convertToEntityProperty(cursor.getString(offset + 13)) // picFile
         );
         return entity;
     }
@@ -173,8 +202,12 @@ public class ProgramDao extends AbstractDao<Program, Long> {
         entity.setBaseY(cursor.getInt(offset + 5));
         entity.setFrameTime(cursor.getFloat(offset + 6));
         entity.setStayTime(cursor.getFloat(offset + 7));
-        entity.setProgramType(cursor.isNull(offset + 8) ? null : programTypeConverter.convertToEntityProperty(cursor.getString(offset + 8)));
-        entity.setPicFile(cursor.isNull(offset + 9) ? null : picFileConverter.convertToEntityProperty(cursor.getString(offset + 9)));
+        entity.setFlowBoundFile(cursor.isNull(offset + 8) ? null : flowBoundFileConverter.convertToEntityProperty(cursor.getString(offset + 8)));
+        entity.setFlowEffect(cursor.getInt(offset + 9));
+        entity.setFlowSpeed(cursor.getInt(offset + 10));
+        entity.setUseFlowBound(cursor.getShort(offset + 11) != 0);
+        entity.setProgramType(cursor.isNull(offset + 12) ? null : programTypeConverter.convertToEntityProperty(cursor.getString(offset + 12)));
+        entity.setPicFile(cursor.isNull(offset + 13) ? null : picFileConverter.convertToEntityProperty(cursor.getString(offset + 13)));
      }
     
     @Override

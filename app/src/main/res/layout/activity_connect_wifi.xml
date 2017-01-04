@@ -6,6 +6,7 @@
     android:orientation="vertical"
     tools:context="cn.com.hotled.xyled.activity.ConnectWifiActivity">
     <RelativeLayout
+        android:id="@+id/rl_openwifi"
         android:layout_margin="10dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">

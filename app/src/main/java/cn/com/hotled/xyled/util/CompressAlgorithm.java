@@ -52,7 +52,6 @@ public class CompressAlgorithm {
                 compressContentList.add(colPixelList.get(i));
             }
         }
-        System.out.println(compressContentList);
 
         return compressContentList;
     }

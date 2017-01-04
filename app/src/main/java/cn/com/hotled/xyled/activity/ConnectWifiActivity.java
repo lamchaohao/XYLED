@@ -108,45 +108,18 @@ public class ConnectWifiActivity extends BaseActivity {
         connectWifiAdapter = new ConnectWifiAdapter(this, mWifiList,mWifiAdmin);
         recyclerView.setAdapter(connectWifiAdapter);
         mWifiSwitcher = (Switch) findViewById(R.id.sw_openWiFi);
-
+        View rlOpenWifi = findViewById(R.id.rl_openwifi);
+        rlOpenWifi.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openWifi();
+            }
+        });
         mWifiSwitcher.setChecked(mWifiAdmin.mWifiManager.isWifiEnabled());
         mWifiSwitcher.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mWifiSwitcher.isChecked()) {
-                    //想要开启
-                    if (mWifiAdmin.mWifiManager.isWifiEnabled()) {
-                        mWifiSwitcher.setChecked(true);
-                        return;
-                    }else {
-                        if (!mWifiAdmin.openWifi()) {
-                            mWifiSwitcher.setChecked(false);
-                            Snackbar.make(recyclerView,"打开WIFI失败",Snackbar.LENGTH_LONG).setAction("打开系统设置", new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
-                                }
-                            }).show();
-                        }
-                    }
-
-                }else {
-                    //想要关闭
-                    if (!mWifiAdmin.mWifiManager.isWifiEnabled()) {
-                        mWifiSwitcher.setChecked(false);
-                        return;
-                    }else {
-                        if (!mWifiAdmin.closeWifi()) {
-                            mWifiSwitcher.setChecked(true);
-                            Snackbar.make(recyclerView,"关闭WIFI失败",Snackbar.LENGTH_LONG).setAction("打开系统设置", new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
-                                }
-                            }).show();
-                        }
-                    }
-                }
+                    openWifi();
             }
         });
 
@@ -161,6 +134,43 @@ public class ConnectWifiActivity extends BaseActivity {
 
             }
         });
+    }
+
+    private void openWifi() {
+        if (mWifiSwitcher.isChecked()) {
+            //想要开启
+            if (mWifiAdmin.mWifiManager.isWifiEnabled()) {
+                mWifiSwitcher.setChecked(true);
+                return;
+            }else {
+                if (!mWifiAdmin.openWifi()) {
+                    mWifiSwitcher.setChecked(false);
+                    Snackbar.make(recyclerView,"打开WIFI失败",Snackbar.LENGTH_LONG).setAction("打开系统设置", new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
+                        }
+                    }).show();
+                }
+            }
+
+        }else {
+            //想要关闭
+            if (!mWifiAdmin.mWifiManager.isWifiEnabled()) {
+                mWifiSwitcher.setChecked(false);
+                return;
+            }else {
+                if (!mWifiAdmin.closeWifi()) {
+                    mWifiSwitcher.setChecked(true);
+                    Snackbar.make(recyclerView,"关闭WIFI失败",Snackbar.LENGTH_LONG).setAction("打开系统设置", new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
+                        }
+                    }).show();
+                }
+            }
+        }
     }
 
     private void registerWifiReciver() {

@@ -30,6 +30,12 @@ public class Program {
     private int baseY;
     private float frameTime;
     private float stayTime;
+    @Convert(converter = FileConverter.class,columnType = String.class)
+    private File flowBoundFile;
+
+    private int flowEffect;
+    private int flowSpeed;
+    private boolean useFlowBound;
     @Convert(converter = ProgramTypeConverter.class,columnType = String.class)
     private ProgramType programType;
 
@@ -47,9 +53,11 @@ public class Program {
     @Generated(hash = 1978875243)
     private transient ProgramDao myDao;
 
-    @Generated(hash = 1291497007)
-    public Program(long id, int sortNumber, long screenId, String programName, int baseX, int baseY,
-            float frameTime, float stayTime, ProgramType programType, File picFile) {
+    @Generated(hash = 2090265522)
+    public Program(long id, int sortNumber, long screenId, String programName,
+            int baseX, int baseY, float frameTime, float stayTime,
+            File flowBoundFile, int flowEffect, int flowSpeed, boolean useFlowBound,
+            ProgramType programType, File picFile) {
         this.id = id;
         this.sortNumber = sortNumber;
         this.screenId = screenId;
@@ -58,13 +66,16 @@ public class Program {
         this.baseY = baseY;
         this.frameTime = frameTime;
         this.stayTime = stayTime;
+        this.flowBoundFile = flowBoundFile;
+        this.flowEffect = flowEffect;
+        this.flowSpeed = flowSpeed;
+        this.useFlowBound = useFlowBound;
         this.programType = programType;
         this.picFile = picFile;
     }
 
-
+    @Generated(hash = 775603163)
     public Program() {
-        setId(System.currentTimeMillis());
     }
 
     public long getId() {
@@ -97,6 +108,70 @@ public class Program {
 
     public void setProgramName(String programName) {
         this.programName = programName;
+    }
+
+    public int getBaseX() {
+        return this.baseX;
+    }
+
+    public void setBaseX(int baseX) {
+        this.baseX = baseX;
+    }
+
+    public int getBaseY() {
+        return this.baseY;
+    }
+
+    public void setBaseY(int baseY) {
+        this.baseY = baseY;
+    }
+
+    public float getFrameTime() {
+        return this.frameTime;
+    }
+
+    public void setFrameTime(float frameTime) {
+        this.frameTime = frameTime;
+    }
+
+    public float getStayTime() {
+        return this.stayTime;
+    }
+
+    public void setStayTime(float stayTime) {
+        this.stayTime = stayTime;
+    }
+
+    public File getFlowBoundFile() {
+        return this.flowBoundFile;
+    }
+
+    public void setFlowBoundFile(File flowBoundFile) {
+        this.flowBoundFile = flowBoundFile;
+    }
+
+    public int getFlowEffect() {
+        return this.flowEffect;
+    }
+
+    public void setFlowEffect(int flowEffect) {
+        this.flowEffect = flowEffect;
+    }
+
+    public int getFlowSpeed() {
+        return this.flowSpeed;
+    }
+
+    public void setFlowSpeed(int flowSpeed) {
+        this.flowSpeed = flowSpeed;
+    }
+
+    public boolean getUseFlowBound() {
+        return this.useFlowBound;
+    }
+
+    public void setUseFlowBound(boolean useFlowBound) {
+        this.useFlowBound = useFlowBound;
     }
 
     public ProgramType getProgramType() {
@@ -187,45 +262,6 @@ public class Program {
         myDao = daoSession != null ? daoSession.getProgramDao() : null;
     }
 
-
-    public int getBaseX() {
-        return this.baseX;
-    }
-
-
-    public void setBaseX(int baseX) {
-        this.baseX = baseX;
-    }
-
-
-    public int getBaseY() {
-        return this.baseY;
-    }
-
-
-    public void setBaseY(int baseY) {
-        this.baseY = baseY;
-    }
-
-
-    public float getFrameTime() {
-        return this.frameTime;
-    }
-
-
-    public void setFrameTime(float frameTime) {
-        this.frameTime = frameTime;
-    }
-
-
-    public float getStayTime() {
-        return this.stayTime;
-    }
-
-
-    public void setStayTime(float stayTime) {
-        this.stayTime = stayTime;
-    }
-
+    
 
 }

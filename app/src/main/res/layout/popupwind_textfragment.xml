@@ -167,6 +167,56 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"/>
         </LinearLayout>
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:text="边框:"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <Switch
+                android:id="@+id/sw_openFlow"
+                android:layout_marginLeft="20dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_fgText_setFlow"
+            style="@style/TeXtEditIconLayout"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <RelativeLayout
+                style="@style/TeXtEditIcon"
+                android:id="@+id/rl_fgText_flowLayout"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="match_parent" >
+                <ImageView
+                    android:id="@+id/iv_fgText_flowStyle"
+                    android:src="@color/buttonSelect"
+                    android:layout_centerInParent="true"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+            </RelativeLayout>
+            <Button
+                style="@style/TeXtEditIcon"
+                android:id="@+id/bt_fgText_flowShowEffect"
+                android:layout_weight="1"
+                android:text="样式"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"/>
+            <Button
+                style="@style/TeXtEditIcon"
+                android:id="@+id/bt_fgText_flowShowSpeed"
+                android:layout_weight="1"
+                android:text="移动速度"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+
     </LinearLayout>
 </ScrollView>
 

@@ -58,6 +58,8 @@
         </activity>
         <activity android:name=".activity.MutilConnectActivity">
         </activity>
+        <activity android:name=".activity.SelectFlowActivity">
+        </activity>
     </application>
 
 </manifest>

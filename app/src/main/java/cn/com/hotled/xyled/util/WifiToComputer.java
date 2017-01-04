@@ -15,6 +15,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -33,7 +34,7 @@ import static android.graphics.Color.BLACK;
  * Created by Lam on 2016/12/15.
  */
 
-public class WifiMutilMoveCompressUtil {
+public class WifiToComputer {
 
     private static final int BLACK_BG_COL_BYTE_COUNT = 3;
     //文件总头区 5byte
@@ -91,7 +92,9 @@ public class WifiMutilMoveCompressUtil {
     private List<byte[]> mFlowByteList;
     private int mFrameIndex = 0;
     private int mFlowAddress=0;
-    public WifiMutilMoveCompressUtil(Activity context, List<Program> programs, int screenWidth, int screenHeight, float frameTime, float stayTime) {
+    private byte[] mHeadBytes;
+
+    public WifiToComputer(Activity context, List<Program> programs, int screenWidth, int screenHeight, float frameTime, float stayTime) {
         mContext = context;
         mProgramList = programs;
         mScreenWidth = screenWidth;
@@ -102,7 +105,7 @@ public class WifiMutilMoveCompressUtil {
             @Override
             public void handleMessage(Message msg) {
                 if (msg.arg1 == 100) {
-                    Toast.makeText(mContext, "WifiMutilMoveCompressUtil已生成", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mContext, "此节目文件已生成", Toast.LENGTH_SHORT).show();
                 }
             }
         };
@@ -189,7 +192,7 @@ public class WifiMutilMoveCompressUtil {
 
         //取点后压缩
         CompressAlgorithm compressAlgorithm = new CompressAlgorithm();
-        List<Byte> compress = compressAlgorithm.compress(bitmapPixels, widthToCompress, 24);//进行压缩
+        List<Byte> compress = compressAlgorithm.compress(bitmapPixels, widthToCompress, mScreenHeight-4);//进行压缩
         byte[] textContent = new byte[compress.size()];
         for (int i = 0; i < compress.size(); i++) {
             textContent[i] = compress.get(i);
@@ -215,14 +218,15 @@ public class WifiMutilMoveCompressUtil {
     }
 
     private void initFlowBound() {
-        mFlowByteList = new ArrayList<>();
-
         byte[] color={3,12,16};
         FromFile flow =new FromFile(mScreenWidth,mScreenHeight,color,4,mFrameCount);
         flow.setFlowFile(mProgramList.get(0).getFlowBoundFile());
         mFlowByteList = flow.genFlowBound();
 
     }
+
+
+
 
 
     private void initItemPart() {
@@ -247,9 +251,9 @@ public class WifiMutilMoveCompressUtil {
         textStyle = 0;//底图
 //        screenAddress[0] = 0;
 //        screenAddress[1] = 0;
-        screenAddress = intToByteArray(mScreenHeight*4+4, 2);
-        screenWidthByte = intToByteArray(mScreenWidth-8, 2);
-        screenHeightByte = (byte) (mScreenHeight-8);
+        screenAddress = intToByteArray(66, 2);
+        screenWidthByte = intToByteArray(mScreenWidth-4, 2);
+        screenHeightByte = (byte) (mScreenHeight-4);
 
         mTextAttrs[0] = textStyle;
         setInbyteArray(1, screenAddress, mTextAttrs);
@@ -397,13 +401,13 @@ public class WifiMutilMoveCompressUtil {
 
         mHeight = 32;
         // TODO: 2016/12/29 将高度减去4以适配流水边
-        Bitmap bitmap = Bitmap.createBitmap(mWidth, mHeight-8, Bitmap.Config.ARGB_4444);
+        Bitmap bitmap = Bitmap.createBitmap(mWidth, mHeight-4, Bitmap.Config.ARGB_4444);
 
         //设置好画笔，开始计算
         float drawWidth = computeWidth(sb.toString(), paint);
         if (drawWidth > 64) {
             mWidth = (int) drawWidth;
-            bitmap = Bitmap.createBitmap(mWidth, mHeight-8, Bitmap.Config.ARGB_4444);
+            bitmap = Bitmap.createBitmap(mWidth, mHeight-4, Bitmap.Config.ARGB_4444);
             if (bitmap != null)
                 canvas.setBitmap(bitmap);
         }
@@ -461,9 +465,33 @@ public class WifiMutilMoveCompressUtil {
         }
     }
 
+    private void setHeadBytes(){
+        File file =new File(Environment.getExternalStorageDirectory()+"/COLOR_01.PRG");
+        mHeadBytes = new byte[4096];
+        FileInputStream fis=null;
+        if (file.exists()) {
+            try {
+                fis=new FileInputStream(file);
+                fis.read(mHeadBytes);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }finally {
+                if (fis!=null){
+                    try {
+                        fis.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+
+    }
 
     public void startGenFile() {
-        new Thread(new WifiMutilMoveCompressUtil.GenFileThread()).start();
+        new Thread(new WifiToComputer.GenFileThread()).start();
     }
 
     class GenFileThread implements Runnable {
@@ -475,7 +503,7 @@ public class WifiMutilMoveCompressUtil {
     }
 
     private void genFile() {
-
+        setHeadBytes();
         initFileHead();
         initTextContent();
         initBlackBG();
@@ -508,6 +536,8 @@ public class WifiMutilMoveCompressUtil {
         try {
             fos = new FileOutputStream(mColorPRG, true);
             // TODO: 2016/12/23 为测试WiFi，先不写入4096字节头
+            fos.write(mHeadBytes);//写入4096头
+            Log.i("move","写入头文件4096 byte...");
 
             fos.write(mFileHeadPart);
             Log.i("move", "写入文件总头mFileHeadPart" + mFileHeadPart.length + "byte");

@@ -4,8 +4,10 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
@@ -27,10 +29,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.SeekBar;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import com.afollestad.materialdialogs.DialogAction;
@@ -64,6 +70,7 @@ import cn.com.hotled.xyled.view.WheelView;
 
 public class EasyTextActivity extends BaseActivity implements View.OnClickListener{
 
+    private static final int SELECT_FLOW_CODE = 202;
     @BindView(R.id.pv_fgText_photo)
     PhotoView mPhotoView;
     @BindView(R.id.et_fgText_input)
@@ -100,6 +107,18 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
     ImageButton ib_trainY;
     @BindView(R.id.iv_fgText_setTime)
     ImageView iv_setTime;
+    @BindView(R.id.rl_fgText_flowLayout)
+    RelativeLayout rl_setFlowStyle;
+    @BindView(R.id.iv_fgText_flowStyle)
+    ImageView iv_setFlowStyle;
+    @BindView(R.id.bt_fgText_flowShowEffect)
+    Button bt_setFlowEffect;
+    @BindView(R.id.bt_fgText_flowShowSpeed)
+    Button bt_setFlowSpeed;
+    @BindView(R.id.sw_openFlow)
+    Switch swOpenFlow;
+    @BindView(R.id.ll_fgText_setFlow)
+    LinearLayout llSetFlow;
 
     private Canvas canvas;
     private Bitmap targetBitmap;
@@ -127,6 +146,7 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
     private List<TextButton> mOldTextButtonList;
     private ProgramDao mProgramDao;
     private Program mProgram;
+    private Bitmap mFlowBitmap;
 
 
     @Override
@@ -175,7 +195,17 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
             }
 
             mEt_input.setText(sb.toString());
-
+            if (mProgram.getFlowBoundFile()!=null){
+                String absolutePath = mProgram.getFlowBoundFile().getAbsolutePath();
+                mFlowBitmap=BitmapFactory.decodeFile(absolutePath);
+                setFlowBound(absolutePath);
+            }
+            swOpenFlow.setChecked(mProgram.getUseFlowBound());
+            if (swOpenFlow.isChecked()) {
+                llSetFlow.setVisibility(View.VISIBLE);
+            }else {
+                llSetFlow.setVisibility(View.GONE);
+            }
             drawText();
         }
         isLoadData=false;
@@ -248,6 +278,23 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
         ib_MoreTextBg.setOnClickListener(this);
         ib_trainX.setOnClickListener(this);
         ib_trainY.setOnClickListener(this);
+        rl_setFlowStyle.setOnClickListener(this);
+        bt_setFlowEffect.setOnClickListener(this);
+        bt_setFlowSpeed.setOnClickListener(this);
+        swOpenFlow.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    llSetFlow.setVisibility(View.VISIBLE);
+                    mProgram.setUseFlowBound(true);
+                    drawText();
+                }else {
+                    mProgram.setUseFlowBound(false);
+                    llSetFlow.setVisibility(View.GONE);
+                    drawText();
+                }
+            }
+        });
     }
 
     private void initPhotoView() {
@@ -262,7 +309,6 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
         //启用抗锯齿效果
         paint = new Paint();
         mWidth = 64;
-        // TODO: 2016/11/29 临时改为16高
         mHeight = 32;
 
         targetBitmap = Bitmap.createBitmap(mWidth, mHeight, Bitmap.Config.ARGB_4444);
@@ -338,6 +384,15 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
         paint.setTextAlign(Paint.Align.LEFT);
         //设置好画笔，开始计算
         float drawWidth = computeWidth(sb.toString());
+        //需要加上流水边框的宽度,左右都需要加上
+        int tempBaseX=mBaseX;
+        int tempBaseY=mBaseY;
+        if (mFlowBitmap!=null&&mProgram.getUseFlowBound()){
+            drawWidth+=mFlowBitmap.getHeight()*2;
+            //加上流水边框后，文字需要偏移流水边框的一个宽度
+            tempBaseX+=mFlowBitmap.getHeight();
+            tempBaseY+=mFlowBitmap.getHeight();
+        }
         if (drawWidth>64) {
             mWidth = (int) drawWidth;
             targetBitmap = Bitmap.createBitmap(mWidth, mHeight, Bitmap.Config.ARGB_4444);
@@ -347,8 +402,12 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
         }
         //背景
         drawBgColor(drawWidth);
+        if (mFlowBitmap!=null&&mProgram.getUseFlowBound()){
+        //流水边框
+            drawFlowBound();
+        }
         //文本
-        canvas.drawText(sb.toString(),mBaseX,mBaseY,paint);
+        canvas.drawText(sb.toString(),tempBaseX,tempBaseY,paint);
     }
 
     private float computeWidth(String text) {
@@ -361,6 +420,7 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
         Log.i("advance", "computeWidth:drawWidth "+drawWidth);
         //为了避免OOM，bitmap的最大宽度设置为2048,
         // TODO: 2016/12/8 如果文字太长，需要重新绘制一个bitmap，bitmap的最大尺寸为4096*4096
+        // TODO: 2017/1/4 文字太长省略后，提示用户不影响屏幕显示
         if (drawWidth>=2048)
             return 2048;
         return drawWidth;
@@ -371,6 +431,82 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
         bgPaint.setColor(mTextBgColor);
         canvas.drawRect(mBaseX,0,drawWidth,mHeight,bgPaint);
     }
+    private void drawFlowBound() {
+
+        int[] flowbound = new int[mFlowBitmap.getWidth() * mFlowBitmap.getHeight()];
+        for (int x1 = 0, i = 0; x1 < mFlowBitmap.getWidth(); x1++) {
+            for (int y1 = 0; y1 < mFlowBitmap.getHeight(); y1++) {
+                int pixel = mFlowBitmap.getPixel(x1, y1);
+                flowbound[i] = pixel;
+                i++;
+            }
+        }
+
+        int screenHeight = mHeight;
+        int screenWidth = getTargetBitmap().getWidth();
+        Paint flowPaint=new Paint();
+
+        //up part1
+        for (int k = 0; k < screenWidth; k++) {
+            int colorIndex = (k) * mFlowBitmap.getHeight();//this is right
+            while (colorIndex >= flowbound.length) {
+                colorIndex -= flowbound.length;
+            }
+            for (int q = 0; q < mFlowBitmap.getHeight(); q++) {
+                flowPaint.setColor(flowbound[colorIndex + q]);
+                int i = (screenWidth - k - 1) * screenHeight + q;
+                float x=i/screenHeight;
+                float y=i%screenHeight;
+                canvas.drawPoint(x,y,flowPaint);
+            }
+        }
+        //right part
+        for (int j = 0; j < screenHeight; j++) {
+            int colorIndex = j * mFlowBitmap.getHeight();
+            while (colorIndex>=flowbound.length){
+                colorIndex-=flowbound.length;
+            }
+            for (int q = 0; q < mFlowBitmap.getHeight(); q++) {
+                flowPaint.setColor(flowbound[colorIndex + q]);
+                int i = getTargetBitmap().getHeight()*getTargetBitmap().getWidth() - screenHeight * (q + 1) + j ;
+                float x=i/screenHeight;
+                float y=i%screenHeight;
+                canvas.drawPoint(x,y,flowPaint);
+            }
+        }
+
+        //down part1
+        for (int k = screenWidth; k >= 2; k--) {
+            int colorIndex = k * mFlowBitmap.getHeight();
+            while (colorIndex>=flowbound.length){
+                colorIndex-=flowbound.length;
+            }
+
+            for (int q = mFlowBitmap.getHeight(); q > 0; q--){
+                flowPaint.setColor(flowbound[colorIndex + q - 1]);
+                int i = (k - 1) * screenHeight - q ;
+                float x=i/screenHeight;
+                float y=i%screenHeight;
+                canvas.drawPoint(x,y,flowPaint);
+            }
+        }
+
+        //left part1
+        for (int j = 0; j < screenHeight; j++) {
+            int colorIndex = (j) * mFlowBitmap.getHeight();
+            while (colorIndex>=flowbound.length){
+                colorIndex-=flowbound.length;
+            }
+            for (int q = 0; q < mFlowBitmap.getHeight(); q++) {
+                flowPaint.setColor(flowbound[colorIndex + q]);
+                int i = screenHeight * q + j ;
+                float x=i/screenHeight;
+                float y=i%screenHeight;
+                canvas.drawPoint(x,y,flowPaint);
+            }
+        }
+    }
+
 
     private void setTrainY() {
         View outerView = LayoutInflater.from(this).inflate(R.layout.alert_train_y, null);
@@ -708,6 +844,15 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
             case R.id.ib_fgText_trainY:
                 setTrainY();
                 break;
+            case R.id.rl_fgText_flowLayout:
+                startActivityForResult(new Intent(this,SelectFlowActivity.class),SELECT_FLOW_CODE);
+                break;
+            case R.id.bt_fgText_flowShowEffect:
+
+                break;
+            case R.id.bt_fgText_flowShowSpeed:
+
+                break;
         }
     }
     public float getFrameTime() {
@@ -725,6 +870,42 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
     public Bitmap getTargetBitmap() {
         return targetBitmap;
     }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode==RESULT_OK&&requestCode==SELECT_FLOW_CODE){
+            String fileName = data.getStringExtra("fileName");
+            isTextChanged=true;
+            mProgram.setFlowBoundFile(new File(fileName));
+            setFlowBound(fileName);
+
+        }
+    }
+
+    private void setFlowBound(String fileName) {
+        mFlowBitmap = BitmapFactory.decodeFile(fileName);
+        int width = mFlowBitmap.getWidth();
+        int height = mFlowBitmap.getHeight();
+        // 设置想要的大小
+        int newWidth = width*5;
+        int newHeight = height*5;
+        // 计算缩放比例
+        float scaleWidth = ((float) newWidth) / width;
+        float scaleHeight = ((float) newHeight) / height;
+        // 取得想要缩放的matrix参数
+        Matrix matrix = new Matrix();
+        matrix.postScale(scaleWidth, scaleHeight);
+        // 得到新的图片
+        Bitmap newbm = Bitmap.createBitmap(mFlowBitmap, 0, 0, width, height, matrix,
+                true);
+        iv_setFlowStyle.setImageBitmap(newbm);
+
+        drawText();
+
+    }
+
+
 
     @Override
     public void onBackPressed() {

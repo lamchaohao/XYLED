@@ -20,6 +20,7 @@ import cn.com.hotled.xyled.bean.Program;
 import cn.com.hotled.xyled.dao.ProgramDao;
 import cn.com.hotled.xyled.util.MutilMoveCompressUtil;
 import cn.com.hotled.xyled.util.WifiMutilMoveCompressUtil;
+import cn.com.hotled.xyled.util.WifiToComputer;
 
 public class ProgramManageActivity extends BaseActivity {
     private static final int EASY_TEXT_REQUEST_CODE = 0x23;
@@ -65,6 +66,14 @@ public class ProgramManageActivity extends BaseActivity {
             public void onClick(View v) {
                 MutilMoveCompressUtil mutilMoveUtil =new MutilMoveCompressUtil(ProgramManageActivity.this,mProgramList,64,32,60,60);
                 mutilMoveUtil.startGenFile();
+            }
+        });
+
+        findViewById(R.id.bt_itemMan_sentoCompu).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                WifiToComputer wifiToComputer = new WifiToComputer(ProgramManageActivity.this,mProgramList,64,32,60,60);
+                wifiToComputer.startGenFile();
             }
         });
 
