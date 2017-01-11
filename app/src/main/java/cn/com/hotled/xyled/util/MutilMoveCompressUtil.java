@@ -99,7 +99,7 @@ public class MutilMoveCompressUtil {
             @Override
             public void handleMessage(Message msg) {
                 if (msg.arg1==100){
-                    Toast.makeText(mContext, "此节目文件已生成", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mContext, "USB传输文件已生成", Toast.LENGTH_SHORT).show();
                 }
             }
         };

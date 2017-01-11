@@ -26,7 +26,8 @@ import cn.com.hotled.xyled.App;
 import cn.com.hotled.xyled.bean.Program;
 import cn.com.hotled.xyled.bean.TextButton;
 import cn.com.hotled.xyled.dao.TextButtonDao;
-import cn.com.hotled.xyled.flowbound.FromFile;
+import cn.com.hotled.xyled.flowbound.BaseFlowBound;
+import cn.com.hotled.xyled.flowbound.ClockwiseFlow;
 
 import static android.graphics.Color.BLACK;
 
@@ -219,8 +220,8 @@ public class WifiToComputer {
 
     private void initFlowBound() {
         byte[] color={3,12,16};
-        FromFile flow =new FromFile(mScreenWidth,mScreenHeight,color,4,mFrameCount);
-        flow.setFlowFile(mProgramList.get(0).getFlowBoundFile());
+        BaseFlowBound flow =new ClockwiseFlow(mScreenWidth,mScreenHeight,color,4,mFrameCount);
+//        flow.setFlowFile(mProgramList.get(0).getFlowBoundFile());
         mFlowByteList = flow.genFlowBound();
 
     }

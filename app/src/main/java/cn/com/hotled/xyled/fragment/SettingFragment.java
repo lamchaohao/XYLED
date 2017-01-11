@@ -73,10 +73,12 @@ public class SettingFragment extends Fragment {
                         SendTest tcpSend=new SendTest(getContext(),tcpIP,Integer.parseInt(tcpPort),file);
                         tcpSend.send();
                         dialog.dismiss();
+//                        getActivity().startService(new Intent(getActivity(), SendDataService.class));
                     }
                 })
                 .setNegativeButton("cancle",null)
                 .show();
+
 
     }
     private void sendFileToComputer() {

@@ -60,6 +60,12 @@
         </activity>
         <activity android:name=".activity.SelectFlowActivity">
         </activity>
+
+        <service
+            android:name=".service.SendDataService"
+            android:enabled="true"
+            android:exported="true">
+        </service>
     </application>
 
 </manifest>

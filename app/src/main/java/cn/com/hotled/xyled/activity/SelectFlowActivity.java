@@ -6,6 +6,7 @@ import android.os.Environment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 
 import java.io.File;
@@ -31,9 +32,11 @@ public class SelectFlowActivity extends BaseActivity {
         mRvSelectFlow = (RecyclerView) findViewById(R.id.rv_selectflow);
         mRvSelectFlow.setLayoutManager(new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false));
         String filePath= Environment.getExternalStorageDirectory()+"/xyled.flow";
+        Log.i("environment",Environment.getExternalStorageDirectory().toString());
         File file=new File(filePath);
         File[] files = file.listFiles();
         mFileList = new ArrayList<>();
+        if (files!=null)
         for (File file1 : files) {
             mFileList.add(file1);
         }
