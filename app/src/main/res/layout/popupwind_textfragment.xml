@@ -161,6 +161,13 @@
                 android:layout_height="wrap_content" />
             <ImageButton
                 style="@style/TeXtEditIcon"
+                android:id="@+id/ib_fgText_inCenter"
+                android:src="@drawable/ic_view_day_black_36dp"
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="match_parent" />
+            <ImageButton
+                style="@style/TeXtEditIcon"
                 android:id="@+id/ib_fgText_trainY"
                 android:layout_weight="1"
                 android:src="@drawable/ic_swap_vert_black_48dp"
@@ -216,7 +223,9 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"/>
         </LinearLayout>
-
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="20dp"/>
     </LinearLayout>
 </ScrollView>
 

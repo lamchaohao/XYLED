@@ -2,18 +2,22 @@ package cn.com.hotled.xyled.util;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.net.wifi.WifiInfo;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.ConnectException;
 import java.net.Socket;
 
 import cn.com.hotled.xyled.R;
@@ -28,6 +32,7 @@ public class SendTest {
 
     private static final int UPDATE_PROGRESS = 0x11;
     private static final int WIFI_ERRO = 0x114;
+    private static final int CONN_ERRO = 0x124;
     private String targetIP;
     private int targetPort;
     private File mFile;
@@ -41,17 +46,25 @@ public class SendTest {
                     int arg1 = msg.arg1;
                     if (arg1==100){
                         Toast.makeText(mContext,"已发送",Toast.LENGTH_LONG).show();
+                        mTvStatus.setText("发送完成");
                     }
                     mProgressBar.setProgress(arg1);
                     break;
                 case WIFI_ERRO:
                     Toast.makeText(mContext,"所连接WiFi非本公司产品，请切换WiFi",Toast.LENGTH_LONG).show();
+                    mTvStatus.setText("所连接WiFi非本公司产品，请切换WiFi");
+                    mContext.startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
+                    break;
+                case CONN_ERRO:
+                    Toast.makeText(mContext,"连接错误，请重新连接屏幕",Toast.LENGTH_LONG).show();
+                    mTvStatus.setText("无法发送，请重新连接屏幕");
                     break;
             }
 
 
         }
     };
+    private TextView mTvStatus;
 
     public SendTest(Context context, String targetIP, int targetPort, File file) {
         this.mContext=context;
@@ -75,6 +88,7 @@ public class SendTest {
 
     private void showDialog() {
         View view = LayoutInflater.from(mContext).inflate(R.layout.content_progress, null);
+        mTvStatus = (TextView) view.findViewById(R.id.tv_progress_status);
         mProgressBar = (NumberProgressBar) view.findViewById(R.id.content_progressbar);
         mProgressBar.setProgress(0);
         mProgressBar.setMax(100);
@@ -85,10 +99,11 @@ public class SendTest {
             }
         });
         new AlertDialog.Builder(mContext)
-                .setTitle("sending...")
+                .setTitle("传送数据")
                 .setView(view)
-                .setPositiveButton("ok",null)
-                .setNegativeButton("dismiss",null)
+                .setCancelable(false)
+                .setPositiveButton("完成",null)
+                .setNegativeButton("关闭",null)
                 .show();
     }
     /**
@@ -237,16 +252,15 @@ public class SendTest {
             boolean pauseSuccess = true;
             for (int i = 0; i < readMsg.length; i++) {
                 if(pauseCMD[i]!=readMsg[i]){
-                    Log.w("tcpSend","暂停不成功 pauseCMD[i]!=readMsg[i]");
+                    Log.d("tcpSend","暂停不成功 pauseCMD[i]!=readMsg[i]");
                     pauseSuccess = false;
                 }
-//                Log.w("tcpSend","返回的暂停 pauseCMD msg = "+readMsg[i]);
             }
             if (pauseSuccess) {
-                Log.w("tcpSend","暂停成功");
+                Log.d("tcpSend","暂停成功");
                 //暂停了,开始写数据
-                Log.w("tcpSend","开始写数据");
-                Log.i("tcpSend","mFile size--"+mFile.length()+" byte");
+                Log.d("tcpSend","开始写数据");
+                Log.d("tcpSend","mFile size--"+mFile.length()+" byte");
                 int serialNum = (int) (mFile.length()/512); //包序是从0开始，基数与个数
                 if (mFile.length()%512==0){
                     serialNum--;
@@ -302,11 +316,12 @@ public class SendTest {
                         String s = writeCMD[i] + " ";
                         writeSB.append(s);
                     }
-                    Log.w("tcpSend","writeSB == "+writeSB.toString());
+//                    Log.d("tcpSend","writeSB == "+writeSB.toString());
                     setInbyteArray(0,writeCMD,sendPack);//写指令
                     setInbyteArray(16,buf,sendPack);//文件数据
 
-                    Log.w("tcpSend","flashAddress == "+flashAddress+",serialNum= "+serialNum);
+//                    Log.d("tcpSend","flashAddress == "+flashAddress+",serialNum= "+serialNum);
+                    Log.d("tcpSend","serialNum == "+serialNum);
                     os.write(sendPack,0,sendPack.length);
                     flashAddress += 512;
                     serialNum --;
@@ -318,7 +333,7 @@ public class SendTest {
                         String s = feedBackData[i] + " ";
                         sb.append(s);
                     }
-                    Log.w("tcpSend","feedBackData == "+sb.toString());
+//                    Log.d("tcpSend","feedBackData == "+sb.toString());
                     for(int startIndex =5;startIndex<8;startIndex++ ){
                         if(feedBackData[startIndex]==0){
                             writeSuccess=true;
@@ -328,7 +343,7 @@ public class SendTest {
                         }
                     }
 
-                    Log.w("tcpSend","writeSuccess == "+writeSuccess+" ");
+//                    Log.d("tcpSend","writeSuccess == "+writeSuccess+" ");
                     progress+=len;
                     float sumProgress = (progress / fileLength)*100;
                     Message msg=mHandler.obtainMessage();
@@ -348,8 +363,8 @@ public class SendTest {
 
                 setInbyteArray(0,writeCMD,sendPack);//暂停指令
                 setInbyteArray(16,firstPackage,sendPack);//文件数据
-                Log.w("tcpSend","firstPackage == "+firstPackage);
-                Log.w("tcpSend","flashAddress == "+0+",serialNum= "+0);
+//                Log.w("tcpSend","firstPackage == "+firstPackage);
+                Log.d("tcpSend","flashAddress == "+0+",serialNum= "+0);
                 os.write(sendPack,0,sendPack.length);
                 progress+=firstPackage.length;
                 float sumProgress = (progress / fileLength)*100;
@@ -357,16 +372,20 @@ public class SendTest {
                 msg.arg1= (int) sumProgress;
                 msg.what=UPDATE_PROGRESS;
                 mHandler.sendMessage(msg);
-                Log.w("tcpSend","sumProgress == "+msg.arg1);
+                Log.d("tcpSend","sumProgress == "+msg.arg1);
 
                 socket.getInputStream().read(feedBackData);
 
                 os.write(resetCMD);
                 socket.getInputStream().read(feedBackData);
-                Log.w("tcpSend","写入reset指令后读取 == "+0+",feedBackData= "+0);
-                Log.i("tcpSend","send file done");
+                Log.d("tcpSend","写入reset指令后读取 == "+0+",feedBackData= "+0);
+                Log.d("tcpSend","send file done");
             }
 
+        } catch (ConnectException e){
+            Message message = mHandler.obtainMessage();
+            message.what=CONN_ERRO;
+            mHandler.sendMessage(message);
         } catch (IOException e) {
             e.printStackTrace();
         }finally {

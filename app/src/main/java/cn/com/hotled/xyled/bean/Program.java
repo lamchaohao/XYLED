@@ -5,10 +5,9 @@ import org.greenrobot.greendao.annotation.Convert;
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
-import org.greenrobot.greendao.annotation.ToMany;
+import org.greenrobot.greendao.annotation.ToOne;
 
 import java.io.File;
-import java.util.List;
 
 import cn.com.hotled.xyled.dao.DaoSession;
 import cn.com.hotled.xyled.dao.ProgramDao;
@@ -41,9 +40,8 @@ public class Program {
 
     @Convert(converter = FileConverter.class,columnType = String.class)
     private File picFile;
-
-    @ToMany(referencedJoinProperty = "programId")
-    private List<TextButton> mTextButtons;
+    @ToOne
+    private TextButton mTextButton;
 
     /** Used to resolve relations */
     @Generated(hash = 2040040024)
@@ -52,7 +50,6 @@ public class Program {
     /** Used for active entity operations. */
     @Generated(hash = 1978875243)
     private transient ProgramDao myDao;
-
     @Generated(hash = 2090265522)
     public Program(long id, int sortNumber, long screenId, String programName,
             int baseX, int baseY, float frameTime, float stayTime,
@@ -73,152 +70,121 @@ public class Program {
         this.programType = programType;
         this.picFile = picFile;
     }
-
     @Generated(hash = 775603163)
     public Program() {
     }
-
     public long getId() {
         return this.id;
     }
-
     public void setId(long id) {
         this.id = id;
     }
-
     public int getSortNumber() {
         return this.sortNumber;
     }
-
     public void setSortNumber(int sortNumber) {
         this.sortNumber = sortNumber;
     }
-
     public long getScreenId() {
         return this.screenId;
     }
-
     public void setScreenId(long screenId) {
         this.screenId = screenId;
     }
-
     public String getProgramName() {
         return this.programName;
     }
-
     public void setProgramName(String programName) {
         this.programName = programName;
     }
-
     public int getBaseX() {
         return this.baseX;
     }
-
     public void setBaseX(int baseX) {
         this.baseX = baseX;
     }
-
     public int getBaseY() {
         return this.baseY;
     }
-
     public void setBaseY(int baseY) {
         this.baseY = baseY;
     }
-
     public float getFrameTime() {
         return this.frameTime;
     }
-
     public void setFrameTime(float frameTime) {
         this.frameTime = frameTime;
     }
-
     public float getStayTime() {
         return this.stayTime;
     }
-
     public void setStayTime(float stayTime) {
         this.stayTime = stayTime;
     }
-
     public File getFlowBoundFile() {
         return this.flowBoundFile;
     }
-
     public void setFlowBoundFile(File flowBoundFile) {
         this.flowBoundFile = flowBoundFile;
     }
-
     public int getFlowEffect() {
         return this.flowEffect;
     }
-
     public void setFlowEffect(int flowEffect) {
         this.flowEffect = flowEffect;
     }
-
     public int getFlowSpeed() {
         return this.flowSpeed;
     }
-
     public void setFlowSpeed(int flowSpeed) {
         this.flowSpeed = flowSpeed;
     }
-
     public boolean getUseFlowBound() {
         return this.useFlowBound;
     }
-
     public void setUseFlowBound(boolean useFlowBound) {
         this.useFlowBound = useFlowBound;
     }
-
     public ProgramType getProgramType() {
         return this.programType;
     }
-
     public void setProgramType(ProgramType programType) {
         this.programType = programType;
     }
-
     public File getPicFile() {
         return this.picFile;
     }
-
     public void setPicFile(File picFile) {
         this.picFile = picFile;
     }
-
-    /**
-     * To-many relationship, resolved on first access (and after reset).
-     * Changes to to-many relations are not persisted, make changes to the target entity.
-     */
-    @Generated(hash = 1854599080)
-    public List<TextButton> getMTextButtons() {
-        if (mTextButtons == null) {
-            final DaoSession daoSession = this.daoSession;
+    @Generated(hash = 831346144)
+    private transient boolean mTextButton__refreshed;
+    /** To-one relationship, resolved on first access. */
+    @Generated(hash = 962665120)
+    public TextButton getMTextButton() {
+        if (mTextButton != null || !mTextButton__refreshed) {
             if (daoSession == null) {
                 throw new DaoException("Entity is detached from DAO context");
             }
             TextButtonDao targetDao = daoSession.getTextButtonDao();
-            List<TextButton> mTextButtonsNew = targetDao
-                    ._queryProgram_MTextButtons(id);
-            synchronized (this) {
-                if (mTextButtons == null) {
-                    mTextButtons = mTextButtonsNew;
-                }
-            }
+            targetDao.refresh(mTextButton);
+            mTextButton__refreshed = true;
         }
-        return mTextButtons;
+        return mTextButton;
     }
-
-    /** Resets a to-many relationship, making the next get call to query for a fresh result. */
-    @Generated(hash = 2029917038)
-    public synchronized void resetMTextButtons() {
-        mTextButtons = null;
+    /** To-one relationship, returned entity is not refreshed and may carry only the PK property. */
+    @Generated(hash = 515791678)
+    public TextButton peakMTextButton() {
+        return mTextButton;
     }
-
+    /** called by internal mechanisms, do not call yourself. */
+    @Generated(hash = 727491815)
+    public void setMTextButton(TextButton mTextButton) {
+        synchronized (this) {
+            this.mTextButton = mTextButton;
+            mTextButton__refreshed = true;
+        }
+    }
     /**
      * Convenient call for {@link org.greenrobot.greendao.AbstractDao#delete(Object)}.
      * Entity must attached to an entity context.
@@ -230,7 +196,6 @@ public class Program {
         }
         myDao.delete(this);
     }
-
     /**
      * Convenient call for {@link org.greenrobot.greendao.AbstractDao#refresh(Object)}.
      * Entity must attached to an entity context.
@@ -242,7 +207,6 @@ public class Program {
         }
         myDao.refresh(this);
     }
-
     /**
      * Convenient call for {@link org.greenrobot.greendao.AbstractDao#update(Object)}.
      * Entity must attached to an entity context.
@@ -254,7 +218,6 @@ public class Program {
         }
         myDao.update(this);
     }
-
     /** called by internal mechanisms, do not call yourself. */
     @Generated(hash = 1211846659)
     public void __setDaoSession(DaoSession daoSession) {
@@ -262,6 +225,6 @@ public class Program {
         myDao = daoSession != null ? daoSession.getProgramDao() : null;
     }
 
-    
+
 
 }

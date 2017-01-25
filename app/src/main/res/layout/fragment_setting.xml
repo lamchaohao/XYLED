@@ -3,10 +3,31 @@
               android:orientation="vertical"
               android:layout_width="match_parent"
               android:layout_height="match_parent">
+
     <LinearLayout
         android:background="@drawable/recycler_bg"
         android:layout_margin="15dp"
-        android:padding="15dp"
+        android:padding="10dp"
+        android:id="@+id/ll_setting_enterWifi"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <ImageView
+            android:src="@drawable/ic_wifi_green_a700_36dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <TextView
+            android:layout_marginLeft="20dp"
+            android:text="连接屏幕"
+            android:layout_gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:background="@drawable/recycler_bg"
+        android:layout_margin="15dp"
+        android:padding="10dp"
         android:id="@+id/ll_setting_send"
         android:orientation="horizontal"
         android:layout_width="match_parent"
@@ -26,7 +47,7 @@
     <LinearLayout
         android:background="@drawable/recycler_bg"
         android:layout_margin="15dp"
-        android:padding="15dp"
+        android:padding="10dp"
         android:id="@+id/ll_setting_socket"
         android:orientation="horizontal"
         android:layout_width="match_parent"
@@ -43,25 +64,25 @@
             android:layout_height="wrap_content"/>
     </LinearLayout>
 
+
     <LinearLayout
         android:background="@drawable/recycler_bg"
         android:layout_margin="15dp"
-        android:padding="15dp"
-        android:id="@+id/ll_setting_sendtoComputer"
+        android:padding="10dp"
+        android:id="@+id/ll_setting_language"
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <ImageView
-            android:src="@drawable/ic_check_circle_green_700_36dp"
+            android:src="@drawable/ic_language_primary_dark_36dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
         <TextView
             android:layout_marginLeft="20dp"
-            android:text="发送到电脑"
+            android:text="语言"
             android:layout_gravity="center"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
     </LinearLayout>
-
 
 </LinearLayout>

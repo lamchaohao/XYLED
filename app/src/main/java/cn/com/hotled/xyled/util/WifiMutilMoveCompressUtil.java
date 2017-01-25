@@ -3,7 +3,6 @@ package cn.com.hotled.xyled.util;
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -17,7 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cn.com.hotled.xyled.bean.Program;
-import cn.com.hotled.xyled.flowbound.FromFile;
+import cn.com.hotled.xyled.bean.ProgramType;
+import cn.com.hotled.xyled.flowbound.AntiClockWiseFlow;
 
 /**
  * Created by Lam on 2016/12/15.
@@ -26,6 +26,7 @@ import cn.com.hotled.xyled.flowbound.FromFile;
 public class WifiMutilMoveCompressUtil {
 
     private static final int BLACK_BG_COL_BYTE_COUNT = 3;
+    private static final int TEXT_ATTRS_LENGTH = 6;
     //文件总头区 5byte
 
     private byte[] mFileHeadPart = new byte[5];
@@ -59,6 +60,8 @@ public class WifiMutilMoveCompressUtil {
     private List<Integer> mTextScreenHeightList;
     private List<Integer> mTextScreenWidthList;
     private List<Integer> mProgramLengthList;
+    private boolean isNeedSend;
+    private final List<Program> mTextProgram;
 
     public WifiMutilMoveCompressUtil(Activity context, List<Program> programs, int screenWidth, int screenHeight, float frameTime, float stayTime) {
         mContext = context;
@@ -71,11 +74,27 @@ public class WifiMutilMoveCompressUtil {
             @Override
             public void handleMessage(Message msg) {
                 if (msg.arg1 == 100) {
-                    Toast.makeText(mContext, "Wifi发送文件已生成", Toast.LENGTH_SHORT).show();
+                    if (isNeedSend){
+                        Toast.makeText(mContext, "录制完成，准备传输", Toast.LENGTH_SHORT).show();
+                        SendTest tcpSend=new SendTest(mContext,"192.168.3.1",16389,mColorPRG);
+                        tcpSend.send();
+                    }else {
+                        Toast.makeText(mContext, "Wifi发送文件已生成", Toast.LENGTH_SHORT).show();
+                    }
                 }
             }
         };
+        mTextProgram = new ArrayList<>();
+        for (Program program : mProgramList) {
+            if (program.getProgramType()== ProgramType.Text) {
+                mTextProgram.add(program);
+            }
+        }
 
+    }
+
+    public void setNeedSend(boolean needSend) {
+        isNeedSend = needSend;
     }
 
     private void initFileHead() {
@@ -94,7 +113,7 @@ public class WifiMutilMoveCompressUtil {
 
     private void initTextContent() {
         mProgramLengthList = new ArrayList<>();
-        DrawBitmapUtil drawBitmapUtil =new DrawBitmapUtil(mContext,mProgramList,mScreenWidth,mTextScreenHeightList);
+        DrawBitmapUtil drawBitmapUtil =new DrawBitmapUtil(mContext,mTextProgram,mScreenWidth,mTextScreenHeightList);
         mBitmapList = drawBitmapUtil.drawBitmap();
         mTextContentList = new ArrayList<>();
         mColByteCountList = new ArrayList<>();
@@ -218,10 +237,10 @@ public class WifiMutilMoveCompressUtil {
     private void initFlowBound() {
         mFlowByteList = new ArrayList<>();
 
-        boolean[] useFlow=new boolean[mProgramList.size()];
+        boolean[] useFlow=new boolean[mTextProgram.size()];
 
-        for (int i = 0; i < mProgramList.size(); i++) {
-            useFlow[i]=mProgramList.get(i).getUseFlowBound();
+        for (int i = 0; i < mTextProgram.size(); i++) {
+            useFlow[i]=mTextProgram.get(i).getUseFlowBound();
         }
 
         int useCount=0;
@@ -233,15 +252,15 @@ public class WifiMutilMoveCompressUtil {
 
         File[] flowFiles =new File[useCount];
         int fileIndex = 0;
-        for (int i = 0; i < mProgramList.size(); i++) {
+        for (int i = 0; i < mTextProgram.size(); i++) {
             if (useFlow[i]){
-                flowFiles[fileIndex]=mProgramList.get(i).getFlowBoundFile();
+                flowFiles[fileIndex]=mTextProgram.get(i).getFlowBoundFile();
                 fileIndex++;
             }
         }
 
         byte[] color={3,12,16};
-        FromFile flow =new FromFile(mScreenWidth,mScreenHeight,color,4,mFrameCount);
+        AntiClockWiseFlow flow =new AntiClockWiseFlow(mScreenWidth,mScreenHeight);
         flow.setFlowFile(flowFiles);
         flow.setUseFlows(useFlow);
         flow.setProgramLength(mProgramLengthList);
@@ -257,35 +276,41 @@ public class WifiMutilMoveCompressUtil {
         mTextScreenWidthList=new ArrayList<>();
         for (Program program : mProgramList) {
             byte[] tempTextAttr =new byte[6];
-            if (program.getUseFlowBound()) {
-                //初始化数据
-                Bitmap bitmap = BitmapFactory.decodeFile(program.getFlowBoundFile().getAbsolutePath());
-                int height = bitmap.getHeight();
-                byte[] screenStartAddress = intToByteArray(mScreenHeight * height + height, 2);
-                byte[] screenWidthByte = intToByteArray(mScreenWidth - height * 2, 2);
-                //设置到文字属性
-                tempTextAttr[0]=0;
-                setInbyteArray(1, screenStartAddress, tempTextAttr);
-                setInbyteArray(3, screenWidthByte, tempTextAttr);
-                tempTextAttr[5]= (byte) (mScreenHeight-height*2);
-                //保存到list
-                mTextAttrsList.add(tempTextAttr);
-                mTextScreenHeightList.add(mScreenHeight-height*2);
-                mTextScreenWidthList.add(mScreenWidth - height * 2);
+            if (program.getProgramType()==ProgramType.Text){
+                //文字节目
+                if (program.getUseFlowBound()) {
+                    //初始化数据
+                    Bitmap bitmap = BitmapFactory.decodeFile(program.getFlowBoundFile().getAbsolutePath());
+                    int height = bitmap.getHeight();
+                    byte[] screenStartAddress = intToByteArray(mScreenHeight * height + height, 2);
+                    byte[] screenWidthByte = intToByteArray(mScreenWidth - height * 2, 2);
+                    //设置到文字属性
+                    tempTextAttr[0]=0;
+                    setInbyteArray(1, screenStartAddress, tempTextAttr);
+                    setInbyteArray(3, screenWidthByte, tempTextAttr);
+                    tempTextAttr[5]= (byte) (mScreenHeight-height*2);
+                    //保存到list
+                    mTextAttrsList.add(tempTextAttr);
+                    mTextScreenHeightList.add(mScreenHeight-height*2);
+                    mTextScreenWidthList.add(mScreenWidth - height * 2);
+                }else {
+                    //如果没有使用流水边
+                    byte[] screenStartAddress = intToByteArray(0, 2);
+                    byte[] screenWidthByte = intToByteArray(mScreenWidth, 2);
+                    //设置到文字属性
+                    tempTextAttr[0]=0;  //底图
+                    setInbyteArray(1,screenStartAddress,tempTextAttr);
+                    setInbyteArray(3, screenWidthByte, tempTextAttr);
+                    tempTextAttr[5]= (byte) (mScreenHeight);
+                    //保存到list
+                    mTextAttrsList.add(tempTextAttr);
+                    mTextScreenHeightList.add(mScreenHeight);
+                    mTextScreenWidthList.add(mScreenWidth);
+                }
             }else {
-                //如果没有使用流水边
-                byte[] screenStartAddress = intToByteArray(0, 2);
-                byte[] screenWidthByte = intToByteArray(mScreenWidth, 2);
-                //设置到文字属性
-                tempTextAttr[0]=0;  //底图
-                setInbyteArray(1,screenStartAddress,tempTextAttr);
-                setInbyteArray(3, screenWidthByte, tempTextAttr);
-                tempTextAttr[5]= (byte) (mScreenHeight);
-                //保存到list
-                mTextAttrsList.add(tempTextAttr);
-                mTextScreenHeightList.add(mScreenHeight);
-                mTextScreenWidthList.add(mScreenWidth);
+                //图片节目
             }
+
         }
     }
 
@@ -300,12 +325,6 @@ public class WifiMutilMoveCompressUtil {
 
     private void setTimeAxis(int index) {
         //文字属性地址 3byte
-        int attrStartAddress =  mFileHeadPart.length + mItemPart.length;
-        for (int i = 0; i < index; i++) {
-            attrStartAddress += mTextAttrsList.get(index).length;//每个节目加上各自的文字属性
-        }
-
-
         int flowBoundslength = 0;
         for (byte[] bytes : mFlowByteList) {
             flowBoundslength+=bytes.length;
@@ -334,7 +353,8 @@ public class WifiMutilMoveCompressUtil {
             int tempPicAddress= textContentAddressInt-flowBoundslength+mFlowAddress;
 
             byte[] picAddress = intToByteArray(tempPicAddress, 4);//当方式为跳向指定帧时这个地址是指向时间轴上的一个时间点(头0开始)
-            byte[] attrAddress = intToByteArray(attrStartAddress, 3);
+//            byte[] attrAddress = intToByteArray(attrStartAddress, 3);
+            byte[] attrAddress = getAttrAddress(mFrameIndex);
             byte[] textContentAddress = intToByteArray(tempTextAddress, 4);
             byte[] clockOrTem = new byte[3];
 
@@ -347,17 +367,30 @@ public class WifiMutilMoveCompressUtil {
         }
 
     }
+
+    private byte[] getAttrAddress(int frameIndex) {
+        int attrStartAddress =  mFileHeadPart.length + mItemPart.length;
+        int whichProgram=0;
+        int currentFrame=mProgramLengthList.get(whichProgram)-mTextScreenWidthList.get(0);
+        while(frameIndex>currentFrame&&whichProgram<mTextAttrsList.size()-1){
+            whichProgram++;
+            currentFrame+=mProgramLengthList.get(whichProgram);
+        }
+        int other=attrStartAddress+(whichProgram)*6;
+        return intToByteArray(other, 3);
+    }
+
     private void checkFault() {
         int i=0;
         int attrStartAddress =  mFileHeadPart.length + mItemPart.length;
         for (byte[] bytes : mTimeAxisList) {
-            int m=0;
-            int j=mProgramLengthList.get(m)-mTextScreenWidthList.get(m);
-            while(i>j&&m<mTextAttrsList.size()-1){
-                m++;
-                j+=mProgramLengthList.get(m);
+            int whichProgram=0;
+            int currentFrame=mProgramLengthList.get(whichProgram)-mTextScreenWidthList.get(whichProgram);
+            while(i>currentFrame&&whichProgram<mTextAttrsList.size()-1){
+                whichProgram++;
+                currentFrame+=mProgramLengthList.get(whichProgram);
             }
-            int other=attrStartAddress+(m)*6;
+            int other=attrStartAddress+(whichProgram)*6;
             byte[] textAtt = intToByteArray(other, 3);
             setInbyteArray(6,textAtt,bytes);
             i++;
@@ -429,27 +462,21 @@ public class WifiMutilMoveCompressUtil {
         initFlowBound();
         initTimeAxis();
         initItemPart();
-        checkFault();
+//        checkFault();
         Log.i("move", "帧数 mframeCount = " + mFrameCount);
         Log.i("move", "时间轴 mTimeAxisList = " + mTimeAxisList.size());
 
-        mColorPRG = new File(Environment.getExternalStorageDirectory() + "/amap/COLOR_01.PRG");
+        mColorPRG = new File(mContext.getFilesDir()+"/color.prg");
+        Log.i("move", "mColorPRG = " + mColorPRG.getAbsolutePath());
         if (mColorPRG.exists()) {
             Log.i("move", "文件已存在" + mColorPRG.getAbsolutePath());
             mColorPRG.delete();
-            try {
-                mColorPRG.createNewFile();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
             Log.i("move", "文件已存在" + mColorPRG.getAbsolutePath() + "并删除");
-        } else {
-            try {
-                mColorPRG.createNewFile();
-                Log.i("move", "生成新文件" + mColorPRG.getAbsolutePath());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+        }
+        try {
+            mColorPRG.createNewFile();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
         FileOutputStream fos = null;
         try {

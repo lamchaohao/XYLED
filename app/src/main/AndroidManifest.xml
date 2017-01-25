@@ -20,25 +20,16 @@
         android:theme="@style/AppTheme.NoActionBar">
         <activity
             android:name=".activity.MainActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
 
-                <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
         </activity>
         <activity
             android:name=".activity.SocketActivity"
             android:windowSoftInputMode="adjustPan"/>
-        <activity
-            android:name=".activity.HomeActivity"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="adjustResize">
-        </activity>
         <activity android:name=".activity.ConnectWifiActivity"/>
         <activity android:name=".activity.TestActivity">
         </activity>
-        <activity android:name=".activity.MoveTestActivity"/>
         <activity
             android:name=".activity.BrowsePhotoActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
@@ -52,6 +43,7 @@
             android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
         <activity
             android:name=".activity.EasyTextActivity"
+            android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden">
         </activity>
         <activity android:name=".activity.AddScreenActivity">
@@ -66,6 +58,22 @@
             android:enabled="true"
             android:exported="true">
         </service>
+
+        <activity android:name=".activity.PhotoEditActivity">
+        </activity>
+        <activity android:name=".activity.ReadActivity">
+        </activity>
+        <activity android:name=".activity.SendActivity">
+        </activity>
+        <activity android:name=".activity.AboutUsActivity">
+        </activity>
+        <activity android:name=".activity.WelcomeActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

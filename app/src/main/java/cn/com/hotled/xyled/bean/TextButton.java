@@ -1,12 +1,9 @@
 package cn.com.hotled.xyled.bean;
 
-import android.widget.Button;
-
 import org.greenrobot.greendao.annotation.Convert;
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
-import org.greenrobot.greendao.annotation.Transient;
 
 import java.io.File;
 
@@ -17,12 +14,9 @@ import java.io.File;
 public class TextButton {
     @Id(autoincrement = true)
     private long id;
-    @Transient //不进行持久化
-    private Button button;
     private String text;
     @Convert(converter = FileConverter.class,columnType = String.class)
     private File typeface;
-
     private int textSize;
     private int textColor;
     private int textBackgroudColor;
@@ -32,20 +26,11 @@ public class TextButton {
     private boolean isSelected;
     private int sortNumber;
     private long programId;
-
-    public TextButton(String text, int textSize, int textColor, int textBackgroudColor, boolean isbold, boolean isIlatic, boolean isUnderline) {
-        this.text = text;
-        this.textSize = textSize;
-        this.textColor = textColor;
-        this.textBackgroudColor = textBackgroudColor;
-        this.isbold = isbold;
-        this.isIlatic = isIlatic;
-        this.isUnderline = isUnderline;
-    }
-
     @Generated(hash = 1776588816)
-    public TextButton(long id, String text, File typeface, int textSize, int textColor, int textBackgroudColor, boolean isbold,
-            boolean isIlatic, boolean isUnderline, boolean isSelected, int sortNumber, long programId) {
+    public TextButton(long id, String text, File typeface, int textSize,
+            int textColor, int textBackgroudColor, boolean isbold, boolean isIlatic,
+            boolean isUnderline, boolean isSelected, int sortNumber,
+            long programId) {
         this.id = id;
         this.text = text;
         this.typeface = typeface;
@@ -59,123 +44,80 @@ public class TextButton {
         this.sortNumber = sortNumber;
         this.programId = programId;
     }
-
+    @Generated(hash = 1553072539)
     public TextButton() {
-        setId(System.currentTimeMillis());
     }
-
     public long getId() {
         return this.id;
     }
-
     public void setId(long id) {
         this.id = id;
     }
-
     public String getText() {
         return this.text;
     }
-
     public void setText(String text) {
         this.text = text;
     }
-
     public File getTypeface() {
         return this.typeface;
     }
-
     public void setTypeface(File typeface) {
         this.typeface = typeface;
     }
-
     public int getTextSize() {
         return this.textSize;
     }
-
     public void setTextSize(int textSize) {
         this.textSize = textSize;
     }
-
     public int getTextColor() {
         return this.textColor;
     }
-
     public void setTextColor(int textColor) {
         this.textColor = textColor;
     }
-
     public int getTextBackgroudColor() {
         return this.textBackgroudColor;
     }
-
     public void setTextBackgroudColor(int textBackgroudColor) {
         this.textBackgroudColor = textBackgroudColor;
     }
-
-    public boolean isbold() {
-        return this.isbold;
-    }
-
-    public void setIsbold(boolean isbold) {
-        this.isbold = isbold;
-    }
-
-    public boolean isIlatic() {
-        return this.isIlatic;
-    }
-
-    public void setIsIlatic(boolean isIlatic) {
-        this.isIlatic = isIlatic;
-    }
-
-    public boolean isUnderline() {
-        return this.isUnderline;
-    }
-
-    public void setIsUnderline(boolean isUnderline) {
-        this.isUnderline = isUnderline;
-    }
-
-    public boolean isSelected() {
-        return this.isSelected;
-    }
-
-    public void setIsSelected(boolean isSelected) {
-        this.isSelected = isSelected;
-    }
-
-    public long getProgramId() {
-        return this.programId;
-    }
-
-    public void setProgramId(long programId) {
-        this.programId = programId;
-    }
-
     public boolean getIsbold() {
         return this.isbold;
     }
-
+    public void setIsbold(boolean isbold) {
+        this.isbold = isbold;
+    }
     public boolean getIsIlatic() {
         return this.isIlatic;
     }
-
+    public void setIsIlatic(boolean isIlatic) {
+        this.isIlatic = isIlatic;
+    }
     public boolean getIsUnderline() {
         return this.isUnderline;
     }
-
+    public void setIsUnderline(boolean isUnderline) {
+        this.isUnderline = isUnderline;
+    }
     public boolean getIsSelected() {
         return this.isSelected;
     }
-
+    public void setIsSelected(boolean isSelected) {
+        this.isSelected = isSelected;
+    }
     public int getSortNumber() {
         return this.sortNumber;
     }
-
     public void setSortNumber(int sortNumber) {
         this.sortNumber = sortNumber;
     }
-
-
+    public long getProgramId() {
+        return this.programId;
+    }
+    public void setProgramId(long programId) {
+        this.programId = programId;
+    }
 
 }

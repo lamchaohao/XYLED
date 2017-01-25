@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_send"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="cn.com.hotled.xyled.activity.SendActivity">
+    <ProgressBar
+        android:id="@+id/pb_send_record"
+        android:layout_marginTop="30dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+    <RelativeLayout
+        android:layout_centerInParent="true"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <cn.com.hotled.xyled.view.NumberProgressBar
+            android:paddingTop="10dp"
+            android:visibility="gone"
+            android:id="@+id/send_progressbar"
+            style="@style/NumberProgressBar_Beauty_Red"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+        <TextView
+            android:id="@+id/tv_progress_send"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="30dp"
+            android:text="请耐心等候，录制文件"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </RelativeLayout>
+    <Button
+        android:id="@+id/bt_send_sendAct"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        android:text="发送"
+        android:layout_marginBottom="5dp"
+        android:background="@drawable/recycler_bg"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+</RelativeLayout>

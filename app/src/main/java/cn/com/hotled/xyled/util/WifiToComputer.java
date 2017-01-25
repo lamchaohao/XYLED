@@ -2,12 +2,7 @@ package cn.com.hotled.xyled.util;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
-import android.graphics.Typeface;
+import android.graphics.BitmapFactory;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
@@ -22,14 +17,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import cn.com.hotled.xyled.App;
 import cn.com.hotled.xyled.bean.Program;
-import cn.com.hotled.xyled.bean.TextButton;
-import cn.com.hotled.xyled.dao.TextButtonDao;
-import cn.com.hotled.xyled.flowbound.BaseFlowBound;
-import cn.com.hotled.xyled.flowbound.ClockwiseFlow;
-
-import static android.graphics.Color.BLACK;
+import cn.com.hotled.xyled.flowbound.AntiClockWiseFlow;
 
 /**
  * Created by Lam on 2016/12/15.
@@ -38,26 +27,15 @@ import static android.graphics.Color.BLACK;
 public class WifiToComputer {
 
     private static final int BLACK_BG_COL_BYTE_COUNT = 3;
+    private static final int TEXT_ATTRS_LENGTH = 6;
     //文件总头区 5byte
-    private byte fileHeadLength;   //总头长度
-    private byte mItemCount;       //节目个数
-    private byte mItemTableLength; //节目表长度
-    private byte mFrameHeadLength; //帧头长度
-    private byte mTextAttrsLength;  //字层性长度
+
     private byte[] mFileHeadPart = new byte[5];
 
     //节目区 10byte
     private byte[] mItemPart = new byte[10];
 
     //文字属性区 6byte
-    private byte[] mTextAttrs = new byte[6];
-    private byte textStyle;
-    private byte[] screenAddress = new byte[2];
-    private byte[] screenWidthByte = new byte[2];
-    private byte screenHeightByte;
-
-    private byte mFrameTime;
-    private byte mStayTime;
 
     private byte picStyle;
 
@@ -73,26 +51,16 @@ public class WifiToComputer {
     private Handler genFileHandler;
 
     private List<byte[]> mColByteCountList;
-    private List<TextButton> mTextButtonList;
 
-    private int mTextSize;
-    private int mTextColor = Color.RED;
-    private int mTextBgColor = BLACK;
-    private boolean isBold;
-    private boolean isItalic;
-    private boolean isUnderLine;
-    private File mTypeFile;
-    private int mWidth;
-    private int mHeight;
-    private int mBaseX = 0;
-    private int mBaseY = 25;
     private List<Bitmap> mBitmapList;
     private int mTempColbyteCount;
-    private boolean isBlankSide;
-    private byte[] mFlowBoundBytes;
     private List<byte[]> mFlowByteList;
     private int mFrameIndex = 0;
     private int mFlowAddress=0;
+    private List<byte[]> mTextAttrsList;
+    private List<Integer> mTextScreenHeightList;
+    private List<Integer> mTextScreenWidthList;
+    private List<Integer> mProgramLengthList;
     private byte[] mHeadBytes;
 
     public WifiToComputer(Activity context, List<Program> programs, int screenWidth, int screenHeight, float frameTime, float stayTime) {
@@ -100,8 +68,8 @@ public class WifiToComputer {
         mProgramList = programs;
         mScreenWidth = screenWidth;
         mScreenHeight = screenHeight;
-        mFrameTime = (byte) frameTime;
-        mStayTime = (byte) stayTime;
+//        mFrameTime = (byte) frameTime;
+//        mStayTime = (byte) stayTime;
         genFileHandler = new Handler() {
             @Override
             public void handleMessage(Message msg) {
@@ -114,20 +82,23 @@ public class WifiToComputer {
     }
 
     private void initFileHead() {
-        fileHeadLength = 4;
-        mItemCount = 1;
-        mItemTableLength = 10;
-        mFrameHeadLength = 16;
-        mTextAttrsLength = 6;
+
+        byte fileHeadLength = 4;          //总头长度
+        byte itemCount = 1;              //节目个数
+        byte itemTableLength = 10;       //节目表长度
+        byte frameHeadLength = 16;       //帧头长度
+        byte textAttrsLength = 6;         //字层性长度
         mFileHeadPart[0] = fileHeadLength;
-        mFileHeadPart[1] = mItemCount;
-        mFileHeadPart[2] = mItemTableLength;
-        mFileHeadPart[3] = mFrameHeadLength;
-        mFileHeadPart[4] = mTextAttrsLength;
+        mFileHeadPart[1] = itemCount;
+        mFileHeadPart[2] = itemTableLength;
+        mFileHeadPart[3] = frameHeadLength;
+        mFileHeadPart[4] = textAttrsLength;
     }
 
     private void initTextContent() {
-        mBitmapList = drawBitmap();
+        mProgramLengthList = new ArrayList<>();
+        DrawBitmapUtil drawBitmapUtil =new DrawBitmapUtil(mContext,mProgramList,mScreenWidth,mTextScreenHeightList);
+        mBitmapList = drawBitmapUtil.drawBitmap();
         mTextContentList = new ArrayList<>();
         mColByteCountList = new ArrayList<>();
         for (int i = 0; i < mBitmapList.size(); i++) {
@@ -139,26 +110,8 @@ public class WifiToComputer {
         byte[] bitmapPixels = null;
         int xStart = 0;
         int yStart = 0;
-        int widthToCompress = 0;
-        if (isBlankSide){
-            bitmapPixels = new byte[bitmap.getWidth() * bitmap.getHeight()];
-            mFrameCount+=bitmap.getWidth();
-        }else {
-            if (index==mBitmapList.size()-1){
-                bitmapPixels = new byte[(bitmap.getWidth()+mScreenWidth*2 )* bitmap.getHeight()];
-                widthToCompress = bitmap.getWidth()+mScreenWidth*2; //最后一个节目前后都加上黑色图片
-                mFrameCount+=widthToCompress;
-            }else {
-                bitmapPixels = new byte[(bitmap.getWidth()+mScreenWidth) * bitmap.getHeight()];
-                widthToCompress = bitmap.getWidth()+mScreenWidth;
-                mFrameCount+=widthToCompress;
-            }
-
-            xStart =mScreenWidth;
-            yStart= bitmap.getHeight();
-
-        }
-
+        bitmapPixels = new byte[bitmap.getWidth() * bitmap.getHeight()];
+        int widthToCompress = bitmap.getWidth();
         for (int x1 = 0, i = xStart*yStart; x1 < bitmap.getWidth(); x1++) {
             for (int y1 = 0; y1 < bitmap.getHeight(); y1++) {
                 int pixel = bitmap.getPixel(x1, y1);
@@ -171,7 +124,7 @@ public class WifiToComputer {
                 } else if (hexStr.length() >= 6) {
                     int length = hexStr.length();
                     hexStr = hexStr.substring(length - 6);//保证要有6位数字
-                    red = Integer.parseInt(hexStr.substring(0, 2), 16);
+                    red = Integer.parseInt(hexStr.substring(0, 2), 16);//使用十六进制
                     green = Integer.parseInt(hexStr.substring(2, 4), 16);
                     blue = Integer.parseInt(hexStr.substring(4, 6), 16);
                 }
@@ -193,18 +146,65 @@ public class WifiToComputer {
 
         //取点后压缩
         CompressAlgorithm compressAlgorithm = new CompressAlgorithm();
-        List<Byte> compress = compressAlgorithm.compress(bitmapPixels, widthToCompress, mScreenHeight-4);//进行压缩
-        byte[] textContent = new byte[compress.size()];
-        for (int i = 0; i < compress.size(); i++) {
-            textContent[i] = compress.get(i);
+        List<Byte> compress = compressAlgorithm.compress(bitmapPixels, widthToCompress, mTextScreenHeightList.get(index));//进行压缩
+        //当前节目所使用的屏幕宽度
+        int currentScreenWidth=mTextScreenWidthList.get(index);
+        //黑色过渡图片
+        byte[] blackBgBytes = addABlack(mTextScreenHeightList.get(index),currentScreenWidth);
+        //包括两张黑色图片与正文的文字内容字节数组
+        byte[] textContent = new byte[compress.size()+blackBgBytes.length*2];
+        //此节目中压缩后的每一列的所需用到的字节数
+        byte[] tempColByteCount=new byte[widthToCompress+currentScreenWidth*2];
+
+        //前 黑色背景
+        for (int i=0;i<blackBgBytes.length;i++){
+            textContent[i] = blackBgBytes[i];
+        }
+        for (int i=0;i<currentScreenWidth;i++){
+            tempColByteCount[i]=BLACK_BG_COL_BYTE_COUNT;
         }
 
-        mColByteCountList.add(compressAlgorithm.getColByteCount());
+        //中 正文
+        for (int i = 0,textStart=blackBgBytes.length; i < compress.size(); i++) {
+            textContent[textStart+i] = compress.get(i);
+        }
+        byte[] colByteCount = compressAlgorithm.getColByteCount();
+        for (int i = 0; i < colByteCount.length; i++) {
+            tempColByteCount[currentScreenWidth+i]=colByteCount[i];
+        }
+
+        //后 黑色背景
+        for (int i = 0,textStart=compress.size()+blackBgBytes.length; i < blackBgBytes.length; i++) {
+            textContent[textStart+i] = blackBgBytes[i];
+        }
+        for (int i=colByteCount.length+currentScreenWidth;i<tempColByteCount.length;i++){
+            tempColByteCount[i]=BLACK_BG_COL_BYTE_COUNT;
+        }
+
+        mColByteCountList.add(tempColByteCount);
+        mProgramLengthList.add(widthToCompress+currentScreenWidth*2);
+        mFrameCount+=(widthToCompress+currentScreenWidth*2);
         return textContent;
     }
 
+
+    private byte[] addABlack(int height,int currentScreenWidth){
+        byte count = (byte) (height-8);
+        byte blackColor = 64;
+        byte[] blackBg=new byte[BLACK_BG_COL_BYTE_COUNT*currentScreenWidth];
+        int index = 0;
+        for (int i = 0; i < blackBg.length; i++) {
+            blackBg[i] = blackColor;
+            index++;
+            if (index % BLACK_BG_COL_BYTE_COUNT == 0) {
+                blackBg[i] = count;
+            }
+        }
+        return blackBg;
+    }
+
     private void initBlackBG() {
-        byte count = (byte) 24;
+        byte count = (byte) (mScreenHeight-8);
         byte blackColor = 64;
         mBlackBG = new byte[BLACK_BG_COL_BYTE_COUNT * (mScreenWidth)];
         int index = 0;
@@ -219,47 +219,77 @@ public class WifiToComputer {
     }
 
     private void initFlowBound() {
+        mFlowByteList = new ArrayList<>();
+
+        boolean[] useFlow=new boolean[mProgramList.size()];
+
+        for (int i = 0; i < mProgramList.size(); i++) {
+            useFlow[i]=mProgramList.get(i).getUseFlowBound();
+        }
+
+        int useCount=0;
+        for (boolean use : useFlow) {
+            if (use) {
+                useCount++;
+            }
+        }
+
+        File[] flowFiles =new File[useCount];
+        int fileIndex = 0;
+        for (int i = 0; i < mProgramList.size(); i++) {
+            if (useFlow[i]){
+                flowFiles[fileIndex]=mProgramList.get(i).getFlowBoundFile();
+                fileIndex++;
+            }
+        }
+
         byte[] color={3,12,16};
-        BaseFlowBound flow =new ClockwiseFlow(mScreenWidth,mScreenHeight,color,4,mFrameCount);
-//        flow.setFlowFile(mProgramList.get(0).getFlowBoundFile());
+        AntiClockWiseFlow flow =new AntiClockWiseFlow(mScreenWidth,mScreenHeight);
+        flow.setFlowFile(flowFiles);
+        flow.setUseFlows(useFlow);
+        flow.setProgramLength(mProgramLengthList);
         mFlowByteList = flow.genFlowBound();
-
     }
 
 
 
-
-
-    private void initItemPart() {
-
-        mFrameCount -= mScreenWidth;
-
-        byte[] frameCountByte = intToByteArray(mFrameCount, 2);
-        setInbyteArray(1, frameCountByte, mItemPart);
-        int textContentLength = 0;
-        for (byte[] bytes : mTextContentList) {
-            textContentLength += bytes.length;
-        }
-        int flowBoundslength = 0;
-        for (byte[] bytes : mFlowByteList) {
-            flowBoundslength+=bytes.length;
-        }
-        int timeAxisAddress = mFileHeadPart.length + mItemPart.length + mTextAttrs.length + mBlackBG.length +flowBoundslength+ textContentLength ;
-        setInbyteArray(6, intToByteArray(timeAxisAddress, 4), mItemPart);
-    }
 
     private void initTextAttrs() {
-        textStyle = 0;//底图
-//        screenAddress[0] = 0;
-//        screenAddress[1] = 0;
-        screenAddress = intToByteArray(66, 2);
-        screenWidthByte = intToByteArray(mScreenWidth-4, 2);
-        screenHeightByte = (byte) (mScreenHeight-4);
-
-        mTextAttrs[0] = textStyle;
-        setInbyteArray(1, screenAddress, mTextAttrs);
-        setInbyteArray(3, screenWidthByte, mTextAttrs);
-        mTextAttrs[5] = screenHeightByte;
+        mTextAttrsList = new ArrayList<>();
+        mTextScreenHeightList = new ArrayList<>();
+        mTextScreenWidthList=new ArrayList<>();
+        for (Program program : mProgramList) {
+            byte[] tempTextAttr =new byte[6];
+            if (program.getUseFlowBound()) {
+                //初始化数据
+                Bitmap bitmap = BitmapFactory.decodeFile(program.getFlowBoundFile().getAbsolutePath());
+                int height = bitmap.getHeight();
+                byte[] screenStartAddress = intToByteArray(mScreenHeight * height + height, 2);
+                byte[] screenWidthByte = intToByteArray(mScreenWidth - height * 2, 2);
+                //设置到文字属性
+                tempTextAttr[0]=0;
+                setInbyteArray(1, screenStartAddress, tempTextAttr);
+                setInbyteArray(3, screenWidthByte, tempTextAttr);
+                tempTextAttr[5]= (byte) (mScreenHeight-height*2);
+                //保存到list
+                mTextAttrsList.add(tempTextAttr);
+                mTextScreenHeightList.add(mScreenHeight-height*2);
+                mTextScreenWidthList.add(mScreenWidth - height * 2);
+            }else {
+                //如果没有使用流水边
+                byte[] screenStartAddress = intToByteArray(0, 2);
+                byte[] screenWidthByte = intToByteArray(mScreenWidth, 2);
+                //设置到文字属性
+                tempTextAttr[0]=0;  //底图
+                setInbyteArray(1,screenStartAddress,tempTextAttr);
+                setInbyteArray(3, screenWidthByte, tempTextAttr);
+                tempTextAttr[5]= (byte) (mScreenHeight);
+                //保存到list
+                mTextAttrsList.add(tempTextAttr);
+                mTextScreenHeightList.add(mScreenHeight);
+                mTextScreenWidthList.add(mScreenWidth);
+            }
+        }
     }
 
 
@@ -274,13 +304,21 @@ public class WifiToComputer {
     private void setTimeAxis(int index) {
         //文字属性地址 3byte
         int attrStartAddress =  mFileHeadPart.length + mItemPart.length;
-        //文字地址
+        int whichProgram=0;
+        int currentFrame=mProgramLengthList.get(whichProgram)-mTextScreenWidthList.get(whichProgram);
+
+        while(mFrameIndex>currentFrame&&whichProgram<mTextAttrsList.size()-1){
+            whichProgram++;
+            currentFrame+=mProgramLengthList.get(whichProgram);
+        }
+        attrStartAddress=attrStartAddress+(whichProgram)*TEXT_ATTRS_LENGTH;
+
         int flowBoundslength = 0;
         for (byte[] bytes : mFlowByteList) {
             flowBoundslength+=bytes.length;
         }
-
-        int textContentAddressInt = mFileHeadPart.length + mItemPart.length + mTextAttrs.length + mBlackBG.length +flowBoundslength ;
+        //文字地址
+        int textContentAddressInt = mFileHeadPart.length + mItemPart.length + 6*mTextAttrsList.size() + mBlackBG.length +flowBoundslength ;
         picStyle = 0;//1BIT地址指向(0=图层,1=跳转地址),7BIT未用
 
         for (int i = 0; i < mColByteCountList.get(index).length; i++) {
@@ -303,7 +341,8 @@ public class WifiToComputer {
             int tempPicAddress= textContentAddressInt-flowBoundslength+mFlowAddress;
 
             byte[] picAddress = intToByteArray(tempPicAddress, 4);//当方式为跳向指定帧时这个地址是指向时间轴上的一个时间点(头0开始)
-            byte[] attrAddress = intToByteArray(attrStartAddress, 3);
+//            byte[] attrAddress = intToByteArray(attrStartAddress, 3);
+            byte[] attrAddress = getAttrAddress(mFrameIndex);
             byte[] textContentAddress = intToByteArray(tempTextAddress, 4);
             byte[] clockOrTem = new byte[3];
 
@@ -315,128 +354,51 @@ public class WifiToComputer {
             mTimeAxisList.add(timeAxis);
         }
 
-
     }
 
-
-    private List<Bitmap> drawBitmap() {
-        List<Bitmap> bitmaps = new ArrayList<>();
-        for (Program program : mProgramList) {
-            mTextButtonList = ((App) mContext.getApplication()).getDaoSession().getTextButtonDao().queryBuilder().where(TextButtonDao.Properties.ProgramId.eq(program.getId())).list();
-            if (mTextButtonList == null || mTextButtonList.size() == 0) {
-                mTextButtonList = new ArrayList<>();
-            }
-
-            for (int i = 0; i < mTextButtonList.size(); i++) {
-                if (i == mTextButtonList.size() - 1) {
-                    TextButton textButton = mTextButtonList.get(0);
-                    mTextBgColor = textButton.getTextBackgroudColor();
-                    mTextColor = textButton.getTextColor();
-                    mTextSize = textButton.getTextSize();
-                    isUnderLine = textButton.getIsUnderline();
-                    isItalic = textButton.getIsIlatic();
-                    isBold = textButton.getIsbold();
-                    mTypeFile = textButton.getTypeface();
-                    mBaseX = program.getBaseX();
-                    mBaseY = program.getBaseY();
-                }
-            }
-            bitmaps.add(drawText());
-            ;
+    private byte[] getAttrAddress(int frameIndex) {
+        int attrStartAddress =  mFileHeadPart.length + mItemPart.length;
+        int whichProgram=0;
+        int currentFrame=mProgramLengthList.get(whichProgram)-mTextScreenWidthList.get(whichProgram);
+        while(frameIndex>currentFrame&&whichProgram<mTextAttrsList.size()-1){
+            whichProgram++;
+            currentFrame+=mProgramLengthList.get(whichProgram);
         }
-        return bitmaps;
+        int other=attrStartAddress+(whichProgram)*6;
+        return intToByteArray(other, 3);
     }
 
-    private Bitmap drawText() {
-        Paint paint = new Paint();
-        Canvas canvas = new Canvas();
-        StringBuilder sb = new StringBuilder();
-        for (TextButton textButton : mTextButtonList) {
-            sb.append(textButton.getText());
+    private void checkFault() {
+        int i=0;
+        int attrStartAddress =  mFileHeadPart.length + mItemPart.length;
+        for (byte[] bytes : mTimeAxisList) {
+            int whichProgram=0;
+            int currentFrame=mProgramLengthList.get(whichProgram)-mTextScreenWidthList.get(whichProgram);
+            while(i>currentFrame&&whichProgram<mTextAttrsList.size()-1){
+                whichProgram++;
+                currentFrame+=mProgramLengthList.get(whichProgram);
+            }
+            int other=attrStartAddress+(whichProgram)*6;
+            byte[] textAtt = intToByteArray(other, 3);
+            setInbyteArray(6,textAtt,bytes);
+            i++;
         }
-
-        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
-        canvas.drawPaint(paint);
-        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
-
-        //如果图片比所设置的宽，则需加长
-
-        //先设置好画笔，才进行计算
-        paint.setColor(mTextColor);
-        paint.setTextSize(mTextSize);
-
-        if (mTypeFile != null) {
-            Typeface typeface = Typeface.createFromFile(mTypeFile);
-            paint.setTypeface(typeface);
-            if (isBold) {//粗体
-                paint.setTypeface(Typeface.create(typeface, Typeface.BOLD));
-            }
-            if (isItalic) {//斜体
-                paint.setTypeface(Typeface.create(typeface, Typeface.ITALIC));
-            }
-            if (isBold && isItalic) {//粗斜体
-                paint.setTypeface(Typeface.create(typeface, Typeface.BOLD_ITALIC));
-            }
-        } else {
-            paint.setTypeface(Typeface.DEFAULT);
-
-            if (isBold) {//粗体
-                paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
-            }
-            if (isItalic) {//斜体
-                paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.ITALIC));
-            }
-            if (isBold && isItalic) {//粗斜体
-                paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD_ITALIC));
-            }
-
-
-        }
-        if (isUnderLine) {//下划线
-            paint.setUnderlineText(true);
-        } else {
-            paint.setUnderlineText(false);
-        }
-        paint.setTextAlign(Paint.Align.LEFT);
-        mWidth = 64;
-
-        mHeight = 32;
-        // TODO: 2016/12/29 将高度减去4以适配流水边
-        Bitmap bitmap = Bitmap.createBitmap(mWidth, mHeight-4, Bitmap.Config.ARGB_4444);
-
-        //设置好画笔，开始计算
-        float drawWidth = computeWidth(sb.toString(), paint);
-        if (drawWidth > 64) {
-            mWidth = (int) drawWidth;
-            bitmap = Bitmap.createBitmap(mWidth, mHeight-4, Bitmap.Config.ARGB_4444);
-            if (bitmap != null)
-                canvas.setBitmap(bitmap);
-        }
-        //背景
-        drawBgColor(drawWidth, canvas);
-        //文本
-        canvas.drawText(sb.toString(), mBaseX, mBaseY, paint);
-
-        return bitmap;
     }
 
-
-    private float computeWidth(String text, Paint paint) {
-        float drawWidth = mBaseX;
-        float[] widths = new float[text.length()];
-        paint.getTextWidths(text, widths);
-        for (int i = 0; i < widths.length; i++) {
-            drawWidth += widths[i];
+    private void initItemPart() {
+        mFrameCount -= mTextScreenWidthList.get(mTextScreenWidthList.size()-1);
+        byte[] frameCountByte = intToByteArray(mFrameCount, 2);
+        setInbyteArray(1, frameCountByte, mItemPart);
+        int textContentLength = 0;
+        for (byte[] bytes : mTextContentList) {
+            textContentLength += bytes.length;
         }
-        Log.i("advance", "computeWidth:drawWidth " + drawWidth);
-        // TODO: 2016/12/8 如果文字太长，需要重新绘制一个bitmap，bitmap的最大尺寸为4096*4096
-        return drawWidth;
-    }
-
-    private void drawBgColor(float drawWidth, Canvas canvas) {
-        Paint bgPaint = new Paint();
-        bgPaint.setColor(mTextBgColor);
-        canvas.drawRect(mBaseX, 0, drawWidth, mHeight, bgPaint);
+        int flowBoundslength = 0;
+        for (byte[] bytes : mFlowByteList) {
+            flowBoundslength+=bytes.length;
+        }
+        int timeAxisAddress = mFileHeadPart.length + mItemPart.length + 6*mTextAttrsList.size() + mBlackBG.length +flowBoundslength+ textContentLength ;
+        setInbyteArray(6, intToByteArray(timeAxisAddress, 4), mItemPart);
     }
 
     /**
@@ -490,7 +452,6 @@ public class WifiToComputer {
         }
 
     }
-
     public void startGenFile() {
         new Thread(new WifiToComputer.GenFileThread()).start();
     }
@@ -506,12 +467,12 @@ public class WifiToComputer {
     private void genFile() {
         setHeadBytes();
         initFileHead();
+        initTextAttrs();
         initTextContent();
         initBlackBG();
         initFlowBound();
-        initTextAttrs();
-        initItemPart();
         initTimeAxis();
+        initItemPart();
         Log.i("move", "帧数 mframeCount = " + mFrameCount);
         Log.i("move", "时间轴 mTimeAxisList = " + mTimeAxisList.size());
 
@@ -536,31 +497,30 @@ public class WifiToComputer {
         FileOutputStream fos = null;
         try {
             fos = new FileOutputStream(mColorPRG, true);
-            // TODO: 2016/12/23 为测试WiFi，先不写入4096字节头
-            fos.write(mHeadBytes);//写入4096头
-            Log.i("move","写入头文件4096 byte...");
-
+            fos.write(mHeadBytes);
+            Log.i("move", "写入总头mHeadBytes " + mHeadBytes.length + " byte");
             fos.write(mFileHeadPart);
-            Log.i("move", "写入文件总头mFileHeadPart" + mFileHeadPart.length + "byte");
+            Log.i("move", "写入文件总头mFileHeadPart " + mFileHeadPart.length + " byte");
 
             fos.write(mItemPart);
-            Log.i("move", "写入节目区mItemPart" + mItemPart.length + "byte");
+            Log.i("move", "写入节目区mItemPart" + mItemPart.length + " byte");
 
-            fos.write(mTextAttrs);
-            Log.i("move", "写入字属性文件mTextAttrs" + mTextAttrs.length + "byte");
+            for (byte[] bytes : mTextAttrsList) {
+                fos.write(bytes);
+                Log.i("move", "写入字属性文件mTextAttrsList" + bytes.length + " byte");
+            }
 
             //多加一块黑色图片，使其完整左移
             fos.write(mBlackBG);
-            Log.i("move", "写入黑色背景图片 backBG" + mBlackBG.length + "byte");//写入黑色背景图片
+            Log.i("move", "写入黑色背景图片 backBG " + mBlackBG.length + " byte");//写入黑色背景图片
 
-//            fos.write(mFlowBoundBytes);
             for (byte[] bytes : mFlowByteList) {
                 fos.write(bytes);
             }
-            Log.i("move", "写入流水边 mFlowByteList" + mFlowByteList.size() + "byte");//写入黑色背景图片
+            Log.i("move", "写入流水边 mFlowByteList " + mFlowByteList.size() + " byte");//写入黑色背景图片
             for (byte[] bytes : mTextContentList) {
                 fos.write(bytes);
-                Log.i("move", "写入文件mContent" + bytes.length + "byte");
+                Log.i("move", "写入文件mContent " + bytes.length + " byte");
             }
 
             for (int i = 0; i < mTimeAxisList.size(); i++) {

@@ -77,6 +77,7 @@ public class ConnectWifiActivity extends BaseActivity {
                 String[] permissions = {Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION};
                 ActivityCompat.requestPermissions(this, permissions, REQUST_LOCATION_PERMISSION_CODE);
                 //用户授权的结果会回调到FragmentActivity的onRequestPermissionsResult
+                loadData();
             }
         }else {
                 //已经拥有授权
@@ -92,6 +93,7 @@ public class ConnectWifiActivity extends BaseActivity {
            loadData();
         } else {
             // 权限拒绝了
+            loadData();
             Toast.makeText(this, "需要权限才能开启WIFI", Toast.LENGTH_SHORT).show();
             startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
         }

@@ -18,9 +18,9 @@ import cn.com.hotled.xyled.R;
 import cn.com.hotled.xyled.adapter.ItemSortAdapter;
 import cn.com.hotled.xyled.bean.Program;
 import cn.com.hotled.xyled.dao.ProgramDao;
-import cn.com.hotled.xyled.util.MutilMoveCompressUtil;
-import cn.com.hotled.xyled.util.WifiMutilMoveCompressUtil;
-import cn.com.hotled.xyled.util.WifiToComputer;
+import cn.com.hotled.xyled.util.PicCompressUtil;
+
+import static cn.com.hotled.xyled.bean.ProgramType.Pic;
 
 public class ProgramManageActivity extends BaseActivity {
     private static final int EASY_TEXT_REQUEST_CODE = 0x23;
@@ -28,6 +28,7 @@ public class ProgramManageActivity extends BaseActivity {
     private List<Program> mProgramList;
     private ItemSortAdapter mAdapter;
     private int mPosition;
+    private long mScreenId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,8 +39,8 @@ public class ProgramManageActivity extends BaseActivity {
     }
 
     private void loadData() {
-        long screenId = getIntent().getLongExtra("screenId", -1);
-        mProgramList = ((App) getApplication()).getDaoSession().getProgramDao().queryBuilder().where(ProgramDao.Properties.ScreenId.eq(screenId)).list();
+        mScreenId = getIntent().getLongExtra("screenId", -1);
+        mProgramList = ((App) getApplication()).getDaoSession().getProgramDao().queryBuilder().where(ProgramDao.Properties.ScreenId.eq(mScreenId)).list();
 
         Program[] sortProgramList = new Program[mProgramList.size()];
         for (int i = 0; i < mProgramList.size(); i++) {
@@ -56,7 +57,7 @@ public class ProgramManageActivity extends BaseActivity {
         btSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                WifiMutilMoveCompressUtil compressUtil = new WifiMutilMoveCompressUtil(ProgramManageActivity.this, mProgramList,64,32,60,60);
+                PicCompressUtil compressUtil = new PicCompressUtil(ProgramManageActivity.this, mProgramList,64,32,60,60);
                 compressUtil.startGenFile();
             }
         });
@@ -64,18 +65,22 @@ public class ProgramManageActivity extends BaseActivity {
         findViewById(R.id.bt_itemMan_send).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                MutilMoveCompressUtil mutilMoveUtil =new MutilMoveCompressUtil(ProgramManageActivity.this,mProgramList,64,32,60,60);
-                mutilMoveUtil.startGenFile();
+                Intent intent = new Intent(ProgramManageActivity.this, SendActivity.class);
+                intent.putExtra("screenId",mScreenId);
+                startActivity(intent);
+//                PicCompressUtil compressUtil = new PicCompressUtil(ProgramManageActivity.this, mProgramList,64,32,60,60);
+//                compressUtil.setNeedSend(true);
+//                compressUtil.startGenFile();
             }
         });
 
-        findViewById(R.id.bt_itemMan_sentoCompu).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                WifiToComputer wifiToComputer = new WifiToComputer(ProgramManageActivity.this,mProgramList,64,32,60,60);
-                wifiToComputer.startGenFile();
-            }
-        });
+//        findViewById(R.id.bt_itemMan_sentoCompu).setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                WiFiToComputerUtil wifiToComputer = new WiFiToComputerUtil(ProgramManageActivity.this,mProgramList,64,32,60,60);
+//                wifiToComputer.startGen();
+//            }
+//        });
 
         DragSortListView dslv_manage = (DragSortListView) findViewById(R.id.dslv_manage);
 
@@ -85,11 +90,20 @@ public class ProgramManageActivity extends BaseActivity {
         dslv_manage.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(ProgramManageActivity.this, EasyTextActivity.class);
-                intent.putExtra("programId",id);
+
                 mPosition = position;
-                intent.putExtra("programName",mProgramList.get(position).getProgramName());
-                startActivityForResult(intent,EASY_TEXT_REQUEST_CODE);
+                if (mProgramList.get(position).getProgramType()== Pic) {
+                    Intent intent = new Intent(ProgramManageActivity.this, PhotoEditActivity.class);
+                    intent.putExtra("programId",mProgramList.get(position).getId());
+                    intent.putExtra("programName",mProgramList.get(position).getProgramName());
+                    startActivity(intent);
+                }else {
+                    Intent intent = new Intent(ProgramManageActivity.this, EasyTextActivity.class);
+                    intent.putExtra("programId",mProgramList.get(position).getId());
+                    intent.putExtra("programName",mProgramList.get(position).getProgramName());
+                    startActivityForResult(intent,EASY_TEXT_REQUEST_CODE);
+                }
+
             }
         });
         dslv_manage.setDropListener(new DragSortListView.DropListener() {

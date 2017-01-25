@@ -25,6 +25,14 @@
           fab:fab_label="新增屏幕"
              />
        <com.github.clans.fab.FloatingActionButton
+           android:id="@+id/fab_addProgramPic"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:src="@drawable/ic_add_white_24dp"
+           fab:fab_size="mini"
+           fab:fab_label="新建图片"
+           />
+       <com.github.clans.fab.FloatingActionButton
            android:id="@+id/fab_addProgramText"
            android:layout_width="wrap_content"
            android:layout_height="wrap_content"
@@ -32,6 +40,7 @@
            fab:fab_size="mini"
            fab:fab_label="新建文字节目"
            />
+
 
    </com.github.clans.fab.FloatingActionMenu>
 

@@ -2,11 +2,9 @@ package cn.com.hotled.xyled.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 
 import java.io.File;
@@ -25,20 +23,25 @@ public class SelectFlowActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select_flow);
+        prepareToInit();
+
+    }
+
+    private void prepareToInit() {
+        mRvSelectFlow = (RecyclerView) findViewById(R.id.rv_selectflow);
+        mRvSelectFlow.setLayoutManager(new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false));
         initView();
     }
 
     private void initView() {
-        mRvSelectFlow = (RecyclerView) findViewById(R.id.rv_selectflow);
-        mRvSelectFlow.setLayoutManager(new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false));
-        String filePath= Environment.getExternalStorageDirectory()+"/xyled.flow";
-        Log.i("environment",Environment.getExternalStorageDirectory().toString());
-        File file=new File(filePath);
-        File[] files = file.listFiles();
+
+        File fileDir=new File(getFilesDir()+"/flow");
+        File[] files = fileDir.listFiles();
+
         mFileList = new ArrayList<>();
         if (files!=null)
-        for (File file1 : files) {
-            mFileList.add(file1);
+        for (File file : files) {
+            mFileList.add(file);
         }
         FlowAdapter adapter =new FlowAdapter(mFileList,this);
         mRvSelectFlow.setAdapter(adapter);
@@ -53,6 +56,7 @@ public class SelectFlowActivity extends BaseActivity {
             }
         });
     }
+
 
     @Override
     public void onCreateCustomToolBar(Toolbar toolbar) {

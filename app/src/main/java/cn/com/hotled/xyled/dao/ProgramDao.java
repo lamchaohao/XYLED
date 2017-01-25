@@ -1,11 +1,13 @@
 package cn.com.hotled.xyled.dao;
 
 import java.util.List;
+import java.util.ArrayList;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteStatement;
 
 import org.greenrobot.greendao.AbstractDao;
 import org.greenrobot.greendao.Property;
+import org.greenrobot.greendao.internal.SqlUtils;
 import org.greenrobot.greendao.internal.DaoConfig;
 import org.greenrobot.greendao.database.Database;
 import org.greenrobot.greendao.database.DatabaseStatement;
@@ -15,6 +17,7 @@ import org.greenrobot.greendao.query.QueryBuilder;
 import cn.com.hotled.xyled.bean.FileConverter;
 import cn.com.hotled.xyled.bean.ProgramType;
 import cn.com.hotled.xyled.bean.ProgramTypeConverter;
+import cn.com.hotled.xyled.bean.TextButton;
 import java.io.File;
 
 import cn.com.hotled.xyled.bean.Program;
@@ -46,6 +49,7 @@ public class ProgramDao extends AbstractDao<Program, Long> {
         public final static Property UseFlowBound = new Property(11, boolean.class, "useFlowBound", false, "USE_FLOW_BOUND");
         public final static Property ProgramType = new Property(12, String.class, "programType", false, "PROGRAM_TYPE");
         public final static Property PicFile = new Property(13, String.class, "picFile", false, "PIC_FILE");
+        public final static Property MTextButton = new Property(14, Long.class, "mTextButton", false, "M_TEXT_BUTTON");
     }
 
     private DaoSession daoSession;
@@ -81,7 +85,8 @@ public class ProgramDao extends AbstractDao<Program, Long> {
                 "\"FLOW_SPEED\" INTEGER NOT NULL ," + // 10: flowSpeed
                 "\"USE_FLOW_BOUND\" INTEGER NOT NULL ," + // 11: useFlowBound
                 "\"PROGRAM_TYPE\" TEXT," + // 12: programType
-                "\"PIC_FILE\" TEXT);"); // 13: picFile
+                "\"PIC_FILE\" TEXT," + // 13: picFile
+                "\"M_TEXT_BUTTON\" INTEGER);"); // 14: mTextButton
     }
 
     /** Drops the underlying database table. */
@@ -249,4 +254,95 @@ public class ProgramDao extends AbstractDao<Program, Long> {
         return query.list();
     }
 
+    private String selectDeep;
+
+    protected String getSelectDeep() {
+        if (selectDeep == null) {
+            StringBuilder builder = new StringBuilder("SELECT ");
+            SqlUtils.appendColumns(builder, "T", getAllColumns());
+            builder.append(',');
+            SqlUtils.appendColumns(builder, "T0", daoSession.getTextButtonDao().getAllColumns());
+            builder.append(" FROM PROGRAM T");
+            builder.append(" LEFT JOIN TEXT_BUTTON T0 ON T.\"M_TEXT_BUTTON\"=T0.\"_id\"");
+            builder.append(' ');
+            selectDeep = builder.toString();
+        }
+        return selectDeep;
+    }
+    
+    protected Program loadCurrentDeep(Cursor cursor, boolean lock) {
+        Program entity = loadCurrent(cursor, 0, lock);
+        int offset = getAllColumns().length;
+
+        TextButton mTextButton = loadCurrentOther(daoSession.getTextButtonDao(), cursor, offset);
+        entity.setMTextButton(mTextButton);
+
+        return entity;    
+    }
+
+    public Program loadDeep(Long key) {
+        assertSinglePk();
+        if (key == null) {
+            return null;
+        }
+
+        StringBuilder builder = new StringBuilder(getSelectDeep());
+        builder.append("WHERE ");
+        SqlUtils.appendColumnsEqValue(builder, "T", getPkColumns());
+        String sql = builder.toString();
+        
+        String[] keyArray = new String[] { key.toString() };
+        Cursor cursor = db.rawQuery(sql, keyArray);
+        
+        try {
+            boolean available = cursor.moveToFirst();
+            if (!available) {
+                return null;
+            } else if (!cursor.isLast()) {
+                throw new IllegalStateException("Expected unique result, but count was " + cursor.getCount());
+            }
+            return loadCurrentDeep(cursor, true);
+        } finally {
+            cursor.close();
+        }
+    }
+    
+    /** Reads all available rows from the given cursor and returns a list of new ImageTO objects. */
+    public List<Program> loadAllDeepFromCursor(Cursor cursor) {
+        int count = cursor.getCount();
+        List<Program> list = new ArrayList<Program>(count);
+        
+        if (cursor.moveToFirst()) {
+            if (identityScope != null) {
+                identityScope.lock();
+                identityScope.reserveRoom(count);
+            }
+            try {
+                do {
+                    list.add(loadCurrentDeep(cursor, false));
+                } while (cursor.moveToNext());
+            } finally {
+                if (identityScope != null) {
+                    identityScope.unlock();
+                }
+            }
+        }
+        return list;
+    }
+    
+    protected List<Program> loadDeepAllAndCloseCursor(Cursor cursor) {
+        try {
+            return loadAllDeepFromCursor(cursor);
+        } finally {
+            cursor.close();
+        }
+    }
+    
+
+    /** A raw-style query where you can pass any WHERE clause and arguments. */
+    public List<Program> queryDeep(String where, String... selectionArg) {
+        Cursor cursor = db.rawQuery(getSelectDeep() + where, selectionArg);
+        return loadDeepAllAndCloseCursor(cursor);
+    }
+ 
 }

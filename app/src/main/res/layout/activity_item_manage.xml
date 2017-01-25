@@ -19,7 +19,7 @@
             android:layout_weight="1"
             android:layout_alignParentBottom="true"
             android:id="@+id/bt_itemMan_send"
-            android:text="USB"
+            android:text="录制并发送"
             android:layout_width="0dp"
             android:layout_height="wrap_content"/>
         <Button
@@ -28,14 +28,6 @@
             android:layout_alignParentBottom="true"
             android:id="@+id/bt_itemMan_sendbyPhone"
             android:text="录制"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"/>
-        <Button
-            android:layout_weight="1"
-            android:layout_marginBottom="40dp"
-            android:layout_alignParentBottom="true"
-            android:id="@+id/bt_itemMan_sentoCompu"
-            android:text="wifi调试"
             android:layout_width="0dp"
             android:layout_height="wrap_content"/>
     </LinearLayout>

@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -49,6 +50,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ScreenFragment mScreenFragment;
     private SettingFragment mSettingFragment;
     private MoreFragment mMoreFragment;
+    private boolean backFlag;
+    private long firstTime;
+    private long lastTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -151,5 +155,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         tvMore.setTextColor(getResources().getColor(R.color.textSecondary));
     }
 
+    @Override
+    public void onBackPressed() {
+        if (!backFlag){//第一次点击
+            Toast.makeText(this, "再按一次返回退出程序", Toast.LENGTH_SHORT).show();
+            firstTime = System.currentTimeMillis();
+            backFlag=true;
+        }else{
+            //第二次点击
+            lastTime = System.currentTimeMillis();
+            long gapTime=lastTime-firstTime;
 
+            if (gapTime<2000){
+               finish();
+            }else{
+                //防止时间过长再次点击没反应
+                Toast.makeText(this, "再按一次返回退出程序", Toast.LENGTH_SHORT).show();
+                firstTime = System.currentTimeMillis();
+
+            }
+        }
+    }
 }

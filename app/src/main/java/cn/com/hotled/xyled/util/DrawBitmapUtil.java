@@ -16,6 +16,7 @@ import java.util.List;
 
 import cn.com.hotled.xyled.App;
 import cn.com.hotled.xyled.bean.Program;
+import cn.com.hotled.xyled.bean.ProgramType;
 import cn.com.hotled.xyled.bean.TextButton;
 import cn.com.hotled.xyled.dao.TextButtonDao;
 
@@ -42,7 +43,6 @@ public class DrawBitmapUtil {
     private int mBaseY = 25;
     private int mIndex=0;
 
-
     public DrawBitmapUtil(Activity context, List<Program> programList, int width, List<Integer> heights) {
         mContext = context;
         mProgramList = programList;
@@ -50,30 +50,35 @@ public class DrawBitmapUtil {
         mHeightList = heights;
     }
 
+
+
     public List<Bitmap> drawBitmap() {
         List<Bitmap> bitmaps = new ArrayList<>();
         for (Program program : mProgramList) {
-            mTextButtonList = ((App) mContext.getApplication()).getDaoSession().getTextButtonDao().queryBuilder().where(TextButtonDao.Properties.ProgramId.eq(program.getId())).list();
-            if (mTextButtonList == null || mTextButtonList.size() == 0) {
-                mTextButtonList = new ArrayList<>();
+            if (program.getProgramType()== ProgramType.Text){//如果是文本的节目才继续
+                mTextButtonList = ((App) mContext.getApplication()).getDaoSession().getTextButtonDao().queryBuilder().where(TextButtonDao.Properties.ProgramId.eq(program.getId())).list();
+                if (mTextButtonList == null || mTextButtonList.size() == 0) {
+                    mTextButtonList = new ArrayList<>();
+                }
+
+                for (int i = 0; i < mTextButtonList.size(); i++) {
+                    if (i == 0) {
+                        TextButton textButton = mTextButtonList.get(0);
+                        mTextBgColor = textButton.getTextBackgroudColor();
+                        mTextColor = textButton.getTextColor();
+                        mTextSize = textButton.getTextSize();
+                        isUnderLine = textButton.getIsUnderline();
+                        isItalic = textButton.getIsIlatic();
+                        isBold = textButton.getIsbold();
+                        mTypeFile = textButton.getTypeface();
+                        mBaseX = program.getBaseX();
+                        mBaseY = program.getBaseY();
+                    }
+                }
+                bitmaps.add(drawText());
+                mIndex++;
             }
 
-            for (int i = 0; i < mTextButtonList.size(); i++) {
-                if (i == mTextButtonList.size() - 1) {
-                    TextButton textButton = mTextButtonList.get(0);
-                    mTextBgColor = textButton.getTextBackgroudColor();
-                    mTextColor = textButton.getTextColor();
-                    mTextSize = textButton.getTextSize();
-                    isUnderLine = textButton.getIsUnderline();
-                    isItalic = textButton.getIsIlatic();
-                    isBold = textButton.getIsbold();
-                    mTypeFile = textButton.getTypeface();
-                    mBaseX = program.getBaseX();
-                    mBaseY = program.getBaseY();
-                }
-            }
-            bitmaps.add(drawText());
-            mIndex++;
         }
         return bitmaps;
     }

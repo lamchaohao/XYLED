@@ -1,6 +1,5 @@
 package cn.com.hotled.xyled.dao;
 
-import java.util.List;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteStatement;
 
@@ -9,8 +8,6 @@ import org.greenrobot.greendao.Property;
 import org.greenrobot.greendao.internal.DaoConfig;
 import org.greenrobot.greendao.database.Database;
 import org.greenrobot.greendao.database.DatabaseStatement;
-import org.greenrobot.greendao.query.Query;
-import org.greenrobot.greendao.query.QueryBuilder;
 
 import cn.com.hotled.xyled.bean.FileConverter;
 import java.io.File;
@@ -45,7 +42,6 @@ public class TextButtonDao extends AbstractDao<TextButton, Long> {
     }
 
     private final FileConverter typefaceConverter = new FileConverter();
-    private Query<TextButton> program_MTextButtonsQuery;
 
     public TextButtonDao(DaoConfig config) {
         super(config);
@@ -194,18 +190,4 @@ public class TextButtonDao extends AbstractDao<TextButton, Long> {
         return true;
     }
     
-    /** Internal query to resolve the "mTextButtons" to-many relationship of Program. */
-    public List<TextButton> _queryProgram_MTextButtons(long programId) {
-        synchronized (this) {
-            if (program_MTextButtonsQuery == null) {
-                QueryBuilder<TextButton> queryBuilder = queryBuilder();
-                queryBuilder.where(Properties.ProgramId.eq(null));
-                program_MTextButtonsQuery = queryBuilder.build();
-            }
-        }
-        Query<TextButton> query = program_MTextButtonsQuery.forCurrentThread();
-        query.setParameter(0, programId);
-        return query.list();
-    }
-
 }

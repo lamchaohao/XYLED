@@ -4,7 +4,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Environment;
+import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -17,7 +17,6 @@ import java.io.File;
 import cn.com.hotled.xyled.R;
 import cn.com.hotled.xyled.activity.SocketActivity;
 import cn.com.hotled.xyled.util.SendTest;
-import cn.com.hotled.xyled.util.TcpSend;
 
 /**
  * Created by Lam on 2016/12/1.
@@ -34,8 +33,7 @@ public class SettingFragment extends Fragment {
     }
 
     private void initView(View view) {
-        View llSend = view.findViewById(R.id.ll_setting_send);
-        llSend.setOnClickListener(new View.OnClickListener() {
+        view.findViewById(R.id.ll_setting_send).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 sendFile();
@@ -48,15 +46,26 @@ public class SettingFragment extends Fragment {
             }
         });
 
-        view.findViewById(R.id.ll_setting_sendtoComputer).setOnClickListener(new View.OnClickListener() {
+        View ll_enterWifi = view.findViewById(R.id.ll_setting_enterWifi);
+        ll_enterWifi.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                sendFileToComputer();
+                startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
+            }
+        });
+        view.findViewById(R.id.ll_setting_language).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new AlertDialog.Builder(getContext())
+                        .setTitle("coming soon")
+                        .setMessage("正在开发")
+                        .setPositiveButton("好的",null)
+                        .show();
             }
         });
     }
     private void sendFile() {
-        final File file = new File(Environment.getExternalStorageDirectory()+"/amap/COLOR_01.PRG");
+        final File file = new File(getContext().getFilesDir()+"/color.prg");
         View view = LayoutInflater.from(getContext()).inflate(R.layout.tcp_send, null);
         final EditText et_tcpIp = (EditText) view.findViewById(R.id.et_tcpIp);
         final EditText et_tcpPort = (EditText) view.findViewById(R.id.et_tcpPort);
@@ -81,29 +90,6 @@ public class SettingFragment extends Fragment {
 
 
     }
-    private void sendFileToComputer() {
-        final File file = new File(Environment.getExternalStorageDirectory()+"/amap/COLOR_01.PRG");
-        View view = LayoutInflater.from(getContext()).inflate(R.layout.tcp_send, null);
-        final EditText et_tcpIp = (EditText) view.findViewById(R.id.et_tcpIp);
-        final EditText et_tcpPort = (EditText) view.findViewById(R.id.et_tcpPort);
-        et_tcpIp.setText("192.168.1.101");
-        et_tcpPort.setText("10010");
-        new AlertDialog.Builder(getContext())
-                .setTitle("设置服务器IP与端口")
-                .setView(view)
-                .setPositiveButton("发送文件到电脑", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        String tcpIP = et_tcpIp.getText().toString();
-                        String tcpPort = et_tcpPort.getText().toString();
-                        TcpSend tcpSend=new TcpSend(getContext(),tcpIP,Integer.parseInt(tcpPort),file);
-                        tcpSend.send();
-                        dialog.dismiss();
-                    }
-                })
-                .setNegativeButton("cancle",null)
-                .show();
 
-    }
 
 }
