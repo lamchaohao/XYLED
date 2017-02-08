@@ -11,7 +11,7 @@ import java.io.File;
  * Created by Lam on 2016/11/1.
  */
 @Entity
-public class TextButton {
+public class TextContent {
     @Id(autoincrement = true)
     private long id;
     private String text;
@@ -26,8 +26,8 @@ public class TextButton {
     private boolean isSelected;
     private int sortNumber;
     private long programId;
-    @Generated(hash = 1776588816)
-    public TextButton(long id, String text, File typeface, int textSize,
+    @Generated(hash = 2126404718)
+    public TextContent(long id, String text, File typeface, int textSize,
             int textColor, int textBackgroudColor, boolean isbold, boolean isIlatic,
             boolean isUnderline, boolean isSelected, int sortNumber,
             long programId) {
@@ -44,8 +44,8 @@ public class TextButton {
         this.sortNumber = sortNumber;
         this.programId = programId;
     }
-    @Generated(hash = 1553072539)
-    public TextButton() {
+    @Generated(hash = 1675015659)
+    public TextContent() {
     }
     public long getId() {
         return this.id;

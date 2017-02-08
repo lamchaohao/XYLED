@@ -11,7 +11,7 @@ import java.io.File;
 
 import cn.com.hotled.xyled.dao.DaoSession;
 import cn.com.hotled.xyled.dao.ProgramDao;
-import cn.com.hotled.xyled.dao.TextButtonDao;
+import cn.com.hotled.xyled.dao.TextContentDao;
 
 /**
  * Created by Lam on 2016/12/13.
@@ -20,10 +20,7 @@ import cn.com.hotled.xyled.dao.TextButtonDao;
 public class Program {
     @Id(autoincrement = true)
     private long id;
-
     private int sortNumber;
-
-    private long screenId;
     private String programName;
     private int baseX;
     private int baseY;
@@ -41,23 +38,20 @@ public class Program {
     @Convert(converter = FileConverter.class,columnType = String.class)
     private File picFile;
     @ToOne
-    private TextButton mTextButton;
-
+    private TextContent mTextContent;
     /** Used to resolve relations */
     @Generated(hash = 2040040024)
     private transient DaoSession daoSession;
-
     /** Used for active entity operations. */
     @Generated(hash = 1978875243)
     private transient ProgramDao myDao;
-    @Generated(hash = 2090265522)
-    public Program(long id, int sortNumber, long screenId, String programName,
-            int baseX, int baseY, float frameTime, float stayTime,
-            File flowBoundFile, int flowEffect, int flowSpeed, boolean useFlowBound,
+    @Generated(hash = 1060272550)
+    public Program(long id, int sortNumber, String programName, int baseX,
+            int baseY, float frameTime, float stayTime, File flowBoundFile,
+            int flowEffect, int flowSpeed, boolean useFlowBound,
             ProgramType programType, File picFile) {
         this.id = id;
         this.sortNumber = sortNumber;
-        this.screenId = screenId;
         this.programName = programName;
         this.baseX = baseX;
         this.baseY = baseY;
@@ -84,12 +78,6 @@ public class Program {
     }
     public void setSortNumber(int sortNumber) {
         this.sortNumber = sortNumber;
-    }
-    public long getScreenId() {
-        return this.screenId;
-    }
-    public void setScreenId(long screenId) {
-        this.screenId = screenId;
     }
     public String getProgramName() {
         return this.programName;
@@ -157,32 +145,32 @@ public class Program {
     public void setPicFile(File picFile) {
         this.picFile = picFile;
     }
-    @Generated(hash = 831346144)
-    private transient boolean mTextButton__refreshed;
+    @Generated(hash = 1829868973)
+    private transient boolean mTextContent__refreshed;
     /** To-one relationship, resolved on first access. */
-    @Generated(hash = 962665120)
-    public TextButton getMTextButton() {
-        if (mTextButton != null || !mTextButton__refreshed) {
+    @Generated(hash = 1540501994)
+    public TextContent getMTextContent() {
+        if (mTextContent != null || !mTextContent__refreshed) {
             if (daoSession == null) {
                 throw new DaoException("Entity is detached from DAO context");
             }
-            TextButtonDao targetDao = daoSession.getTextButtonDao();
-            targetDao.refresh(mTextButton);
-            mTextButton__refreshed = true;
+            TextContentDao targetDao = daoSession.getTextContentDao();
+            targetDao.refresh(mTextContent);
+            mTextContent__refreshed = true;
         }
-        return mTextButton;
+        return mTextContent;
     }
     /** To-one relationship, returned entity is not refreshed and may carry only the PK property. */
-    @Generated(hash = 515791678)
-    public TextButton peakMTextButton() {
-        return mTextButton;
+    @Generated(hash = 2123378356)
+    public TextContent peakMTextContent() {
+        return mTextContent;
     }
     /** called by internal mechanisms, do not call yourself. */
-    @Generated(hash = 727491815)
-    public void setMTextButton(TextButton mTextButton) {
+    @Generated(hash = 342504453)
+    public void setMTextContent(TextContent mTextContent) {
         synchronized (this) {
-            this.mTextButton = mTextButton;
-            mTextButton__refreshed = true;
+            this.mTextContent = mTextContent;
+            mTextContent__refreshed = true;
         }
     }
     /**
@@ -224,7 +212,7 @@ public class Program {
         this.daoSession = daoSession;
         myDao = daoSession != null ? daoSession.getProgramDao() : null;
     }
-
+    
 
 
 }

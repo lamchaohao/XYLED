@@ -17,8 +17,8 @@ import java.util.List;
 import cn.com.hotled.xyled.App;
 import cn.com.hotled.xyled.bean.Program;
 import cn.com.hotled.xyled.bean.ProgramType;
-import cn.com.hotled.xyled.bean.TextButton;
-import cn.com.hotled.xyled.dao.TextButtonDao;
+import cn.com.hotled.xyled.bean.TextContent;
+import cn.com.hotled.xyled.dao.TextContentDao;
 
 import static android.graphics.Color.BLACK;
 
@@ -29,7 +29,7 @@ import static android.graphics.Color.BLACK;
 public class DrawBitmapUtil2 {
     private Activity mContext;
     private List<Program> mProgramList;
-    private List<TextButton> mTextButtonList;
+    private List<TextContent> mTextContentList;
     private int mTextSize;
     private int mTextColor = Color.RED;
     private int mTextBgColor = BLACK;
@@ -56,21 +56,21 @@ public class DrawBitmapUtil2 {
         List<Bitmap> bitmaps = new ArrayList<>();
         for (Program program : mProgramList) {
             if (program.getProgramType()== ProgramType.Text){//如果是文本的节目才继续
-                mTextButtonList = ((App) mContext.getApplication()).getDaoSession().getTextButtonDao().queryBuilder().where(TextButtonDao.Properties.ProgramId.eq(program.getId())).list();
-                if (mTextButtonList == null || mTextButtonList.size() == 0) {
-                    mTextButtonList = new ArrayList<>();
+                mTextContentList = ((App) mContext.getApplication()).getDaoSession().getTextContentDao().queryBuilder().where(TextContentDao.Properties.ProgramId.eq(program.getId())).list();
+                if (mTextContentList == null || mTextContentList.size() == 0) {
+                    mTextContentList = new ArrayList<>();
                 }
 
-                for (int i = 0; i < mTextButtonList.size(); i++) {
+                for (int i = 0; i < mTextContentList.size(); i++) {
                     if (i == 0) {
-                        TextButton textButton = mTextButtonList.get(0);
-                        mTextBgColor = textButton.getTextBackgroudColor();
-                        mTextColor = textButton.getTextColor();
-                        mTextSize = textButton.getTextSize();
-                        isUnderLine = textButton.getIsUnderline();
-                        isItalic = textButton.getIsIlatic();
-                        isBold = textButton.getIsbold();
-                        mTypeFile = textButton.getTypeface();
+                        TextContent textContent = mTextContentList.get(0);
+                        mTextBgColor = textContent.getTextBackgroudColor();
+                        mTextColor = textContent.getTextColor();
+                        mTextSize = textContent.getTextSize();
+                        isUnderLine = textContent.getIsUnderline();
+                        isItalic = textContent.getIsIlatic();
+                        isBold = textContent.getIsbold();
+                        mTypeFile = textContent.getTypeface();
                         mBaseX = program.getBaseX();
                         mBaseY = program.getBaseY();
                     }
@@ -87,8 +87,8 @@ public class DrawBitmapUtil2 {
         Paint paint = new Paint();
         Canvas canvas = new Canvas();
         StringBuilder sb = new StringBuilder();
-        for (TextButton textButton : mTextButtonList) {
-            sb.append(textButton.getText());
+        for (TextContent textContent : mTextContentList) {
+            sb.append(textContent.getText());
         }
 
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));

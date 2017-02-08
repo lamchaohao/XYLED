@@ -26,11 +26,12 @@
                 android:textColor="#FFFFFF"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
-            <ImageView
-                android:id="@+id/iv_toolbar_add"
-                android:paddingRight="10dp"
+            <Button
                 android:layout_alignParentRight="true"
-                android:src="@drawable/ic_add_white_24dp"
+                android:id="@+id/bt_toolbar_send"
+                android:text="发送"
+                android:background="@drawable/sendbutton_bg"
+                android:layout_margin="5dp"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"/>
         </RelativeLayout>

@@ -20,12 +20,10 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import cn.com.hotled.xyled.App;
 import cn.com.hotled.xyled.R;
 import cn.com.hotled.xyled.adapter.CardSeriesAdapter;
 import cn.com.hotled.xyled.bean.LedCard;
 import cn.com.hotled.xyled.bean.LedScreen;
-import cn.com.hotled.xyled.dao.DaoSession;
 
 public class AddScreenActivity extends BaseActivity {
 
@@ -113,11 +111,11 @@ public class AddScreenActivity extends BaseActivity {
 
         LedScreen screen=new LedScreen(screenName,Integer.parseInt(widthStr),Integer.parseInt(heightStr),tvCardName.getText().toString(),address);
 
-        DaoSession daoSession = ((App) getApplication()).getDaoSession();
-        daoSession.getLedScreenDao().insert(screen);
+//        DaoSession daoSession = ((App) getApplication()).getDaoSession();
+//        daoSession.getLedScreenDao().insert(screen);
 
         Intent intent = new Intent();
-        intent.putExtra("screen",screen);
+//        intent.putExtra("screen",screen);
         setResult(RESULT_OK,intent);
         onBackPressed();
     }

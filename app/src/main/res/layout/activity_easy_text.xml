@@ -4,8 +4,7 @@
               android:orientation="vertical"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
-              android:id="@+id/ll_fgText"
-              tools:context="cn.com.hotled.xyled.fragment.TextFragment">
+              android:id="@+id/ll_fgText">
 
     <cn.com.hotled.xyled.view.PhotoView
         android:id="@+id/pv_fgText_photo"

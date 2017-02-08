@@ -18,7 +18,7 @@
         android:layout_height="match_parent">
         <android.support.design.widget.FloatingActionButton
             android:layout_marginBottom="20dp"
-            android:src="@drawable/fab_add"
+            android:src="@drawable/ic_add_white_24dp"
             android:layout_alignParentBottom="true"
             android:id="@+id/fab_photo_add"
             android:layout_centerInParent="true"

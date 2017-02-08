@@ -17,7 +17,6 @@ import cn.com.hotled.xyled.App;
 import cn.com.hotled.xyled.R;
 import cn.com.hotled.xyled.adapter.ItemSortAdapter;
 import cn.com.hotled.xyled.bean.Program;
-import cn.com.hotled.xyled.dao.ProgramDao;
 import cn.com.hotled.xyled.util.PicCompressUtil;
 
 import static cn.com.hotled.xyled.bean.ProgramType.Pic;
@@ -28,7 +27,6 @@ public class ProgramManageActivity extends BaseActivity {
     private List<Program> mProgramList;
     private ItemSortAdapter mAdapter;
     private int mPosition;
-    private long mScreenId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,8 +37,7 @@ public class ProgramManageActivity extends BaseActivity {
     }
 
     private void loadData() {
-        mScreenId = getIntent().getLongExtra("screenId", -1);
-        mProgramList = ((App) getApplication()).getDaoSession().getProgramDao().queryBuilder().where(ProgramDao.Properties.ScreenId.eq(mScreenId)).list();
+        mProgramList = ((App) getApplication()).getDaoSession().getProgramDao().queryBuilder().list();
 
         Program[] sortProgramList = new Program[mProgramList.size()];
         for (int i = 0; i < mProgramList.size(); i++) {
@@ -66,21 +63,9 @@ public class ProgramManageActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(ProgramManageActivity.this, SendActivity.class);
-                intent.putExtra("screenId",mScreenId);
                 startActivity(intent);
-//                PicCompressUtil compressUtil = new PicCompressUtil(ProgramManageActivity.this, mProgramList,64,32,60,60);
-//                compressUtil.setNeedSend(true);
-//                compressUtil.startGenFile();
             }
         });
-
-//        findViewById(R.id.bt_itemMan_sentoCompu).setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                WiFiToComputerUtil wifiToComputer = new WiFiToComputerUtil(ProgramManageActivity.this,mProgramList,64,32,60,60);
-//                wifiToComputer.startGen();
-//            }
-//        });
 
         DragSortListView dslv_manage = (DragSortListView) findViewById(R.id.dslv_manage);
 

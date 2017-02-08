@@ -57,10 +57,10 @@ import cn.com.hotled.xyled.App;
 import cn.com.hotled.xyled.R;
 import cn.com.hotled.xyled.adapter.TypefaceAdapter;
 import cn.com.hotled.xyled.bean.Program;
-import cn.com.hotled.xyled.bean.TextButton;
+import cn.com.hotled.xyled.bean.TextContent;
 import cn.com.hotled.xyled.bean.TypefaceFile;
 import cn.com.hotled.xyled.dao.ProgramDao;
-import cn.com.hotled.xyled.dao.TextButtonDao;
+import cn.com.hotled.xyled.dao.TextContentDao;
 import cn.com.hotled.xyled.decoration.WifiItemDecoration;
 import cn.com.hotled.xyled.global.Global;
 import cn.com.hotled.xyled.util.DensityUtil;
@@ -130,12 +130,12 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
     private int RECOMAND_SIZE=26;
     private int mBaseX = 0;
     private int mBaseY = 25;
-    private TextButton mTextButton;
+    private TextContent mTextContent;
     private TypefaceAdapter typefaceAdapter;
     private float mFrameTime;
     private float mStayTime;
     private long mProgramId;
-    private TextButtonDao mTextButtonDao;
+    private TextContentDao mTextButtonDao;
     private boolean isTextChanged;
     private boolean isLoadData;
     private ProgramDao mProgramDao;
@@ -156,18 +156,18 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
     }
 //
     private void loadData() {
-        mTextButton=new TextButton();
-        mTextButton.setProgramId(mProgramId);
-        mTextButton.setTextSize(RECOMAND_SIZE);
-        mTextButton.setTextColor(Color.RED);
-        mTextButton.setTextBackgroudColor(Color.BLACK);
+        mTextContent =new TextContent();
+        mTextContent.setProgramId(mProgramId);
+        mTextContent.setTextSize(RECOMAND_SIZE);
+        mTextContent.setTextColor(Color.RED);
+        mTextContent.setTextBackgroudColor(Color.BLACK);
 
         mProgramId = getIntent().getLongExtra("programId", -1);
-        mTextButtonDao = ((App) getApplication()).getDaoSession().getTextButtonDao();
+        mTextButtonDao = ((App) getApplication()).getDaoSession().getTextContentDao();
         mProgramDao = ((App) getApplication()).getDaoSession().getProgramDao();
         if (mProgramId!=-1){
             isLoadData=true;
-            List<TextButton> list = mTextButtonDao.queryBuilder().where(TextButtonDao.Properties.ProgramId.eq(mProgramId)).list();
+            List<TextContent> list = mTextButtonDao.queryBuilder().where(TextContentDao.Properties.ProgramId.eq(mProgramId)).list();
 
             mProgram = mProgramDao.queryBuilder().where(ProgramDao.Properties.Id.eq(mProgramId)).list().get(0);
             if (mProgram.getBaseX()!=0)
@@ -185,8 +185,8 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
             if (list!=null){
                 for (int i = 0; i < list.size(); i++) {
                     if (i==0){
-                        mTextButton = list.get(0);
-                        mEt_input.setText(mTextButton.getText());
+                        mTextContent = list.get(0);
+                        mEt_input.setText(mTextContent.getText());
                         if (mProgram.getFlowBoundFile()!=null){
                             String absolutePath = mProgram.getFlowBoundFile().getAbsolutePath();
                             mFlowBitmap= BitmapFactory.decodeFile(absolutePath);
@@ -194,7 +194,7 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
                         }
                         drawText();
                     }else {
-                        mTextButton=new TextButton();
+                        mTextContent =new TextContent();
                     }
                 }
             }
@@ -206,7 +206,7 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
             }
 
         }else {
-            mTextButton=new TextButton();
+            mTextContent =new TextContent();
         }
         isLoadData=false;
     }
@@ -226,7 +226,7 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
             @Override
             public void afterTextChanged(Editable s) {
                 if (!isLoadData) {
-                    mTextButton.setText(s.toString());
+                    mTextContent.setText(s.toString());
                     drawText();
                 }
             }
@@ -271,7 +271,7 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
                         }
 
                     }
-                    if (mTextButton.getText()!=null){
+                    if (mTextContent.getText()!=null){
                         drawText();
                     }
 
@@ -329,45 +329,45 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
         //如果图片比所设置的宽，则需加长
 
         //先设置好画笔，才进行计算
-        paint.setColor(mTextButton.getTextColor());
-        paint.setTextSize(mTextButton.getTextSize());
+        paint.setColor(mTextContent.getTextColor());
+        paint.setTextSize(mTextContent.getTextSize());
 
-        if (mTextButton.getTypeface()!=null) {
-            Typeface typeface = Typeface.createFromFile(mTextButton.getTypeface());
+        if (mTextContent.getTypeface()!=null) {
+            Typeface typeface = Typeface.createFromFile(mTextContent.getTypeface());
             paint.setTypeface(typeface);
-            if (mTextButton.getIsbold()) {//粗体
+            if (mTextContent.getIsbold()) {//粗体
                 paint.setTypeface(Typeface.create(typeface,Typeface.BOLD));
             }
-            if (mTextButton.getIsIlatic()) {//斜体
+            if (mTextContent.getIsIlatic()) {//斜体
                 paint.setTypeface(Typeface.create(typeface,Typeface.ITALIC));
             }
-            if (mTextButton.getIsbold()&&mTextButton.getIsIlatic()){//粗斜体
+            if (mTextContent.getIsbold()&& mTextContent.getIsIlatic()){//粗斜体
                 paint.setTypeface(Typeface.create(typeface,Typeface.BOLD_ITALIC));
             }
         }
         else {
             paint.setTypeface(Typeface.DEFAULT);
 
-            if (mTextButton.getIsbold()) {//粗体
+            if (mTextContent.getIsbold()) {//粗体
                 paint.setTypeface(Typeface.create(Typeface.DEFAULT,Typeface.BOLD));
             }
-            if (mTextButton.getIsIlatic()) {//斜体
+            if (mTextContent.getIsIlatic()) {//斜体
                 paint.setTypeface(Typeface.create(Typeface.DEFAULT,Typeface.ITALIC));
             }
-            if (mTextButton.getIsbold()&&mTextButton.getIsIlatic()){//粗斜体
+            if (mTextContent.getIsbold()&& mTextContent.getIsIlatic()){//粗斜体
                 paint.setTypeface(Typeface.create(Typeface.DEFAULT,Typeface.BOLD_ITALIC));
             }
 
 
         }
-        if (mTextButton.getIsUnderline()) {//下划线
+        if (mTextContent.getIsUnderline()) {//下划线
             paint.setUnderlineText(true);
         }else {
             paint.setUnderlineText(false);
         }
         paint.setTextAlign(Paint.Align.LEFT);
         //设置好画笔，开始计算
-        float drawWidth = computeWidth(mTextButton.getText());
+        float drawWidth = computeWidth(mTextContent.getText());
         //需要加上流水边框的宽度,左右都需要加上
         int tempBaseX=mBaseX;
         int tempBaseY=mBaseY;
@@ -391,8 +391,8 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
             drawFlowBound();
         }
         //文本
-        if (mTextButton.getText()!=null){
-            canvas.drawText(mTextButton.getText(),tempBaseX,tempBaseY,paint);
+        if (mTextContent.getText()!=null){
+            canvas.drawText(mTextContent.getText(),tempBaseX,tempBaseY,paint);
         }
     }
 
@@ -417,7 +417,7 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
 
     private void drawBgColor(float drawWidth) {
         Paint bgPaint=new Paint();
-        bgPaint.setColor(mTextButton.getTextBackgroudColor());
+        bgPaint.setColor(mTextContent.getTextBackgroudColor());
         canvas.drawRect(mBaseX,0,drawWidth,mHeight,bgPaint);
     }
     private void drawFlowBound() {
@@ -573,7 +573,7 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
     }
 
     private void setTextBgColor(int color) {
-        mTextButton.setTextBackgroudColor(color);
+        mTextContent.setTextBackgroudColor(color);
         drawText();
     }
 
@@ -606,7 +606,7 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
     }
 
     public void setTextColor(int textColor) {
-        mTextButton.setTextColor(textColor);
+        mTextContent.setTextColor(textColor);
         drawText();
     }
 
@@ -673,17 +673,17 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
     }
 
     private void setUnderLine() {
-        mTextButton.setIsUnderline(!mTextButton.getIsUnderline());
+        mTextContent.setIsUnderline(!mTextContent.getIsUnderline());
         drawText();
     }
 
     private void setItalic() {
-        mTextButton.setIsIlatic(!mTextButton.getIsIlatic());
+        mTextContent.setIsIlatic(!mTextContent.getIsIlatic());
         drawText();
     }
 
     private void setBold() {
-        mTextButton.setIsbold(!mTextButton.getIsbold());
+        mTextContent.setIsbold(!mTextContent.getIsbold());
         drawText();
     }
 
@@ -719,7 +719,7 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
             public void onItemClick(View view, int position) {
                 //1.先获取选择了哪个字体
                 mSelectedFontFile = fileList.get(position).getFile();
-                mTextButton.setTypeface(fileList.get(position).getFile());
+                mTextContent.setTypeface(fileList.get(position).getFile());
             }
         });
 
@@ -731,7 +731,7 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         if (mSelectedFontFile!=null){
-                            mTextButton.setTypeface(mSelectedFontFile);
+                            mTextContent.setTypeface(mSelectedFontFile);
                             int lastIndexOf = mSelectedFontFile.getName().lastIndexOf(".");
                             String fontFile = mSelectedFontFile.getName().substring(0, lastIndexOf);
                             mBt_setFont.setText(fontFile);
@@ -755,13 +755,13 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
         WheelView wv = (WheelView) outerView.findViewById(R.id.wheelview);
         wv.setOffset(2);//偏移量
         wv.setItems(Arrays.asList(textSizePxList));
-        wv.setSeletion(mTextButton.getTextSize()-1);
+        wv.setSeletion(mTextContent.getTextSize()-1);
 
         wv.setOnWheelViewListener(new WheelView.OnWheelViewListener() {
             @Override
             public void onSelected(int selectedIndex, String item) {
                 mBt_textSize.setText("size:"+item);
-                mTextButton.setTextSize(Integer.parseInt(item));
+                mTextContent.setTextSize(Integer.parseInt(item));
                 drawText();
             }
         });
@@ -933,10 +933,10 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
                     .setPositiveButton("保存", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            if (mTextButton.getId()==0)
-                                mTextButton.setId(System.currentTimeMillis()*2);
-                            mTextButton.setProgramId(mProgramId);
-                            mTextButtonDao.insertOrReplaceInTx(mTextButton);
+                            if (mTextContent.getId()==0)
+                                mTextContent.setId(System.currentTimeMillis()*2);
+                            mTextContent.setProgramId(mProgramId);
+                            mTextButtonDao.insertOrReplaceInTx(mTextContent);
                             mProgram.setBaseY(mBaseY);
                             mProgram.setBaseX(mBaseX);
                             mProgram.setStayTime(getStayTime());

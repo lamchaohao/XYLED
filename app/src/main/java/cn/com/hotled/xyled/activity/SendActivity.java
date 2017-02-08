@@ -26,7 +26,6 @@ import java.util.List;
 import cn.com.hotled.xyled.App;
 import cn.com.hotled.xyled.R;
 import cn.com.hotled.xyled.bean.Program;
-import cn.com.hotled.xyled.dao.ProgramDao;
 import cn.com.hotled.xyled.util.CompressUtil;
 import cn.com.hotled.xyled.util.WifiAdmin;
 import cn.com.hotled.xyled.view.NumberProgressBar;
@@ -79,7 +78,6 @@ public class SendActivity extends BaseActivity {
 
         }
     };
-    private View mPbRecord;
     private ProgressBar mPbSend;
 
     @Override
@@ -92,8 +90,7 @@ public class SendActivity extends BaseActivity {
     }
 
     private void loadData() {
-        long screenId = getIntent().getLongExtra("screenId", -1);
-        List<Program> mProgramList  = ((App) getApplication()).getDaoSession().getProgramDao().queryBuilder().where(ProgramDao.Properties.ScreenId.eq(screenId)).list();
+        List<Program> mProgramList  = ((App) getApplication()).getDaoSession().getProgramDao().queryBuilder().list();
 
         Program[] sortProgramList = new Program[mProgramList.size()];
         for (int i = 0; i < mProgramList.size(); i++) {

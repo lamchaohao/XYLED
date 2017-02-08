@@ -24,8 +24,8 @@ import java.util.List;
 
 import cn.com.hotled.xyled.App;
 import cn.com.hotled.xyled.bean.Program;
-import cn.com.hotled.xyled.bean.TextButton;
-import cn.com.hotled.xyled.dao.TextButtonDao;
+import cn.com.hotled.xyled.bean.TextContent;
+import cn.com.hotled.xyled.dao.TextContentDao;
 
 import static android.graphics.Color.BLACK;
 
@@ -62,7 +62,7 @@ public class MutilMoveCompressUtil {
 
     private List<byte[]> mTimeAxisList;
     private List<Program> mProgramList;
-    private List<byte[]> mTextContentList;
+    private List<byte[]> mTextDetailList;
     private File mColorPRG;
     private int mScreenWidth;
     private int mScreenHeight;
@@ -72,7 +72,7 @@ public class MutilMoveCompressUtil {
     private Handler genFileHandler ;
 
     private List<byte[]> mColByteCountList;
-    private List<TextButton> mTextButtonList ;
+    private List<TextContent> mTextContentList;
 
     private int mTextSize ;
     private int mTextColor = Color.RED;
@@ -123,7 +123,7 @@ public class MutilMoveCompressUtil {
         mTextContentList = new ArrayList<>();
         mColByteCountList = new ArrayList<>();
         for (int i = 0; i < mBitmapList.size(); i++) {
-            mTextContentList.add(convertBitmapToPixel(mBitmapList.get(i)));
+            mTextDetailList.add(convertBitmapToPixel(mBitmapList.get(i)));
         }
     }
 
@@ -199,7 +199,7 @@ public class MutilMoveCompressUtil {
         byte[] frameCountByte = intToByteArray(mFrameCount, 2);
         setInbyteArray(1,frameCountByte,mItemPart);
         int textContentLength=0;
-        for (byte[] bytes : mTextContentList) {
+        for (byte[] bytes : mTextDetailList) {
             textContentLength+=bytes.length;
         }
         textContentLength+=mBlackBG.length*mProgramList.size();
@@ -312,21 +312,21 @@ public class MutilMoveCompressUtil {
     private List<Bitmap> drawBitmap() {
         List<Bitmap> bitmaps = new ArrayList<>();
         for (Program program : mProgramList) {
-            mTextButtonList = ((App) mContext.getApplication()).getDaoSession().getTextButtonDao().queryBuilder().where(TextButtonDao.Properties.ProgramId.eq(program.getId())).list();
-            if (mTextButtonList==null||mTextButtonList.size()==0){
-                mTextButtonList = new ArrayList<>();
+            mTextContentList = ((App) mContext.getApplication()).getDaoSession().getTextContentDao().queryBuilder().where(TextContentDao.Properties.ProgramId.eq(program.getId())).list();
+            if (mTextContentList ==null|| mTextContentList.size()==0){
+                mTextContentList = new ArrayList<>();
             }
 
-            for (int i = 0; i < mTextButtonList.size(); i++) {
-                if (i==mTextButtonList.size()-1){
-                    TextButton textButton = mTextButtonList.get(0);
-                    mTextBgColor=textButton.getTextBackgroudColor();
-                    mTextColor=textButton.getTextColor();
-                    mTextSize = textButton.getTextSize();
-                    isUnderLine = textButton.getIsUnderline();
-                    isItalic = textButton.getIsIlatic();
-                    isBold = textButton.getIsbold();
-                    mTypeFile = textButton.getTypeface();
+            for (int i = 0; i < mTextContentList.size(); i++) {
+                if (i== mTextContentList.size()-1){
+                    TextContent textContent = mTextContentList.get(0);
+                    mTextBgColor= textContent.getTextBackgroudColor();
+                    mTextColor= textContent.getTextColor();
+                    mTextSize = textContent.getTextSize();
+                    isUnderLine = textContent.getIsUnderline();
+                    isItalic = textContent.getIsIlatic();
+                    isBold = textContent.getIsbold();
+                    mTypeFile = textContent.getTypeface();
                     mBaseX = program.getBaseX();
                     mBaseY = program.getBaseY();
                 }
@@ -340,8 +340,8 @@ public class MutilMoveCompressUtil {
         Paint paint =new Paint();
         Canvas canvas=new Canvas();
         StringBuilder sb=new StringBuilder();
-        for (TextButton textButton : mTextButtonList) {
-            sb.append(textButton.getText());
+        for (TextContent textContent : mTextContentList) {
+            sb.append(textContent.getText());
         }
 
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
@@ -549,7 +549,7 @@ public class MutilMoveCompressUtil {
             fos.write(mBlackBG);
             Log.i("move","写入黑色背景图片 backBG"+ mBlackBG.length+"byte");//写入黑色背景图片
 
-            for (byte[] bytes : mTextContentList) {
+            for (byte[] bytes : mTextDetailList) {
                 fos.write(bytes);
                 Log.i("move","写入文件mContent"+bytes.length+"byte");
                 //多加一块黑色图片，使其完整左移

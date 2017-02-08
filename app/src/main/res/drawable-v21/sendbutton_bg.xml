@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ripple xmlns:android="http://schemas.android.com/apk/res/android"
     android:color="@color/buttonSelect">
-        <item android:drawable="@drawable/text_red_bg"/>
+        <item android:drawable="@drawable/sendbutton_rectangle">
+        </item>
 </ripple>

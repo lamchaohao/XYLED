@@ -11,13 +11,11 @@ import org.greenrobot.greendao.internal.SqlUtils;
 import org.greenrobot.greendao.internal.DaoConfig;
 import org.greenrobot.greendao.database.Database;
 import org.greenrobot.greendao.database.DatabaseStatement;
-import org.greenrobot.greendao.query.Query;
-import org.greenrobot.greendao.query.QueryBuilder;
 
 import cn.com.hotled.xyled.bean.FileConverter;
 import cn.com.hotled.xyled.bean.ProgramType;
 import cn.com.hotled.xyled.bean.ProgramTypeConverter;
-import cn.com.hotled.xyled.bean.TextButton;
+import cn.com.hotled.xyled.bean.TextContent;
 import java.io.File;
 
 import cn.com.hotled.xyled.bean.Program;
@@ -37,19 +35,18 @@ public class ProgramDao extends AbstractDao<Program, Long> {
     public static class Properties {
         public final static Property Id = new Property(0, long.class, "id", true, "_id");
         public final static Property SortNumber = new Property(1, int.class, "sortNumber", false, "SORT_NUMBER");
-        public final static Property ScreenId = new Property(2, long.class, "screenId", false, "SCREEN_ID");
-        public final static Property ProgramName = new Property(3, String.class, "programName", false, "PROGRAM_NAME");
-        public final static Property BaseX = new Property(4, int.class, "baseX", false, "BASE_X");
-        public final static Property BaseY = new Property(5, int.class, "baseY", false, "BASE_Y");
-        public final static Property FrameTime = new Property(6, float.class, "frameTime", false, "FRAME_TIME");
-        public final static Property StayTime = new Property(7, float.class, "stayTime", false, "STAY_TIME");
-        public final static Property FlowBoundFile = new Property(8, String.class, "flowBoundFile", false, "FLOW_BOUND_FILE");
-        public final static Property FlowEffect = new Property(9, int.class, "flowEffect", false, "FLOW_EFFECT");
-        public final static Property FlowSpeed = new Property(10, int.class, "flowSpeed", false, "FLOW_SPEED");
-        public final static Property UseFlowBound = new Property(11, boolean.class, "useFlowBound", false, "USE_FLOW_BOUND");
-        public final static Property ProgramType = new Property(12, String.class, "programType", false, "PROGRAM_TYPE");
-        public final static Property PicFile = new Property(13, String.class, "picFile", false, "PIC_FILE");
-        public final static Property MTextButton = new Property(14, Long.class, "mTextButton", false, "M_TEXT_BUTTON");
+        public final static Property ProgramName = new Property(2, String.class, "programName", false, "PROGRAM_NAME");
+        public final static Property BaseX = new Property(3, int.class, "baseX", false, "BASE_X");
+        public final static Property BaseY = new Property(4, int.class, "baseY", false, "BASE_Y");
+        public final static Property FrameTime = new Property(5, float.class, "frameTime", false, "FRAME_TIME");
+        public final static Property StayTime = new Property(6, float.class, "stayTime", false, "STAY_TIME");
+        public final static Property FlowBoundFile = new Property(7, String.class, "flowBoundFile", false, "FLOW_BOUND_FILE");
+        public final static Property FlowEffect = new Property(8, int.class, "flowEffect", false, "FLOW_EFFECT");
+        public final static Property FlowSpeed = new Property(9, int.class, "flowSpeed", false, "FLOW_SPEED");
+        public final static Property UseFlowBound = new Property(10, boolean.class, "useFlowBound", false, "USE_FLOW_BOUND");
+        public final static Property ProgramType = new Property(11, String.class, "programType", false, "PROGRAM_TYPE");
+        public final static Property PicFile = new Property(12, String.class, "picFile", false, "PIC_FILE");
+        public final static Property MTextContent = new Property(13, Long.class, "mTextContent", false, "M_TEXT_CONTENT");
     }
 
     private DaoSession daoSession;
@@ -57,7 +54,6 @@ public class ProgramDao extends AbstractDao<Program, Long> {
     private final FileConverter flowBoundFileConverter = new FileConverter();
     private final ProgramTypeConverter programTypeConverter = new ProgramTypeConverter();
     private final FileConverter picFileConverter = new FileConverter();
-    private Query<Program> ledScreen_ProgramListQuery;
 
     public ProgramDao(DaoConfig config) {
         super(config);
@@ -74,19 +70,18 @@ public class ProgramDao extends AbstractDao<Program, Long> {
         db.execSQL("CREATE TABLE " + constraint + "\"PROGRAM\" (" + //
                 "\"_id\" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL ," + // 0: id
                 "\"SORT_NUMBER\" INTEGER NOT NULL ," + // 1: sortNumber
-                "\"SCREEN_ID\" INTEGER NOT NULL ," + // 2: screenId
-                "\"PROGRAM_NAME\" TEXT," + // 3: programName
-                "\"BASE_X\" INTEGER NOT NULL ," + // 4: baseX
-                "\"BASE_Y\" INTEGER NOT NULL ," + // 5: baseY
-                "\"FRAME_TIME\" REAL NOT NULL ," + // 6: frameTime
-                "\"STAY_TIME\" REAL NOT NULL ," + // 7: stayTime
-                "\"FLOW_BOUND_FILE\" TEXT," + // 8: flowBoundFile
-                "\"FLOW_EFFECT\" INTEGER NOT NULL ," + // 9: flowEffect
-                "\"FLOW_SPEED\" INTEGER NOT NULL ," + // 10: flowSpeed
-                "\"USE_FLOW_BOUND\" INTEGER NOT NULL ," + // 11: useFlowBound
-                "\"PROGRAM_TYPE\" TEXT," + // 12: programType
-                "\"PIC_FILE\" TEXT," + // 13: picFile
-                "\"M_TEXT_BUTTON\" INTEGER);"); // 14: mTextButton
+                "\"PROGRAM_NAME\" TEXT," + // 2: programName
+                "\"BASE_X\" INTEGER NOT NULL ," + // 3: baseX
+                "\"BASE_Y\" INTEGER NOT NULL ," + // 4: baseY
+                "\"FRAME_TIME\" REAL NOT NULL ," + // 5: frameTime
+                "\"STAY_TIME\" REAL NOT NULL ," + // 6: stayTime
+                "\"FLOW_BOUND_FILE\" TEXT," + // 7: flowBoundFile
+                "\"FLOW_EFFECT\" INTEGER NOT NULL ," + // 8: flowEffect
+                "\"FLOW_SPEED\" INTEGER NOT NULL ," + // 9: flowSpeed
+                "\"USE_FLOW_BOUND\" INTEGER NOT NULL ," + // 10: useFlowBound
+                "\"PROGRAM_TYPE\" TEXT," + // 11: programType
+                "\"PIC_FILE\" TEXT," + // 12: picFile
+                "\"M_TEXT_CONTENT\" INTEGER);"); // 13: mTextContent
     }
 
     /** Drops the underlying database table. */
@@ -100,33 +95,32 @@ public class ProgramDao extends AbstractDao<Program, Long> {
         stmt.clearBindings();
         stmt.bindLong(1, entity.getId());
         stmt.bindLong(2, entity.getSortNumber());
-        stmt.bindLong(3, entity.getScreenId());
  
         String programName = entity.getProgramName();
         if (programName != null) {
-            stmt.bindString(4, programName);
+            stmt.bindString(3, programName);
         }
-        stmt.bindLong(5, entity.getBaseX());
-        stmt.bindLong(6, entity.getBaseY());
-        stmt.bindDouble(7, entity.getFrameTime());
-        stmt.bindDouble(8, entity.getStayTime());
+        stmt.bindLong(4, entity.getBaseX());
+        stmt.bindLong(5, entity.getBaseY());
+        stmt.bindDouble(6, entity.getFrameTime());
+        stmt.bindDouble(7, entity.getStayTime());
  
         File flowBoundFile = entity.getFlowBoundFile();
         if (flowBoundFile != null) {
-            stmt.bindString(9, flowBoundFileConverter.convertToDatabaseValue(flowBoundFile));
+            stmt.bindString(8, flowBoundFileConverter.convertToDatabaseValue(flowBoundFile));
         }
-        stmt.bindLong(10, entity.getFlowEffect());
-        stmt.bindLong(11, entity.getFlowSpeed());
-        stmt.bindLong(12, entity.getUseFlowBound() ? 1L: 0L);
+        stmt.bindLong(9, entity.getFlowEffect());
+        stmt.bindLong(10, entity.getFlowSpeed());
+        stmt.bindLong(11, entity.getUseFlowBound() ? 1L: 0L);
  
         ProgramType programType = entity.getProgramType();
         if (programType != null) {
-            stmt.bindString(13, programTypeConverter.convertToDatabaseValue(programType));
+            stmt.bindString(12, programTypeConverter.convertToDatabaseValue(programType));
         }
  
         File picFile = entity.getPicFile();
         if (picFile != null) {
-            stmt.bindString(14, picFileConverter.convertToDatabaseValue(picFile));
+            stmt.bindString(13, picFileConverter.convertToDatabaseValue(picFile));
         }
     }
 
@@ -135,33 +129,32 @@ public class ProgramDao extends AbstractDao<Program, Long> {
         stmt.clearBindings();
         stmt.bindLong(1, entity.getId());
         stmt.bindLong(2, entity.getSortNumber());
-        stmt.bindLong(3, entity.getScreenId());
  
         String programName = entity.getProgramName();
         if (programName != null) {
-            stmt.bindString(4, programName);
+            stmt.bindString(3, programName);
         }
-        stmt.bindLong(5, entity.getBaseX());
-        stmt.bindLong(6, entity.getBaseY());
-        stmt.bindDouble(7, entity.getFrameTime());
-        stmt.bindDouble(8, entity.getStayTime());
+        stmt.bindLong(4, entity.getBaseX());
+        stmt.bindLong(5, entity.getBaseY());
+        stmt.bindDouble(6, entity.getFrameTime());
+        stmt.bindDouble(7, entity.getStayTime());
  
         File flowBoundFile = entity.getFlowBoundFile();
         if (flowBoundFile != null) {
-            stmt.bindString(9, flowBoundFileConverter.convertToDatabaseValue(flowBoundFile));
+            stmt.bindString(8, flowBoundFileConverter.convertToDatabaseValue(flowBoundFile));
         }
-        stmt.bindLong(10, entity.getFlowEffect());
-        stmt.bindLong(11, entity.getFlowSpeed());
-        stmt.bindLong(12, entity.getUseFlowBound() ? 1L: 0L);
+        stmt.bindLong(9, entity.getFlowEffect());
+        stmt.bindLong(10, entity.getFlowSpeed());
+        stmt.bindLong(11, entity.getUseFlowBound() ? 1L: 0L);
  
         ProgramType programType = entity.getProgramType();
         if (programType != null) {
-            stmt.bindString(13, programTypeConverter.convertToDatabaseValue(programType));
+            stmt.bindString(12, programTypeConverter.convertToDatabaseValue(programType));
         }
  
         File picFile = entity.getPicFile();
         if (picFile != null) {
-            stmt.bindString(14, picFileConverter.convertToDatabaseValue(picFile));
+            stmt.bindString(13, picFileConverter.convertToDatabaseValue(picFile));
         }
     }
 
@@ -181,18 +174,17 @@ public class ProgramDao extends AbstractDao<Program, Long> {
         Program entity = new Program( //
             cursor.getLong(offset + 0), // id
             cursor.getInt(offset + 1), // sortNumber
-            cursor.getLong(offset + 2), // screenId
-            cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3), // programName
-            cursor.getInt(offset + 4), // baseX
-            cursor.getInt(offset + 5), // baseY
-            cursor.getFloat(offset + 6), // frameTime
-            cursor.getFloat(offset + 7), // stayTime
-            cursor.isNull(offset + 8) ? null : flowBoundFileConverter.convertToEntityProperty(cursor.getString(offset + 8)), // flowBoundFile
-            cursor.getInt(offset + 9), // flowEffect
-            cursor.getInt(offset + 10), // flowSpeed
-            cursor.getShort(offset + 11) != 0, // useFlowBound
-            cursor.isNull(offset + 12) ? null : programTypeConverter.convertToEntityProperty(cursor.getString(offset + 12)), // programType
-            cursor.isNull(offset + 13) ? null : picFileConverter.convertToEntityProperty(cursor.getString(offset + 13)) // picFile
+            cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2), // programName
+            cursor.getInt(offset + 3), // baseX
+            cursor.getInt(offset + 4), // baseY
+            cursor.getFloat(offset + 5), // frameTime
+            cursor.getFloat(offset + 6), // stayTime
+            cursor.isNull(offset + 7) ? null : flowBoundFileConverter.convertToEntityProperty(cursor.getString(offset + 7)), // flowBoundFile
+            cursor.getInt(offset + 8), // flowEffect
+            cursor.getInt(offset + 9), // flowSpeed
+            cursor.getShort(offset + 10) != 0, // useFlowBound
+            cursor.isNull(offset + 11) ? null : programTypeConverter.convertToEntityProperty(cursor.getString(offset + 11)), // programType
+            cursor.isNull(offset + 12) ? null : picFileConverter.convertToEntityProperty(cursor.getString(offset + 12)) // picFile
         );
         return entity;
     }
@@ -201,18 +193,17 @@ public class ProgramDao extends AbstractDao<Program, Long> {
     public void readEntity(Cursor cursor, Program entity, int offset) {
         entity.setId(cursor.getLong(offset + 0));
         entity.setSortNumber(cursor.getInt(offset + 1));
-        entity.setScreenId(cursor.getLong(offset + 2));
-        entity.setProgramName(cursor.isNull(offset + 3) ? null : cursor.getString(offset + 3));
-        entity.setBaseX(cursor.getInt(offset + 4));
-        entity.setBaseY(cursor.getInt(offset + 5));
-        entity.setFrameTime(cursor.getFloat(offset + 6));
-        entity.setStayTime(cursor.getFloat(offset + 7));
-        entity.setFlowBoundFile(cursor.isNull(offset + 8) ? null : flowBoundFileConverter.convertToEntityProperty(cursor.getString(offset + 8)));
-        entity.setFlowEffect(cursor.getInt(offset + 9));
-        entity.setFlowSpeed(cursor.getInt(offset + 10));
-        entity.setUseFlowBound(cursor.getShort(offset + 11) != 0);
-        entity.setProgramType(cursor.isNull(offset + 12) ? null : programTypeConverter.convertToEntityProperty(cursor.getString(offset + 12)));
-        entity.setPicFile(cursor.isNull(offset + 13) ? null : picFileConverter.convertToEntityProperty(cursor.getString(offset + 13)));
+        entity.setProgramName(cursor.isNull(offset + 2) ? null : cursor.getString(offset + 2));
+        entity.setBaseX(cursor.getInt(offset + 3));
+        entity.setBaseY(cursor.getInt(offset + 4));
+        entity.setFrameTime(cursor.getFloat(offset + 5));
+        entity.setStayTime(cursor.getFloat(offset + 6));
+        entity.setFlowBoundFile(cursor.isNull(offset + 7) ? null : flowBoundFileConverter.convertToEntityProperty(cursor.getString(offset + 7)));
+        entity.setFlowEffect(cursor.getInt(offset + 8));
+        entity.setFlowSpeed(cursor.getInt(offset + 9));
+        entity.setUseFlowBound(cursor.getShort(offset + 10) != 0);
+        entity.setProgramType(cursor.isNull(offset + 11) ? null : programTypeConverter.convertToEntityProperty(cursor.getString(offset + 11)));
+        entity.setPicFile(cursor.isNull(offset + 12) ? null : picFileConverter.convertToEntityProperty(cursor.getString(offset + 12)));
      }
     
     @Override
@@ -240,20 +231,6 @@ public class ProgramDao extends AbstractDao<Program, Long> {
         return true;
     }
     
-    /** Internal query to resolve the "programList" to-many relationship of LedScreen. */
-    public List<Program> _queryLedScreen_ProgramList(long screenId) {
-        synchronized (this) {
-            if (ledScreen_ProgramListQuery == null) {
-                QueryBuilder<Program> queryBuilder = queryBuilder();
-                queryBuilder.where(Properties.ScreenId.eq(null));
-                ledScreen_ProgramListQuery = queryBuilder.build();
-            }
-        }
-        Query<Program> query = ledScreen_ProgramListQuery.forCurrentThread();
-        query.setParameter(0, screenId);
-        return query.list();
-    }
-
     private String selectDeep;
 
     protected String getSelectDeep() {
@@ -261,9 +238,9 @@ public class ProgramDao extends AbstractDao<Program, Long> {
             StringBuilder builder = new StringBuilder("SELECT ");
             SqlUtils.appendColumns(builder, "T", getAllColumns());
             builder.append(',');
-            SqlUtils.appendColumns(builder, "T0", daoSession.getTextButtonDao().getAllColumns());
+            SqlUtils.appendColumns(builder, "T0", daoSession.getTextContentDao().getAllColumns());
             builder.append(" FROM PROGRAM T");
-            builder.append(" LEFT JOIN TEXT_BUTTON T0 ON T.\"M_TEXT_BUTTON\"=T0.\"_id\"");
+            builder.append(" LEFT JOIN TEXT_CONTENT T0 ON T.\"M_TEXT_CONTENT\"=T0.\"_id\"");
             builder.append(' ');
             selectDeep = builder.toString();
         }
@@ -274,8 +251,8 @@ public class ProgramDao extends AbstractDao<Program, Long> {
         Program entity = loadCurrent(cursor, 0, lock);
         int offset = getAllColumns().length;
 
-        TextButton mTextButton = loadCurrentOther(daoSession.getTextButtonDao(), cursor, offset);
-        entity.setMTextButton(mTextButton);
+        TextContent mTextContent = loadCurrentOther(daoSession.getTextContentDao(), cursor, offset);
+        entity.setMTextContent(mTextContent);
 
         return entity;    
     }
