@@ -6,7 +6,6 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.Button;
 
 import com.mobeta.android.dslv.DragSortListView;
 
@@ -17,7 +16,6 @@ import cn.com.hotled.xyled.App;
 import cn.com.hotled.xyled.R;
 import cn.com.hotled.xyled.adapter.ItemSortAdapter;
 import cn.com.hotled.xyled.bean.Program;
-import cn.com.hotled.xyled.util.PicCompressUtil;
 
 import static cn.com.hotled.xyled.bean.ProgramType.Pic;
 
@@ -50,22 +48,6 @@ public class ProgramManageActivity extends BaseActivity {
 
     private void initView() {
 
-        Button btSend = (Button) findViewById(R.id.bt_itemMan_sendbyPhone);
-        btSend.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                PicCompressUtil compressUtil = new PicCompressUtil(ProgramManageActivity.this, mProgramList,64,32,60,60);
-                compressUtil.startGenFile();
-            }
-        });
-
-        findViewById(R.id.bt_itemMan_send).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(ProgramManageActivity.this, SendActivity.class);
-                startActivity(intent);
-            }
-        });
 
         DragSortListView dslv_manage = (DragSortListView) findViewById(R.id.dslv_manage);
 
@@ -117,6 +99,7 @@ public class ProgramManageActivity extends BaseActivity {
     public void onCreateCustomToolBar(Toolbar toolbar) {
         super.onCreateCustomToolBar(toolbar);
         toolbar.setTitle("节目管理");
+
     }
 
     @Override

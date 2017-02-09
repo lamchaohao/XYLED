@@ -1,0 +1,50 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             android:orientation="vertical"
+              android:layout_width="match_parent"
+             android:layout_height="match_parent">
+
+    <FrameLayout
+        android:layout_margin="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <ImageView
+            android:id="@+id/iv_connect_round"
+            android:src="@drawable/connect_view_uncomplete"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+        <ImageView
+            android:id="@+id/iv_connect_wifiLogo"
+            android:gravity="center"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_wifi_green_a700_svg_uncomplete"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+        <TextView
+            android:id="@+id/tv_connect_tip"
+            android:gravity="center"
+            android:layout_marginBottom="40dp"
+            android:layout_gravity="bottom"
+            android:text="点击查屏"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+    </FrameLayout>
+    <TextView
+        android:id="@+id/tv_connect_state"
+        android:padding="10dp"
+        android:text="已连接到 HC-LED[dfc023]"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+    <TextView
+        android:id="@+id/tv_connect_checkResult"
+        android:padding="10dp"
+        android:text="检测到N个屏幕"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rv_connect_wifi"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+    </android.support.v7.widget.RecyclerView>
+
+</LinearLayout>

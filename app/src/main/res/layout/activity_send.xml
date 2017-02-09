@@ -16,25 +16,45 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
     <RelativeLayout
-        android:layout_centerInParent="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-
-        <cn.com.hotled.xyled.view.NumberProgressBar
-            android:paddingTop="10dp"
-            android:visibility="gone"
-            android:id="@+id/send_progressbar"
-            style="@style/NumberProgressBar_Beauty_Red"
+        <ImageView
+            android:layout_marginTop="10dp"
+            android:id="@+id/iv_send_round"
+            android:src="@drawable/send_data_uncomplete"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+        <ImageView
+            android:id="@+id/iv_send_round_outside"
+            android:src="@drawable/connect_view_outside"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
         <TextView
-            android:id="@+id/tv_progress_send"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="30dp"
-            android:text="请耐心等候，录制文件"
-            android:layout_width="wrap_content"
+            android:id="@+id/tv_send_progress"
+            android:text="Ready"
+            android:textSize="38sp"
+            android:gravity="center"
+            android:layout_centerInParent="true"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
     </RelativeLayout>
+
+        <!--<cn.com.hotled.xyled.view.NumberProgressBar-->
+            <!--android:paddingTop="10dp"-->
+            <!--android:visibility="gone"-->
+            <!--android:id="@+id/send_progressbar"-->
+            <!--style="@style/NumberProgressBar_Beauty_Red"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"/>-->
+
+    <TextView
+        android:layout_centerInParent="true"
+        android:id="@+id/tv_progress_tip"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="30dp"
+        android:text="请耐心等候，录制文件"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
     <Button
         android:id="@+id/bt_send_sendAct"
         android:layout_centerHorizontal="true"

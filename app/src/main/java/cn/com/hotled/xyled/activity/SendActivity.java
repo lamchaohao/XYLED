@@ -10,6 +10,9 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -28,7 +31,6 @@ import cn.com.hotled.xyled.R;
 import cn.com.hotled.xyled.bean.Program;
 import cn.com.hotled.xyled.util.CompressUtil;
 import cn.com.hotled.xyled.util.WifiAdmin;
-import cn.com.hotled.xyled.view.NumberProgressBar;
 
 public class SendActivity extends BaseActivity {
     private static final int UPDATE_PROGRESS = 0x11;
@@ -37,7 +39,6 @@ public class SendActivity extends BaseActivity {
     public static final int GENFILE_DONE=0x204;
     private final String targetIP="192.168.3.1";
     private final int targetPort = 16389;
-    private NumberProgressBar mProgressBar;
     private TextView mTvStatus;
     private boolean isSending=false;
     private boolean fileReady=false;
@@ -47,27 +48,32 @@ public class SendActivity extends BaseActivity {
             switch (msg.what){
                 case UPDATE_PROGRESS:
                     int arg1 = msg.arg1;
-                    mProgressBar.setProgress(arg1);
                     mTvStatus.setText("正在传输数据 "+arg1+"%");
+                    mSendProgress.setText(arg1+"%");
                     if (arg1==100){
                         Toast.makeText(SendActivity.this,"已发送",Toast.LENGTH_LONG).show();
                         mTvStatus.setText("发送完成");
+                        mSendAnim.cancel();
+                        mSendOutsideAnim.cancel();
                         isSending=false;
                     }
                     break;
                 case WIFI_ERRO:
                     Toast.makeText(SendActivity.this,"所连接WiFi非本公司产品，请切换WiFi",Toast.LENGTH_LONG).show();
                     mTvStatus.setText("所连接WiFi非本公司产品，请切换WiFi");
+                    mSendAnim.cancel();
+                    mSendOutsideAnim.cancel();
                     startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
                     break;
                 case CONN_ERRO:
                     Toast.makeText(SendActivity.this,"连接错误，请重新连接屏幕",Toast.LENGTH_LONG).show();
                     mTvStatus.setText("无法发送，请重新连接屏幕");
+                    mSendAnim.cancel();
+                    mSendOutsideAnim.cancel();
                     break;
                 case GENFILE_DONE:
                     fileReady=true;
                     mPbSend.setVisibility(View.GONE);
-                    mProgressBar.setVisibility(View.VISIBLE);
                     Toast.makeText(SendActivity.this,"文件已生成，开始传送",Toast.LENGTH_SHORT).show();
                     if (!isSending&&fileReady) {
                         send();
@@ -79,6 +85,11 @@ public class SendActivity extends BaseActivity {
         }
     };
     private ProgressBar mPbSend;
+    private TextView mSendProgress;
+    private Animation mSendAnim;
+    private ImageView mSendRound;
+    private ImageView msendRoundOutside;
+    private Animation mSendOutsideAnim;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,8 +118,12 @@ public class SendActivity extends BaseActivity {
 
     private void initView() {
         mPbSend = (ProgressBar) findViewById(R.id.pb_send_record);
-        mProgressBar = (NumberProgressBar) findViewById(R.id.send_progressbar);
-        mTvStatus = (TextView) findViewById(R.id.tv_progress_send);
+        mSendRound = (ImageView) findViewById(R.id.iv_send_round);
+        msendRoundOutside = (ImageView) findViewById(R.id.iv_send_round_outside);
+        mTvStatus = (TextView) findViewById(R.id.tv_progress_tip);
+        mSendProgress = (TextView) findViewById(R.id.tv_send_progress);
+        mSendAnim = AnimationUtils.loadAnimation(this, R.anim.search_round);
+        mSendOutsideAnim = AnimationUtils.loadAnimation(this, R.anim.anti_clock);
         findViewById(R.id.bt_send_sendAct).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -122,6 +137,8 @@ public class SendActivity extends BaseActivity {
     }
 
     public void send(){
+        mSendRound.startAnimation(mSendAnim);
+        msendRoundOutside.startAnimation(mSendOutsideAnim);
         new Thread(){
             @Override
             public void run() {
