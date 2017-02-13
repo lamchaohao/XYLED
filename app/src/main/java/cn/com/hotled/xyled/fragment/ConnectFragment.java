@@ -37,6 +37,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cn.com.hotled.xyled.R;
+import cn.com.hotled.xyled.activity.ConnectHelpDiagActivity;
 import cn.com.hotled.xyled.adapter.ConnectAdapter;
 import cn.com.hotled.xyled.global.Global;
 import cn.com.hotled.xyled.util.WifiAdmin;
@@ -76,6 +77,7 @@ public class ConnectFragment extends Fragment {
     private TextView mTvTip;
     private TextView mTvState;
     private TextView mTvCheckResult;
+    private ImageView mIvHelp;
 
     @Nullable
     @Override
@@ -95,6 +97,7 @@ public class ConnectFragment extends Fragment {
         mTvTip = (TextView) view.findViewById(R.id.tv_connect_tip);
         mTvState = (TextView) view.findViewById(R.id.tv_connect_state);
         mTvCheckResult = (TextView) view.findViewById(R.id.tv_connect_checkResult);
+        mIvHelp= (ImageView) view.findViewById(R.id.iv_connect_help);
         mInsideAnim = AnimationUtils.loadAnimation(getContext(), R.anim.search_round);
         mRecyclerView = (RecyclerView) view.findViewById(R.id.rv_connect_wifi);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -142,6 +145,14 @@ public class ConnectFragment extends Fragment {
 
             }
         });
+
+        mIvHelp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getContext(), ConnectHelpDiagActivity.class));
+            }
+        });
+
         updateAnimState();
     }
 
@@ -151,15 +162,13 @@ public class ConnectFragment extends Fragment {
         WifiConfiguration exsitsConfig = mWifiAdmin.isExsits(mWifiList.get(position).SSID);//这里的SSID 打印出来没有双引号包括
         if (exsitsConfig!=null){
             // 1.已连接过，直接使用该配置进行连接
-            mWifiAdmin.addNetWork(exsitsConfig);
-//            Log.i("connecAct","已连接过，直接使用该配置进行连接");
-//            mWifiAdmin.setMaxPriority(exsitsConfig);//已经连接过的，需要设置优先级为最大的才能连上
-//            mWifiAdmin.connectWifi(exsitsConfig.networkId);
-
+            Log.i("connecAct","已连接过，直接使用该配置进行连接");
+            mWifiAdmin.setMaxPriority(exsitsConfig);//已经连接过的，需要设置优先级为最大的才能连上
+            mWifiAdmin.connectWifi(exsitsConfig.networkId);
         }else {
             Log.i("connecAct","使用密码连接");
-            int networkID = mWifiAdmin.createWifiInfo2(mWifiList.get(position), Global.CARD_PASSWORD);
-            mWifiAdmin.connectWifi(networkID);
+            WifiConfiguration wifiInfo2 = mWifiAdmin.createWifiInfo2(mWifiList.get(position), Global.CARD_PASSWORD);
+            mWifiAdmin.addNetWork(wifiInfo2);
         }
     }
 

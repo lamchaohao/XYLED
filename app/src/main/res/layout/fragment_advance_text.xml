@@ -35,6 +35,6 @@
             android:layout_height="wrap_content" />
      </LinearLayout>
 
-    <include layout="@layout/popupwind_textfragment"/>
+    <include layout="@layout/content_textsetting"/>
 
 </LinearLayout>

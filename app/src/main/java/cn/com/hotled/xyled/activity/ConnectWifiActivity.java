@@ -249,8 +249,8 @@ public class ConnectWifiActivity extends BaseActivity {
                     .input("请输入密码", null, new MaterialDialog.InputCallback() {
                         @Override
                         public void onInput(@NonNull MaterialDialog dialog, CharSequence input) {
-                            int networkID = mWifiAdmin.createWifiInfo2(mWifiList.get(position), input.toString());
-                            mWifiAdmin.connectWifi(networkID);
+                            WifiConfiguration config = mWifiAdmin.createWifiInfo2(mWifiList.get(position), input.toString());
+                            mWifiAdmin.connectWifi(config.networkId);
                             dialog.dismiss();
                         }
                     })
@@ -271,8 +271,8 @@ public class ConnectWifiActivity extends BaseActivity {
 
         }else{//2.2不需要密码
 
-            int netId = mWifiAdmin.createWifiInfo2(mWifiList.get(position), "");
-            mWifiAdmin.connectWifi(netId);
+            WifiConfiguration wifiInfo2 = mWifiAdmin.createWifiInfo2(mWifiList.get(position), "");
+            mWifiAdmin.connectWifi(wifiInfo2.networkId);
         }
 
     }

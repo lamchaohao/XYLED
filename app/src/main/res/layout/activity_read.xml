@@ -11,6 +11,10 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     android:orientation="vertical"
     tools:context="cn.com.hotled.xyled.activity.ReadActivity">
-
+    <Button
+        android:id="@+id/bt_readback"
+        android:text="Read"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
 
 </LinearLayout>

@@ -38,6 +38,7 @@ import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
@@ -138,6 +139,7 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
     private TextContentDao mTextButtonDao;
     private boolean isTextChanged;
     private boolean isLoadData;
+    private boolean isWarnShowed;
     private ProgramDao mProgramDao;
     private Program mProgram;
     private Bitmap mFlowBitmap;
@@ -176,6 +178,7 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
                 mBaseY =mProgram.getBaseY();
             mFrameTime=mProgram.getFrameTime();
             mStayTime = mProgram.getStayTime();
+
             int effect = mProgram.getFlowEffect();
             if (effect==Global.FLOW_EFFECT_CLOCKWISE){
                 bt_setFlowEffect.setText("顺时针");
@@ -191,6 +194,21 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
                             String absolutePath = mProgram.getFlowBoundFile().getAbsolutePath();
                             mFlowBitmap= BitmapFactory.decodeFile(absolutePath);
                             setFlowBound(absolutePath,false);
+                        }
+                        mBt_textSize.setText("size:"+mTextContent.getTextSize());
+                        if (mTextContent.getTypeface()!=null) {
+                            int lastIndexOf = mTextContent.getTypeface().getName().lastIndexOf(".");
+                            String fontFile = mTextContent.getTypeface().getName().substring(0, lastIndexOf);
+                            mBt_setFont.setText(fontFile);
+                        }
+                        if (mTextContent.getIsbold()) {
+                            ib_setBold.setBackgroundResource(R.drawable.recycler_bg_select);
+                        }
+                        if (mTextContent.getIsIlatic()) {
+                            ib_setItalic.setBackgroundResource(R.drawable.recycler_bg_select);
+                        }
+                        if (mTextContent.getIsUnderline()) {
+                            ib_setUnderLine.setBackgroundResource(R.drawable.recycler_bg_select);
                         }
                         drawText();
                     }else {
@@ -263,11 +281,13 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
                     llSetFlow.setVisibility(View.VISIBLE);
                     mProgram.setUseFlowBound(true);
                     if (mFlowBitmap==null){
-                        boolean isFirstIn = getSharedPreferences("SystemConfig", MODE_PRIVATE).getBoolean("isFirstIn", false);
+                        boolean isFirstIn = getSharedPreferences(Global.SP_SYSTEM_CONFIG, MODE_PRIVATE).getBoolean(Global.KEY_IS_FIRSTIN, false);
                         if (!isFirstIn) {
                             File file = new File(getFilesDir() + "/flow/bounds_1_01.bmp");
-                            mProgram.setFlowBoundFile(file);
-                            setFlowBound(file.toString(),false);
+                            if (file.exists()) {
+                                mProgram.setFlowBoundFile(file);
+                                setFlowBound(file.toString(),false);
+                            }
                         }
 
                     }
@@ -295,8 +315,8 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
         canvas=new Canvas();
         //启用抗锯齿效果
         paint = new Paint();
-        mWidth = 64;
-        mHeight = 32;
+        mWidth = getSharedPreferences(Global.SP_SCREEN_CONFIG,MODE_PRIVATE).getInt(Global.KEY_SCREEN_W,64);
+        mHeight = getSharedPreferences(Global.SP_SCREEN_CONFIG,MODE_PRIVATE).getInt(Global.KEY_SCREEN_H,32);
 
         targetBitmap = Bitmap.createBitmap(mWidth, mHeight, Bitmap.Config.ARGB_4444);
 
@@ -410,8 +430,13 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
         //为了避免OOM，bitmap的最大宽度设置为2048,
         // TODO: 2016/12/8 如果文字太长，需要重新绘制一个bitmap，bitmap的最大尺寸为4096*4096
         // TODO: 2017/1/4 文字太长省略后，提示用户不影响屏幕显示
-        if (drawWidth>=2048)
+        if (drawWidth>=2048){
+            if (!isWarnShowed) {
+                Toast.makeText(this, "文字过长，预览图后部分省略，但不会影响屏幕实际显示", Toast.LENGTH_LONG).show();
+                isWarnShowed=true;
+            }
             return 2048;
+        }
         return drawWidth;
     }
 
@@ -674,16 +699,31 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
 
     private void setUnderLine() {
         mTextContent.setIsUnderline(!mTextContent.getIsUnderline());
+        if (mTextContent.getIsUnderline()) {
+            ib_setUnderLine.setBackgroundResource(R.drawable.recycler_bg_select);
+        }else {
+            ib_setUnderLine.setBackgroundResource(R.drawable.recycler_bg);
+        }
         drawText();
     }
 
     private void setItalic() {
         mTextContent.setIsIlatic(!mTextContent.getIsIlatic());
+        if (mTextContent.getIsIlatic()) {
+            ib_setItalic.setBackgroundResource(R.drawable.recycler_bg_select);
+        }else {
+            ib_setItalic.setBackgroundResource(R.drawable.recycler_bg);
+        }
         drawText();
     }
 
     private void setBold() {
         mTextContent.setIsbold(!mTextContent.getIsbold());
+        if (mTextContent.getIsbold()) {
+            ib_setBold.setBackgroundResource(R.drawable.recycler_bg_select);
+        }else {
+            ib_setBold.setBackgroundResource(R.drawable.recycler_bg);
+        }
         drawText();
     }
 
@@ -694,7 +734,6 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
         if (!downloadFontDir.exists()){
             downloadFontDir.mkdir();
         }
-        Log.i("popup", "setFont: "+downloadFontDir.getAbsolutePath());
         File[] downloadFonts = downloadFontDir.listFiles();
         final List<TypefaceFile> fileList=new ArrayList<>();
         if(downloadFonts!=null)
@@ -1003,6 +1042,5 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
         String programName = getIntent().getStringExtra("programName");
         toolbar.setTitle(programName);
     }
-
 
 }

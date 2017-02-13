@@ -1,5 +1,6 @@
 package cn.com.hotled.xyled.flowbound;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
@@ -25,10 +26,11 @@ public class CompareCompressFlowB extends BaseFlowBound {
     private Map<Integer,Integer> mFlowMap;
     private int mIndex;
 
-    public CompareCompressFlowB(int screenWidth, int screenHeight) {
-        super(screenWidth, screenHeight);
+    public CompareCompressFlowB(Context context, int screenWidth, int screenHeight) {
+        super(context, screenWidth, screenHeight);
         mFlowMap=new HashMap<>();
     }
+
 
     public void setFlowFile(File[] file) {
         flowFile = file;

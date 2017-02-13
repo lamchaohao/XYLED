@@ -27,44 +27,54 @@
                     android:padding="10dp"
                     android:src="@drawable/ic_live_tv_primary_dark_700_36dp"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="match_parent"/>
                 <RelativeLayout
                     android:layout_gravity="center"
                     android:padding="5dp"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content">
+
                     <TextView
-                        android:id="@+id/tv_screenCatag_name"
-                        android:text="店铺门楣"
+                        android:layout_centerVertical="true"
+                        android:id="@+id/tv_screenCatag_card"
+                        android:paddingLeft="15dp"
+                        android:paddingTop="5dp"
+                        android:text="HC-1"
                         android:textSize="18sp"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"/>
 
                     <TextView
                         android:id="@+id/tv_screenCatag_size"
+                        android:layout_centerVertical="true"
                         android:paddingTop="5dp"
-                        android:layout_below="@id/tv_screenCatag_name"
                         android:text="64x32"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
-                    <TextView
-                        android:id="@+id/tv_screenCatag_card"
-                        android:paddingLeft="15dp"
-                        android:paddingTop="5dp"
-                        android:layout_below="@id/tv_screenCatag_name"
-                        android:layout_toRightOf="@id/tv_screenCatag_size"
-                        android:text="HC-1"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
-                    <TextView
-                        android:id="@+id/tv_screenCatag_location"
-                        android:textColor="#AA00FF"
-                        android:paddingLeft="15dp"
-                        android:text="门口"
-                        android:layout_alignBaseline="@id/tv_screenCatag_card"
+                        android:textColor="#1E88E5"
+                        android:textSize="18sp"
+                        android:layout_marginLeft="10dp"
                         android:layout_toRightOf="@id/tv_screenCatag_card"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"/>
+
+                    <TextView
+                        android:layout_centerVertical="true"
+                        android:id="@+id/tv_screenCatag_scanCount"
+                        android:paddingTop="5dp"
+                        android:text="8扫"
+                        android:textSize="18sp"
+                        android:textColor="#6A1B9A"
+                        android:layout_marginLeft="10dp"
+                        android:layout_toRightOf="@id/tv_screenCatag_size"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+                    <ImageView
+                        android:id="@+id/iv_screenCatag_refresh"
+                        android:layout_alignParentRight="true"
+                        android:src="@drawable/ic_refresh_primary_dark_36dp"
+                        android:padding="10dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+
                 </RelativeLayout>
             </LinearLayout>
         </android.support.v7.widget.CardView>

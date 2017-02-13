@@ -120,7 +120,7 @@ public class CompressUtil {
      * @return 压缩后的图片字节数组
      */
     private byte[] convertBitmapToPixel(Bitmap bitmap, int index) {
-        byte[] bitmapPixels = BitmapToPixel.convertBitmapToPixel(bitmap);
+        byte[] bitmapPixels = BitmapToPixel.convertBitmapToPixel(bitmap,mContext);
         int widthToCompress = bitmap.getWidth();
 
         //取点后压缩
@@ -144,7 +144,7 @@ public class CompressUtil {
         mPicContentList=new ArrayList<>();
         for (Program program : mPicProgram) {
             Bitmap bitmap = BitmapFactory.decodeFile(program.getPicFile().getAbsolutePath());
-            byte[] bytes = BitmapToPixel.convertBitmapToPixel(bitmap);
+            byte[] bytes = BitmapToPixel.convertBitmapToPixel(bitmap,mContext);
             FullCompressAlgorithm full=new FullCompressAlgorithm();
             List<Byte> compress = full.compress(bytes);
             byte[]  picBytes=new byte[compress.size()];
@@ -206,7 +206,7 @@ public class CompressUtil {
             }
         }
 
-        ClockwiseFlow flow =new ClockwiseFlow(mScreenWidth,mScreenHeight);
+        ClockwiseFlow flow =new ClockwiseFlow(mContext,mScreenWidth,mScreenHeight);
         flow.setFlowFile(flowFiles);
         flow.setUseFlows(useFlow);
         flow.setProgramLength(mProgramLengthList);

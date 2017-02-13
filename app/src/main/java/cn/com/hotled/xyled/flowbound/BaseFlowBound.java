@@ -1,5 +1,7 @@
 package cn.com.hotled.xyled.flowbound;
 
+import android.content.Context;
+
 import java.util.List;
 
 /**
@@ -9,8 +11,9 @@ import java.util.List;
 public abstract class BaseFlowBound {
     int screenWidth;
     int screenHeight;
-
-    public BaseFlowBound(int screenWidth,int screenHeight) {
+    Context context;
+    public BaseFlowBound(Context context,int screenWidth, int screenHeight) {
+        this.context=context;
         this.screenWidth = screenWidth;
         this.screenHeight=screenHeight;
     }

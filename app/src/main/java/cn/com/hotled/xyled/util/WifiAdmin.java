@@ -5,6 +5,7 @@ import android.net.wifi.ScanResult;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.util.Log;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -173,7 +174,7 @@ public class WifiAdmin {
 
 
 
-    public int createWifiInfo2(ScanResult wifiInfo, String pwd) {
+    public WifiConfiguration createWifiInfo2(ScanResult wifiInfo, String pwd) {
         WifiCipherType type;
 
         if (wifiInfo.capabilities.contains("WPA2-PSK")) {
@@ -195,11 +196,12 @@ public class WifiAdmin {
 
         WifiConfiguration config = createWifiInfo(wifiInfo.SSID,
                 wifiInfo.BSSID, pwd, type);
-        if (config != null) {
-            return mWifiManager.addNetwork(config);
-        } else {
-            return -1;
-        }
+        return config;
+//        if (config != null) {
+//            return mWifiManager.addNetwork(config);
+//        } else {
+//            return -1;
+//        }
     }
 
     /**
@@ -234,7 +236,7 @@ public class WifiAdmin {
         }
 
         config.priority = priority; // 2147483647;
-        System.out.println("priority=" + priority);
+        Log.i("wifiadmin","priority=" + priority);
 
         mWifiManager.updateNetwork(config);
 
@@ -339,6 +341,7 @@ public class WifiAdmin {
 
         return config;
     }
+
     private int shiftPriorityAndSave() {
         List<WifiConfiguration> localList = this.mWifiManager
                 .getConfiguredNetworks();

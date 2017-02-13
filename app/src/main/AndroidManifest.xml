@@ -73,6 +73,8 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+        <activity android:name=".activity.ConnectHelpDiagActivity" android:theme="@style/Theme.AppCompat.Light.Dialog">
+        </activity>
     </application>
 
 </manifest>

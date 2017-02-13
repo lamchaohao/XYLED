@@ -1,10 +1,11 @@
-package cn.com.hotled.xyled.activity;
+package cn.com.hotled.xyled.util;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.wifi.WifiInfo;
-import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
-import android.view.View;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -12,38 +13,40 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.Socket;
 
-import cn.com.hotled.xyled.R;
-import cn.com.hotled.xyled.util.WifiAdmin;
+import cn.com.hotled.xyled.fragment.ScreenFragment;
+import cn.com.hotled.xyled.global.Global;
 
-public class ReadActivity extends BaseActivity {
+import static cn.com.hotled.xyled.fragment.ScreenFragment.READ_FAILE;
+import static cn.com.hotled.xyled.fragment.ScreenFragment.READ_SUCCESS;
+import static cn.com.hotled.xyled.fragment.ScreenFragment.WIFI_ERRO;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_read);
-        initView();
+/**
+ * Created by Lam on 2017/2/10.
+ */
+
+public class ReadScreenDataUntil {
+
+    private Context mContext;
+    private Handler mHandler;
+    public ReadScreenDataUntil(Context context,Handler handler) {
+        mContext = context;
+        mHandler = handler;
     }
 
-    private void initView() {
-        findViewById(R.id.bt_readback).setOnClickListener(new View.OnClickListener() {
+
+    public void startReadData(){
+        new Thread(new Runnable() {
             @Override
-            public void onClick(View v) {
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        readData();
-                    }
-                }).start();
-
+            public void run() {
+                readData();
             }
-        });
+        }).start();
     }
-
     private void readData() {
         Socket socket = null;
         FileOutputStream fos = null;
         OutputStream os =null;
-        WifiAdmin wifiAdmin =new WifiAdmin(this);
+        WifiAdmin wifiAdmin =new WifiAdmin(mContext);
         WifiInfo wifiInfo = wifiAdmin.getWifiInfo();
         String ssid = wifiInfo.getSSID();
         String macStr = "";
@@ -51,9 +54,9 @@ public class ReadActivity extends BaseActivity {
             Log.w("tcpSend","ssid = "+ssid);
             macStr = ssid.substring(ssid.indexOf("[")+1, ssid.indexOf("]"));
         }else {
-//            Message message = mHandler.obtainMessage();
-//            message.what=WIFI_ERRO;
-//            mHandler.sendMessage(message);
+            Message message = mHandler.obtainMessage();
+            message.what=WIFI_ERRO;
+            mHandler.sendMessage(message);
             return;
         }
         String mac1 = macStr.substring(0, 2);
@@ -67,9 +70,8 @@ public class ReadActivity extends BaseActivity {
         int macInt4 = Integer.parseInt(mac4, 16);
         Log.w("tcpSend","mac = "+macInt1+":"+macInt2+":"+macInt3+":"+macInt4);
         try {
-            socket = new Socket("192.168.3.1", 16389);
-//            socket.setSoTimeout(3000);
-            File dataRead=new File(getFilesDir()+"/screenData.dat");
+            socket = new Socket(Global.SERVER_IP, Global.SERVER_PORT);
+            File dataRead=new File(mContext.getFilesDir()+"/screenData.dat");
             if (!dataRead.exists()) {
                 dataRead.createNewFile();
             }else {
@@ -79,9 +81,6 @@ public class ReadActivity extends BaseActivity {
             os = socket.getOutputStream();
 
             byte[] testCMD = new byte[16];
-            //8032364e 128 50 35 78
-            //
-            //8030ed86  128 48 237 134
             testCMD[0] = (byte) macInt1;
             testCMD[1] = (byte) macInt2;
             testCMD[2] = (byte) macInt3;
@@ -164,6 +163,7 @@ public class ReadActivity extends BaseActivity {
             for (int i = 0; i < readMsg.length; i++) {
                 if(testCMD[i]!=readMsg[i]){
                     Log.w("tcpSend","握手不成功 readMsg.equals(testCMD) false");
+                    mHandler.sendEmptyMessageDelayed(ScreenFragment.READ_FAILE,1500);
                 }else {
 
                 }
@@ -176,6 +176,7 @@ public class ReadActivity extends BaseActivity {
             for (int i = 0; i < readMsg.length; i++) {
                 if(pauseCMD[i]!=readMsg[i]){
                     Log.d("tcpSend","暂停不成功 pauseCMD[i]!=readMsg[i]");
+                    mHandler.sendEmptyMessageDelayed(ScreenFragment.READ_FAILE,1500);
                     pauseSuccess = false;
                 }
             }
@@ -198,21 +199,41 @@ public class ReadActivity extends BaseActivity {
                     fos.write(readbackmsg);
                     Log.d("tcpSend","readbackmsg-----start-------");
                     for (int i = 0; i < readbackmsg.length; i++) {
+                        if (k==0){
+                            //第一扇区的数据
+                            if (i==511){
+                                //屏宽
+                                int screenWid=readbackmsg[35];
+                                int screenHei=readbackmsg[37];
+                                int screenScan=readbackmsg[38];
+                                int RGBorder=readbackmsg[498];
+                                screenWid=screenWid<<8;
+                                screenWid+=readbackmsg[36];
+
+                                SharedPreferences.Editor edit = mContext.getSharedPreferences(Global.SP_SCREEN_CONFIG, Context.MODE_PRIVATE).edit();
+                                edit.putInt(Global.KEY_RGB_ORDER,RGBorder);
+                                edit.putInt(Global.KEY_SCREEN_W,screenWid);
+                                edit.putInt(Global.KEY_SCREEN_H,screenHei);
+                                edit.putInt(Global.KEY_SCREEN_SCAN,screenScan);
+                                edit.apply();
+                            }
+                        }
                         Log.d("readAct","readbackmsg[i]= "+readbackmsg[i]+", i = "+i);
                     }
                     Log.d("tcpSend","readbackmsg-----end--------");
                 }
-
-
+                mHandler.sendEmptyMessageDelayed(READ_SUCCESS,1500);
                 os.write(resumeCMD);
 
             }
 
         }catch (IOException e){
             e.printStackTrace();
+            Message message = mHandler.obtainMessage();
+            message.what=READ_FAILE;
+            mHandler.sendMessage(message);
         }
     }
-
 
     /**
      *
@@ -241,10 +262,5 @@ public class ReadActivity extends BaseActivity {
         for (int i = 0;i<source.length;i++){
             target[targetStart+i]=source[i];
         }
-    }
-
-    @Override
-    public void onCreateCustomToolBar(Toolbar toolbar) {
-        toolbar.setTitle("我的卡包");
     }
 }

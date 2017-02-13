@@ -3,6 +3,8 @@ package cn.com.hotled.xyled.fragment;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -13,6 +15,11 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,8 +35,11 @@ import cn.com.hotled.xyled.bean.Program;
 import cn.com.hotled.xyled.bean.ProgramType;
 import cn.com.hotled.xyled.bean.TextContent;
 import cn.com.hotled.xyled.dao.TextContentDao;
+import cn.com.hotled.xyled.global.Global;
+import cn.com.hotled.xyled.util.ReadScreenDataUntil;
 
 import static android.app.Activity.RESULT_OK;
+import static android.content.Context.MODE_PRIVATE;
 
 /**
  * Created by Lam on 2016/12/1.
@@ -40,6 +50,9 @@ public class ScreenFragment extends Fragment implements View.OnClickListener{
     private static final int EASY_TEXT_REQUEST_CODE = 0x23;
     private static final int PHOTO_REQUEST_CODE = 0x24;
     private static final int ITEM_MANAGE_REQUEST_CODE = 0x25;
+    public static final int WIFI_ERRO = 101;
+    public static final int READ_SUCCESS = 200;
+    public static final int READ_FAILE = 400;
     private RecyclerView mRecyclerView;
     private ProgramAdapter mAdapter;
     private android.support.design.widget.FloatingActionButton mFabAdd;
@@ -47,6 +60,34 @@ public class ScreenFragment extends Fragment implements View.OnClickListener{
     private int mProgramPosition;
     private List<Program> mProgramList;
     private View mScreenView;
+    private ImageView mIvRefresh;
+    private Animation mRefreshAnim;
+
+
+    private Handler mHandler =new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what){
+                case WIFI_ERRO:
+                    mRefreshAnim.cancel();
+                    Toast.makeText(getContext(), "未连接屏幕，请查屏", Toast.LENGTH_SHORT).show();
+                    break;
+                case READ_SUCCESS:
+                    mRefreshAnim.cancel();
+                    Toast.makeText(getContext(), "刷新屏幕参数完成！", Toast.LENGTH_SHORT).show();
+                    updateScreenView();
+                    break;
+                case READ_FAILE:
+                    mRefreshAnim.cancel();
+                    Toast.makeText(getContext(), "屏幕无响应，请重试", Toast.LENGTH_SHORT).show();
+                    break;
+            }
+        }
+    };
+    private TextView mTvCardName;
+    private TextView mTvScreenSize;
+    private TextView mTvScreenScanCount;
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -60,13 +101,19 @@ public class ScreenFragment extends Fragment implements View.OnClickListener{
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_sreen, null);
         initView(view);
+        updateScreenView();
         return view;
     }
 
     private void initView(View view) {
         initActionButton(view);
         mScreenView = view.findViewById(R.id.cv_contentScreen_screen);
+        mIvRefresh = (ImageView) view.findViewById(R.id.iv_screenCatag_refresh);
+        mTvCardName = (TextView) view.findViewById(R.id.tv_screenCatag_card);
+        mTvScreenSize = (TextView) view.findViewById(R.id.tv_screenCatag_size);
+        mTvScreenScanCount = (TextView) view.findViewById(R.id.tv_screenCatag_scanCount);
         mScreenView.setOnClickListener(this);
+        mIvRefresh.setOnClickListener(this);
         mRecyclerView = (RecyclerView) view.findViewById(R.id.rv_fragmScreen);
         mAdapter = new ProgramAdapter(getContext(), mProgramList);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -147,6 +194,14 @@ public class ScreenFragment extends Fragment implements View.OnClickListener{
         mFabAdd.setOnClickListener(this);
     }
 
+    private void updateScreenView() {
+        int screenWidth = getContext().getSharedPreferences(Global.SP_SCREEN_CONFIG, MODE_PRIVATE).getInt(Global.KEY_SCREEN_W, -64);
+        int screenHight = getContext().getSharedPreferences(Global.SP_SCREEN_CONFIG, MODE_PRIVATE).getInt(Global.KEY_SCREEN_H, -32);
+        int screenScan = getContext().getSharedPreferences(Global.SP_SCREEN_CONFIG, MODE_PRIVATE).getInt(Global.KEY_SCREEN_SCAN, -1);
+        mTvScreenSize.setText(screenWidth+" x "+screenHight);
+        mTvScreenScanCount.setText(screenScan+" 扫");
+    }
+
     @Override
     public void onClick(View v) {
         switch (v.getId()){
@@ -166,6 +221,9 @@ public class ScreenFragment extends Fragment implements View.OnClickListener{
                 Intent intent=new Intent(getContext(), ProgramManageActivity.class);
                 startActivityForResult(intent,ITEM_MANAGE_REQUEST_CODE);
                 break;
+            case R.id.iv_screenCatag_refresh:
+                readData();
+                break;
 //            case R.id.fab_addProgramPic:
 //                int proSize = mProgramList.size();
 //                proSize++;
@@ -179,6 +237,13 @@ public class ScreenFragment extends Fragment implements View.OnClickListener{
 //                mAdapter.notifyItemInserted(mProgramList.size());
 //                break;
         }
+    }
+
+    private void readData() {
+        mRefreshAnim = AnimationUtils.loadAnimation(getContext(), R.anim.search_round);
+        mIvRefresh.startAnimation(mRefreshAnim);
+        ReadScreenDataUntil readUtil=new ReadScreenDataUntil(getContext(),mHandler);
+        readUtil.startReadData();
     }
 
     @Override

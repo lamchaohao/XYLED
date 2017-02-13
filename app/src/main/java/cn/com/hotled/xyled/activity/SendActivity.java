@@ -29,6 +29,7 @@ import java.util.List;
 import cn.com.hotled.xyled.App;
 import cn.com.hotled.xyled.R;
 import cn.com.hotled.xyled.bean.Program;
+import cn.com.hotled.xyled.global.Global;
 import cn.com.hotled.xyled.util.CompressUtil;
 import cn.com.hotled.xyled.util.WifiAdmin;
 
@@ -36,9 +37,8 @@ public class SendActivity extends BaseActivity {
     private static final int UPDATE_PROGRESS = 0x11;
     private static final int WIFI_ERRO = 0x114;
     private static final int CONN_ERRO = 0x124;
+    private static final int CONN_OUT_OF_TIME = 0x134;
     public static final int GENFILE_DONE=0x204;
-    private final String targetIP="192.168.3.1";
-    private final int targetPort = 16389;
     private TextView mTvStatus;
     private boolean isSending=false;
     private boolean fileReady=false;
@@ -50,6 +50,13 @@ public class SendActivity extends BaseActivity {
                     int arg1 = msg.arg1;
                     mTvStatus.setText("正在传输数据 "+arg1+"%");
                     mSendProgress.setText(arg1+"%");
+                    if (arg1==1){
+                        mSendRound.setImageResource(R.drawable.send_data_uncomplete_low);
+                    }else if (arg1==30){
+                        mSendRound.setImageResource(R.drawable.send_data_uncomplete_middle);
+                    }else if (arg1==70){
+                        mSendRound.setImageResource(R.drawable.send_data_uncomplete_high);
+                    }
                     if (arg1==100){
                         Toast.makeText(SendActivity.this,"已发送",Toast.LENGTH_LONG).show();
                         mTvStatus.setText("发送完成");
@@ -64,12 +71,21 @@ public class SendActivity extends BaseActivity {
                     mSendAnim.cancel();
                     mSendOutsideAnim.cancel();
                     startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
+                    isSending=false;
                     break;
                 case CONN_ERRO:
                     Toast.makeText(SendActivity.this,"连接错误，请重新连接屏幕",Toast.LENGTH_LONG).show();
                     mTvStatus.setText("无法发送，请重新连接屏幕");
                     mSendAnim.cancel();
                     mSendOutsideAnim.cancel();
+                    isSending=false;
+                    break;
+                case CONN_OUT_OF_TIME:
+                    Toast.makeText(SendActivity.this,"连接超时，请重试",Toast.LENGTH_LONG).show();
+                    mTvStatus.setText("连接超时，请重试");
+                    mSendAnim.cancel();
+                    mSendOutsideAnim.cancel();
+                    isSending=false;
                     break;
                 case GENFILE_DONE:
                     fileReady=true;
@@ -110,8 +126,9 @@ public class SendActivity extends BaseActivity {
         mProgramList.clear();
         List<Program> programs = Arrays.asList(sortProgramList);
         mProgramList.addAll(programs);
-
-        CompressUtil compressUtil=new CompressUtil(this,mProgramList,64,32,mHandler);
+        int screenWidth = getSharedPreferences(Global.SP_SCREEN_CONFIG, MODE_PRIVATE).getInt(Global.KEY_SCREEN_W, 64);
+        int screenHeight = getSharedPreferences(Global.SP_SCREEN_CONFIG, MODE_PRIVATE).getInt(Global.KEY_SCREEN_H, 32);
+        CompressUtil compressUtil=new CompressUtil(this,mProgramList,screenWidth,screenHeight,mHandler);
         compressUtil.startGenFile();
     }
 
@@ -177,7 +194,7 @@ public class SendActivity extends BaseActivity {
         int macInt4 = Integer.parseInt(mac4, 16);
         Log.w("tcpSend","mac = "+macInt1+":"+macInt2+":"+macInt3+":"+macInt4);
         try {
-            socket = new Socket(targetIP,targetPort);
+            socket = new Socket(Global.SERVER_IP,Global.SERVER_PORT);
 //            socket.setSoTimeout(3000);
             File file =new File(getFilesDir()+"/color.prg");
             fis = new FileInputStream(file);
@@ -249,7 +266,6 @@ public class SendActivity extends BaseActivity {
             Log.w("tcpSend","发送测试指令");
             byte[] readMsg = new byte[16];
             socket.getInputStream().read(readMsg);//读取返回
-
 
             for (int i = 0; i < readMsg.length; i++) {
                 if(testCMD[i]!=readMsg[i]){
@@ -403,6 +419,9 @@ public class SendActivity extends BaseActivity {
             mHandler.sendMessage(message);
         } catch (IOException e) {
             e.printStackTrace();
+            Message message = mHandler.obtainMessage();
+            message.what=CONN_OUT_OF_TIME;
+            mHandler.sendMessage(message);
         }finally {
             if (socket!=null&&!socket.isClosed()){
                 try {

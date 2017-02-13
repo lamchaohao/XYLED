@@ -178,8 +178,8 @@ public class MutilConnectActivity extends AppCompatActivity {
                 else
                     connectOther();
             }else {
-                int networkID = mWifiAdmin.createWifiInfo2(scanResultZero, "88888888");
-                boolean b = mWifiAdmin.connectWifi(networkID);
+                WifiConfiguration wifiInfo2 = mWifiAdmin.createWifiInfo2(scanResultZero, "88888888");
+                boolean b = mWifiAdmin.connectWifi(wifiInfo2.networkId);
                 if (!b){
                     connectOther();
                 }
@@ -197,8 +197,8 @@ public class MutilConnectActivity extends AppCompatActivity {
                 else
                     connectOther();
             }else {
-                int networkID = mWifiAdmin.createWifiInfo2(scanResultOne, "88888888");
-                boolean b = mWifiAdmin.connectWifi(networkID);
+                WifiConfiguration wifiInfo2 = mWifiAdmin.createWifiInfo2(scanResultOne, "88888888");
+                boolean b = mWifiAdmin.connectWifi(wifiInfo2.networkId);
                 if (!b){
                     connectOther();
                 }
