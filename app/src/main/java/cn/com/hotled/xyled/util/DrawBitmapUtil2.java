@@ -19,6 +19,7 @@ import cn.com.hotled.xyled.bean.Program;
 import cn.com.hotled.xyled.bean.ProgramType;
 import cn.com.hotled.xyled.bean.TextContent;
 import cn.com.hotled.xyled.dao.TextContentDao;
+import cn.com.hotled.xyled.global.Global;
 
 import static android.graphics.Color.BLACK;
 
@@ -42,6 +43,7 @@ public class DrawBitmapUtil2 {
     private int mBaseX = 0;
     private int mBaseY = 25;
     private int mIndex=0;
+    private int mTextEffect;
 
     public DrawBitmapUtil2(Activity context, List<Program> programList, List<Integer> widths, List<Integer> heights) {
         mContext = context;
@@ -63,13 +65,14 @@ public class DrawBitmapUtil2 {
 
                 for (int i = 0; i < mTextContentList.size(); i++) {
                     if (i == 0) {
-                        TextContent textContent = mTextContentList.get(0);
+                        TextContent textContent =  mTextContentList.get(0);
                         mTextBgColor = textContent.getTextBackgroudColor();
                         mTextColor = textContent.getTextColor();
                         mTextSize = textContent.getTextSize();
                         isUnderLine = textContent.getIsUnderline();
                         isItalic = textContent.getIsIlatic();
                         isBold = textContent.getIsbold();
+                        mTextEffect = textContent.getTextEffect();
                         mTypeFile = textContent.getTypeface();
                         mBaseX = program.getBaseX();
                         mBaseY = program.getBaseY();
@@ -134,15 +137,22 @@ public class DrawBitmapUtil2 {
             paint.setUnderlineText(false);
         }
         paint.setTextAlign(Paint.Align.LEFT);
-
-        Bitmap bitmap = Bitmap.createBitmap(mHeightList.get(mIndex), mHeightList.get(mIndex), Bitmap.Config.ARGB_4444);
+        Bitmap bitmap = Bitmap.createBitmap(mWidthList.get(mIndex), mHeightList.get(mIndex), Bitmap.Config.ARGB_4444);
 //        Bitmap bitmap =null;
+        if (bitmap != null)
+            canvas.setBitmap(bitmap);
         //设置好画笔，开始计算
         int mWidth =0;
         float drawWidth = computeWidth(sb.toString(), paint);
-        if (drawWidth > 64) {
+        if (drawWidth > mWidthList.get(mIndex)) {
             mWidth = (int) drawWidth;
-            mWidth+=mWidthList.get(mIndex)*2;
+            //这里在两边都加上了一段空白区域
+            if (mTextEffect== Global.TEXT_EFFECT_APPEAR) {
+                mWidth+=mWidthList.get(mIndex);
+            }else {
+                mWidth+=mWidthList.get(mIndex)*2;
+            }
+
             bitmap = Bitmap.createBitmap(mWidth, mHeightList.get(mIndex), Bitmap.Config.ARGB_4444);
             if (bitmap != null)
                 canvas.setBitmap(bitmap);
@@ -150,7 +160,17 @@ public class DrawBitmapUtil2 {
         //背景
         drawBgColor(drawWidth, canvas);
         //文本
-        canvas.drawText(sb.toString(), mBaseX+mWidthList.get(mIndex), mBaseY, paint);
+        switch (mTextEffect){
+            case Global.TEXT_EFFECT_MOVE_LEFT:
+                canvas.drawText(sb.toString(), mBaseX+mWidthList.get(mIndex), mBaseY, paint);
+                break;
+            case Global.TEXT_EFFECT_APPEAR:
+                canvas.drawText(sb.toString(), mBaseX, mBaseY, paint);
+                break;
+            case Global.TEXT_EFFECT_STATIC:
+                canvas.drawText(sb.toString(), mBaseX, mBaseY, paint);
+                break;
+        }
 
         return bitmap;
     }
@@ -163,14 +183,18 @@ public class DrawBitmapUtil2 {
             drawWidth += widths[i];
         }
         Log.i("drawbitmaputils2", "computeWidth:drawWidth " + drawWidth);
-        // TODO: 2016/12/8 如果文字太长，需要重新绘制一个bitmap，bitmap的最大尺寸为4096*4096
         return drawWidth;
     }
 
     private void drawBgColor(float drawWidth, Canvas canvas) {
         Paint bgPaint = new Paint();
         bgPaint.setColor(mTextBgColor);
-        canvas.drawRect(mBaseX+mWidthList.get(mIndex), 0, drawWidth+mWidthList.get(mIndex), mHeightList.get(mIndex), bgPaint);
+        if (mTextEffect== Global.TEXT_EFFECT_APPEAR) {
+            canvas.drawRect(0, 0, drawWidth+mWidthList.get(mIndex), mHeightList.get(mIndex), bgPaint);
+        }else {
+            canvas.drawRect(mBaseX+mWidthList.get(mIndex), 0, drawWidth+mWidthList.get(mIndex), mHeightList.get(mIndex), bgPaint);
+        }
+
     }
 
 }

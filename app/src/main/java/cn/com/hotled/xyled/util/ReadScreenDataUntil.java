@@ -203,12 +203,13 @@ public class ReadScreenDataUntil {
                             //第一扇区的数据
                             if (i==511){
                                 //屏宽
-                                int screenWid=readbackmsg[35];
-                                int screenHei=readbackmsg[37];
-                                int screenScan=readbackmsg[38];
-                                int RGBorder=readbackmsg[498];
+                                //转换过程中可能会出现负数，故而与0xFF进行与运算
+                                int screenWid=readbackmsg[35]&0xff;
+                                int screenHei=readbackmsg[37]&0xff;
+                                int screenScan=readbackmsg[38]&0xff;
+                                int RGBorder=readbackmsg[498]&0xff;
                                 screenWid=screenWid<<8;
-                                screenWid+=readbackmsg[36];
+                                screenWid+=readbackmsg[36]&0xff;
 
                                 SharedPreferences.Editor edit = mContext.getSharedPreferences(Global.SP_SCREEN_CONFIG, Context.MODE_PRIVATE).edit();
                                 edit.putInt(Global.KEY_RGB_ORDER,RGBorder);

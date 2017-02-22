@@ -11,7 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import cn.com.hotled.xyled.R;
-import cn.com.hotled.xyled.activity.ReadActivity;
+import cn.com.hotled.xyled.activity.ScreenSettingsActivity;
 import cn.com.hotled.xyled.activity.SocketActivity;
 
 /**
@@ -29,12 +29,6 @@ public class SettingFragment extends Fragment {
     }
 
     private void initView(View view) {
-        view.findViewById(R.id.ll_setting_send).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(getContext(), ReadActivity.class));
-            }
-        });
         view.findViewById(R.id.ll_setting_socket).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -47,6 +41,12 @@ public class SettingFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
+            }
+        });
+        view.findViewById(R.id.ll_setting_screenConfig).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getContext(), ScreenSettingsActivity.class));
             }
         });
         view.findViewById(R.id.ll_setting_language).setOnClickListener(new View.OnClickListener() {

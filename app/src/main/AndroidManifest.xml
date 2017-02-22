@@ -2,8 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="cn.com.hotled.xyled">
 
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/> <!-- 定位所需权限 -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/> <!-- 定位所需权限 -->
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE"/> <!-- 允许程序改变网络链接状态 -->
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/> <!-- 允许程序访问访问WIFI网络状态信息 -->
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/> <!-- 允许程序改变WIFI链接状态 -->
@@ -73,7 +73,14 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".activity.ConnectHelpDiagActivity" android:theme="@style/Theme.AppCompat.Light.Dialog">
+        <activity
+            android:name=".activity.ConnectHelpDiagActivity"
+            android:theme="@style/Theme.AppCompat.Light.Dialog">
+        </activity>
+        <activity
+            android:name=".activity.ScreenSettingsActivity"
+            android:label="@string/title_activity_screen_settings"
+            android:theme="@style/AppTheme">
         </activity>
     </application>
 

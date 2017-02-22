@@ -38,7 +38,7 @@ public class Program {
     @Convert(converter = FileConverter.class,columnType = String.class)
     private File picFile;
     @ToOne
-    private TextContent mTextContent;
+    private TextContent textContent;
     /** Used to resolve relations */
     @Generated(hash = 2040040024)
     private transient DaoSession daoSession;
@@ -145,32 +145,32 @@ public class Program {
     public void setPicFile(File picFile) {
         this.picFile = picFile;
     }
-    @Generated(hash = 1829868973)
-    private transient boolean mTextContent__refreshed;
+    @Generated(hash = 1249501131)
+    private transient boolean textContent__refreshed;
     /** To-one relationship, resolved on first access. */
-    @Generated(hash = 1540501994)
-    public TextContent getMTextContent() {
-        if (mTextContent != null || !mTextContent__refreshed) {
+    @Generated(hash = 259863637)
+    public TextContent getTextContent() {
+        if (textContent != null || !textContent__refreshed) {
             if (daoSession == null) {
                 throw new DaoException("Entity is detached from DAO context");
             }
             TextContentDao targetDao = daoSession.getTextContentDao();
-            targetDao.refresh(mTextContent);
-            mTextContent__refreshed = true;
+            targetDao.refresh(textContent);
+            textContent__refreshed = true;
         }
-        return mTextContent;
+        return textContent;
     }
     /** To-one relationship, returned entity is not refreshed and may carry only the PK property. */
-    @Generated(hash = 2123378356)
-    public TextContent peakMTextContent() {
-        return mTextContent;
+    @Generated(hash = 623170699)
+    public TextContent peakTextContent() {
+        return textContent;
     }
     /** called by internal mechanisms, do not call yourself. */
-    @Generated(hash = 342504453)
-    public void setMTextContent(TextContent mTextContent) {
+    @Generated(hash = 2039428569)
+    public void setTextContent(TextContent textContent) {
         synchronized (this) {
-            this.mTextContent = mTextContent;
-            mTextContent__refreshed = true;
+            this.textContent = textContent;
+            textContent__refreshed = true;
         }
     }
     /**
@@ -212,7 +212,6 @@ public class Program {
         this.daoSession = daoSession;
         myDao = daoSession != null ? daoSession.getProgramDao() : null;
     }
-    
 
 
 }

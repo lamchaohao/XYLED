@@ -1,5 +1,7 @@
 package cn.com.hotled.xyled.activity;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.wifi.WifiInfo;
 import android.os.Bundle;
@@ -12,6 +14,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -90,6 +93,7 @@ public class SendActivity extends BaseActivity {
                 case GENFILE_DONE:
                     fileReady=true;
                     mPbSend.setVisibility(View.GONE);
+                    mBtSend.setEnabled(true);
                     Toast.makeText(SendActivity.this,"文件已生成，开始传送",Toast.LENGTH_SHORT).show();
                     if (!isSending&&fileReady) {
                         send();
@@ -106,6 +110,7 @@ public class SendActivity extends BaseActivity {
     private ImageView mSendRound;
     private ImageView msendRoundOutside;
     private Animation mSendOutsideAnim;
+    private Button mBtSend;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -141,7 +146,9 @@ public class SendActivity extends BaseActivity {
         mSendProgress = (TextView) findViewById(R.id.tv_send_progress);
         mSendAnim = AnimationUtils.loadAnimation(this, R.anim.search_round);
         mSendOutsideAnim = AnimationUtils.loadAnimation(this, R.anim.anti_clock);
-        findViewById(R.id.bt_send_sendAct).setOnClickListener(new View.OnClickListener() {
+        mBtSend = (Button) findViewById(R.id.bt_send_send);
+        mBtSend.setEnabled(false);
+        mBtSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (!isSending) {
@@ -479,7 +486,16 @@ public class SendActivity extends BaseActivity {
     @Override
     public void onBackPressed() {
         if (isSending){
-            Snackbar.make(mTvStatus,"正在发送，请勿退出",Snackbar.LENGTH_LONG).show();
+            new AlertDialog.Builder(this)
+                    .setMessage("正在传送，确定退出吗？")
+                    .setPositiveButton("退出", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            SendActivity.super.onBackPressed();
+                        }
+                    })
+                    .setNegativeButton("不退出",null)
+                    .show();
         }else {
             super.onBackPressed();
         }

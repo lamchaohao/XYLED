@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="textEffect">
+        <item>连续左移</item>
+        <item>立刻出现</item>
+        <item>固定</item>
+    </array>
+
+    <array name="flowEffect">
+        <item>顺时针</item>
+        <item>逆时针</item>
+    </array>
+</resources>

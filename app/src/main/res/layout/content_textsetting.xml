@@ -13,12 +13,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
         <LinearLayout
-            style="@style/TeXtEditIconLayout"
+            style="@style/TextEditIconLayout"
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
             <Button
-                style="@style/TeXtEditIcon"
+                style="@style/TextEditIcon"
                 android:id="@+id/bt_fgText_textSize"
                 android:layout_weight="1"
                 android:text="TextSize"
@@ -27,9 +27,9 @@
             <Button
                 android:id="@+id/bt_fgText_font"
                 android:layout_weight="1"
-                android:text="sans-serif"
+                android:text="字体"
                 android:fontFamily="sans-serif"
-                style="@style/TeXtEditIcon"
+                style="@style/TextEditIcon"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"/>
         </LinearLayout>
@@ -39,20 +39,20 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
         <LinearLayout
-            style="@style/TeXtEditIconLayout"
+            style="@style/TextEditIconLayout"
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
             <ImageButton
                 android:id="@+id/ib_fgText_setBold"
-                style="@style/TeXtEditIcon"
+                style="@style/TextEditIcon"
                 android:layout_weight="1"
                 android:src="@drawable/ic_format_bold_black_48dp"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content" />
 
             <ImageButton
-                style="@style/TeXtEditIcon"
+                style="@style/TextEditIcon"
                 android:id="@+id/ib_fgText_setItalic"
                 android:layout_weight="1"
                 android:src="@drawable/ic_format_italic_black_48dp"
@@ -60,7 +60,7 @@
                 android:layout_height="wrap_content" />
 
             <ImageButton
-                style="@style/TeXtEditIcon"
+                style="@style/TextEditIcon"
                 android:id="@+id/ib_fgText_setUnderLine"
                 android:layout_weight="1"
                 android:text="Font"
@@ -75,13 +75,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
         <LinearLayout
-            style="@style/TeXtEditIconLayout"
+            style="@style/TextEditIconLayout"
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
             <ImageButton
-                style="@style/TeXtEditIcon"
+                style="@style/TextEditIcon"
                 android:id="@+id/ib_fgText_textColorRed"
                 android:layout_weight="1"
                 android:src="@drawable/ic_text_format_red_600_48dp"
@@ -89,21 +89,21 @@
                 android:layout_height="wrap_content" />
 
             <ImageButton
-                style="@style/TeXtEditIcon"
+                style="@style/TextEditIcon"
                 android:id="@+id/ib_fgText_textColorGreen"
                 android:layout_weight="1"
                 android:src="@drawable/ic_text_format_green_600_48dp"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content" />
             <ImageButton
-                style="@style/TeXtEditIcon"
+                style="@style/TextEditIcon"
                 android:id="@+id/ib_fgText_textColorBlue"
                 android:layout_weight="1"
                 android:src="@drawable/ic_text_format_blue_600_48dp"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content" />
             <ImageButton
-                style="@style/TeXtEditIcon"
+                style="@style/TextEditIcon"
                 android:id="@+id/ib_fgText_textColorMore"
                 android:layout_weight="1"
                 android:src="@drawable/ic_more_horiz_black_24dp"
@@ -116,33 +116,33 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
         <LinearLayout
-            style="@style/TeXtEditIconLayout"
+            style="@style/TextEditIconLayout"
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
             <ImageButton
                 android:id="@+id/ib_fgText_textBgRed"
-                style="@style/TeXtEditIcon"
+                style="@style/TextEditIcon"
                 android:layout_weight="1"
                 android:src="@drawable/ic_text_fields_red_bg_36dp"
                 android:layout_width="0dp"
                 android:layout_height="48dp" />
             <ImageButton
-                style="@style/TeXtEditIcon"
+                style="@style/TextEditIcon"
                 android:id="@+id/ib_fgText_textBgGreen"
                 android:layout_weight="1"
                 android:src="@drawable/ic_text_fields_green_bg_36dp"
                 android:layout_width="0dp"
                 android:layout_height="48dp" />
             <ImageButton
-                style="@style/TeXtEditIcon"
+                style="@style/TextEditIcon"
                 android:id="@+id/ib_fgText_textBgBlue"
                 android:layout_weight="1"
                 android:src="@drawable/ic_text_fields_blue_bg_36dp"
                 android:layout_width="0dp"
                 android:layout_height="48dp" />
             <ImageButton
-                style="@style/TeXtEditIcon"
+                style="@style/TextEditIcon"
                 android:id="@+id/ib_fgText_textBgMore"
                 android:layout_weight="1"
                 android:src="@drawable/ic_more_horiz_black_24dp"
@@ -156,32 +156,47 @@
             android:layout_height="wrap_content" />
 
         <LinearLayout
-            style="@style/TeXtEditIconLayout"
+            style="@style/TextEditIconLayout"
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
             <ImageButton
-                style="@style/TeXtEditIcon"
+                style="@style/TextEditIcon"
                 android:id="@+id/ib_fgText_trainX"
                 android:layout_weight="1"
                 android:src="@drawable/ic_swap_horiz_black_48dp"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content" />
             <ImageButton
-                style="@style/TeXtEditIcon"
+                style="@style/TextEditIcon"
                 android:id="@+id/ib_fgText_inCenter"
                 android:src="@drawable/ic_view_day_black_36dp"
                 android:layout_weight="1"
                 android:layout_width="0dp"
                 android:layout_height="match_parent" />
             <ImageButton
-                style="@style/TeXtEditIcon"
+                style="@style/TextEditIcon"
                 android:id="@+id/ib_fgText_trainY"
                 android:layout_weight="1"
                 android:src="@drawable/ic_swap_vert_black_48dp"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"/>
         </LinearLayout>
+        <TextView
+            android:textSize="18sp"
+            android:text="文字特效:"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+        <Spinner
+            android:id="@+id/spn_fgText_textEffect"
+            android:entries="@array/textEffect"
+            android:layout_marginRight="10dp"
+            android:layout_marginLeft="10dp"
+            android:padding="10dp"
+            android:spinnerMode="dropdown"
+            android:background="@drawable/recycler_bg"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="match_parent"
@@ -200,12 +215,12 @@
 
         <LinearLayout
             android:id="@+id/ll_fgText_setFlow"
-            style="@style/TeXtEditIconLayout"
+            style="@style/TextEditIconLayout"
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
             <RelativeLayout
-                style="@style/TeXtEditIcon"
+                style="@style/TextEditIcon"
                 android:id="@+id/rl_fgText_flowLayout"
                 android:layout_weight="1"
                 android:layout_width="0dp"
@@ -217,15 +232,18 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"/>
             </RelativeLayout>
-            <Button
-                style="@style/TeXtEditIcon"
-                android:id="@+id/bt_fgText_flowShowEffect"
+            <Spinner
+                style="@style/TextEditIcon"
+                android:id="@+id/spn_fgText_flowShowEffect"
                 android:layout_weight="1"
-                android:text="样式"
+                android:padding="15dp"
+                android:spinnerMode="dialog"
+                android:entries="@array/flowEffect"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"/>
             <Button
-                style="@style/TeXtEditIcon"
+                android:visibility="gone"
+                style="@style/TextEditIcon"
                 android:id="@+id/bt_fgText_flowShowSpeed"
                 android:layout_weight="1"
                 android:text="移动速度"

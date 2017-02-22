@@ -39,6 +39,7 @@ public class TextContentDao extends AbstractDao<TextContent, Long> {
         public final static Property IsSelected = new Property(9, boolean.class, "isSelected", false, "IS_SELECTED");
         public final static Property SortNumber = new Property(10, int.class, "sortNumber", false, "SORT_NUMBER");
         public final static Property ProgramId = new Property(11, long.class, "programId", false, "PROGRAM_ID");
+        public final static Property TextEffect = new Property(12, int.class, "textEffect", false, "TEXT_EFFECT");
     }
 
     private final FileConverter typefaceConverter = new FileConverter();
@@ -66,7 +67,8 @@ public class TextContentDao extends AbstractDao<TextContent, Long> {
                 "\"IS_UNDERLINE\" INTEGER NOT NULL ," + // 8: isUnderline
                 "\"IS_SELECTED\" INTEGER NOT NULL ," + // 9: isSelected
                 "\"SORT_NUMBER\" INTEGER NOT NULL ," + // 10: sortNumber
-                "\"PROGRAM_ID\" INTEGER NOT NULL );"); // 11: programId
+                "\"PROGRAM_ID\" INTEGER NOT NULL ," + // 11: programId
+                "\"TEXT_EFFECT\" INTEGER NOT NULL );"); // 12: textEffect
     }
 
     /** Drops the underlying database table. */
@@ -98,6 +100,7 @@ public class TextContentDao extends AbstractDao<TextContent, Long> {
         stmt.bindLong(10, entity.getIsSelected() ? 1L: 0L);
         stmt.bindLong(11, entity.getSortNumber());
         stmt.bindLong(12, entity.getProgramId());
+        stmt.bindLong(13, entity.getTextEffect());
     }
 
     @Override
@@ -123,6 +126,7 @@ public class TextContentDao extends AbstractDao<TextContent, Long> {
         stmt.bindLong(10, entity.getIsSelected() ? 1L: 0L);
         stmt.bindLong(11, entity.getSortNumber());
         stmt.bindLong(12, entity.getProgramId());
+        stmt.bindLong(13, entity.getTextEffect());
     }
 
     @Override
@@ -144,7 +148,8 @@ public class TextContentDao extends AbstractDao<TextContent, Long> {
             cursor.getShort(offset + 8) != 0, // isUnderline
             cursor.getShort(offset + 9) != 0, // isSelected
             cursor.getInt(offset + 10), // sortNumber
-            cursor.getLong(offset + 11) // programId
+            cursor.getLong(offset + 11), // programId
+            cursor.getInt(offset + 12) // textEffect
         );
         return entity;
     }
@@ -163,6 +168,7 @@ public class TextContentDao extends AbstractDao<TextContent, Long> {
         entity.setIsSelected(cursor.getShort(offset + 9) != 0);
         entity.setSortNumber(cursor.getInt(offset + 10));
         entity.setProgramId(cursor.getLong(offset + 11));
+        entity.setTextEffect(cursor.getInt(offset + 12));
      }
     
     @Override

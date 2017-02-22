@@ -27,7 +27,6 @@ import cn.com.hotled.xyled.flowbound.ClockwiseFlow;
 public class CompressUtil {
 
     private static final int BLACK_BG_COL_BYTE_COUNT = 3;
-    private static final int TEXT_ATTRS_LENGTH = 6;
     //文件总头区 5byte
 
     private byte[] mFileHeadPart = new byte[5];
@@ -56,12 +55,11 @@ public class CompressUtil {
     private List<Bitmap> mBitmapList;
     private int mTempColbyteCount;
     private List<byte[]> mFlowByteList;
-    private int mFrameIndex = 0;
-    private int mFlowAddress=0;
+    private int mTextFrameIndex = 0;
     private List<byte[]> mTextAttrsList;
     private List<Integer> mTextScreenHeightList;
     private List<Integer> mTextScreenWidthList;
-    private List<Integer> mProgramLengthList;
+    private List<Integer> mTextProgramLengthList;
     private List<Program> mTextProgram;
     private List<Program> mPicProgram;
     private byte[] mPicAttrs=new byte[6];
@@ -103,7 +101,8 @@ public class CompressUtil {
      * 初始化文字内容
      */
     private void initTextContent() {
-        mProgramLengthList = new ArrayList<>();
+
+        mTextProgramLengthList = new ArrayList<>();
         DrawBitmapUtil2 drawBitmapUtil =new DrawBitmapUtil2(mContext,mTextProgram,mTextScreenWidthList,mTextScreenHeightList);
         mBitmapList = drawBitmapUtil.drawBitmap();
         mTextContentList = new ArrayList<>();
@@ -131,9 +130,8 @@ public class CompressUtil {
             textContent[i]=compress.get(i);
         }
         mColByteCountList.add(compressAlgorithm.getColByteCount());
-        mProgramLengthList.add(widthToCompress);
+        mTextProgramLengthList.add(widthToCompress-mTextScreenWidthList.get(index));
         mFrameCount+=(widthToCompress);
-
         return textContent;
     }
 
@@ -153,6 +151,8 @@ public class CompressUtil {
                 picBytes[i]=compres;
                 i++;
             }
+            mFrameCount+=60;//每个图片节目60帧
+
             mPicContentList.add(picBytes);
         }
 
@@ -209,7 +209,7 @@ public class CompressUtil {
         ClockwiseFlow flow =new ClockwiseFlow(mContext,mScreenWidth,mScreenHeight);
         flow.setFlowFile(flowFiles);
         flow.setUseFlows(useFlow);
-        flow.setProgramLength(mProgramLengthList);
+        flow.setProgramLength(mTextProgramLengthList);
         flow.setFlowStyle(flowStyle);
 
         mFlowByteList = flow.genFlowBound();
@@ -238,7 +238,7 @@ public class CompressUtil {
             byte[] tempTextAttr =new byte[6];
             if (program.getProgramType()==ProgramType.Text){
                 //文字节目
-                if (program.getUseFlowBound()) {
+                if (program.getUseFlowBound()) {//使用流水边
                     //初始化数据
                     Bitmap bitmap = BitmapFactory.decodeFile(program.getFlowBoundFile().getAbsolutePath());
                     int height = bitmap.getHeight();
@@ -305,13 +305,12 @@ public class CompressUtil {
                 setInbyteArray(9, textContentAddress, timeAxis);
                 setInbyteArray(13, clockOrTem, timeAxis);
                 picProgramIndex++;
-                //每个图片展示30帧
+                //每个图片展示60帧
                 for (int j = 0; j < 60; j++) {
                     mTimeAxisList.add(timeAxis);
                 }
-                mFrameCount+=60;//每个图片节目30帧
             }else {
-                setTimeAxis(textProgramIndex,i);
+                setTextProgramTimeAxis(textProgramIndex,i);
                 textProgramIndex++;
             }
         }
@@ -323,8 +322,10 @@ public class CompressUtil {
      * @param textProgramIndex 第几个文字节目
      * @param programIndex  第几个节目
      */
-    private void setTimeAxis(int textProgramIndex,int programIndex) {
-
+    private void setTextProgramTimeAxis(int textProgramIndex,int programIndex) {
+        int frameOfThisProgram=mColByteCountList.get(textProgramIndex).length;
+        mFrameCount -= mTextScreenWidthList.get(textProgramIndex);
+        frameOfThisProgram-=mTextScreenWidthList.get(textProgramIndex);
         int flowBoundslength = 0;
         for (byte[] bytes : mFlowByteList) {
             flowBoundslength+=bytes.length;
@@ -337,7 +338,7 @@ public class CompressUtil {
         int textContentAddressInt = mFileHeadPart.length + mItemPart.length + 6*(mTextAttrsList.size()+1) +mBlackBG.length+ pictureLength +flowBoundslength ;
         picStyle = 0;//1BIT地址指向(0=图层,1=跳转地址),7BIT未用
 
-        for (int i = 0; i < mColByteCountList.get(textProgramIndex).length; i++) {
+        for (int i = 0; i < frameOfThisProgram; i++) {
             byte[] timeAxis = new byte[16];
             //时间
             timeAxis[0] = (byte) mProgramList.get(programIndex).getFrameTime();
@@ -347,13 +348,16 @@ public class CompressUtil {
             //字内容地址 4byte
             if (i == 0 && textProgramIndex==0) {
                 mTempColbyteCount = 0;
-            }else if (i == 0 && textProgramIndex!=0){
-                mTempColbyteCount += mColByteCountList.get(textProgramIndex-1)[mColByteCountList.get(textProgramIndex-1).length-1];
-            } else {
-                mTempColbyteCount += mColByteCountList.get(textProgramIndex)[i - 1];
             }
-            //地图地址
-            Integer flowIndex = mFlowMap.get(mFrameIndex);
+            else if (i == 0 && textProgramIndex!=0){
+                //加上上一个节目的最后一列的字节数
+                mTempColbyteCount += mColByteCountList.get(textProgramIndex-1)[mTextProgramLengthList.get(textProgramIndex-1)-1];
+            }
+            else {
+                mTempColbyteCount += mColByteCountList.get(textProgramIndex)[i-1];
+            }
+            //map地址
+            Integer flowIndex = mFlowMap.get(mTextFrameIndex);
             int tempFlowadd=0;
             for (int j = 0; j < flowIndex; j++) {
                 tempFlowadd+=mFlowByteList.get(j).length;
@@ -362,8 +366,7 @@ public class CompressUtil {
             int tempPicAddress= textContentAddressInt-flowBoundslength+tempFlowadd;
 
             byte[] picAddress = intToByteArray(tempPicAddress, 4);//当方式为跳向指定帧时这个地址是指向时间轴上的一个时间点(头0开始)
-//            byte[] attrAddress = intToByteArray(attrStartAddress, 3);
-            byte[] attrAddress = getAttrAddress(mFrameIndex);
+            byte[] attrAddress = getAttrAddress(textProgramIndex);
             byte[] textContentAddress = intToByteArray(tempTextAddress, 4);
             byte[] clockOrTem = new byte[3];
 
@@ -371,8 +374,15 @@ public class CompressUtil {
             setInbyteArray(6, attrAddress, timeAxis);
             setInbyteArray(9, textContentAddress, timeAxis);
             setInbyteArray(13, clockOrTem, timeAxis);
-            mFrameIndex++;
+            mTextFrameIndex++;
             mTimeAxisList.add(timeAxis);
+            if (i==frameOfThisProgram-1){
+                //如果是节目的最后一帧，则压缩的mTempColbyteCount应该加上还没有的录入的
+                byte[] bytes = mColByteCountList.get(textProgramIndex);
+                for (int k = i+1; k < bytes.length; k++) {
+                    mTempColbyteCount+=bytes[k];
+                }
+            }
         }
 
     }
@@ -384,38 +394,16 @@ public class CompressUtil {
      */
     private byte[] getAttrAddress(int frameIndex) {
         int attrStartAddress =  mFileHeadPart.length + mItemPart.length;
-        int whichProgram=0;
-        int currentFrame=0;
-        currentFrame=mProgramLengthList.get(whichProgram)-mTextScreenWidthList.get(0);
-//        currentFrame=mProgramLengthList.get(whichProgram);
-        while(frameIndex>currentFrame&&whichProgram<mTextAttrsList.size()-1){
-            whichProgram++;
-            currentFrame+=mProgramLengthList.get(whichProgram);
+        for (int i = 0; i < frameIndex; i++) {
+            attrStartAddress+=mTextAttrsList.get(i).length;
         }
-        int other=attrStartAddress+(whichProgram)*6;
-        return intToByteArray(other, 3);
-    }
-
-    private void checkFault() {
-        int i=0;
-        int attrStartAddress =  mFileHeadPart.length + mItemPart.length;
-        for (byte[] bytes : mTimeAxisList) {
-            int whichProgram=0;
-            int currentFrame=mProgramLengthList.get(whichProgram)-mTextScreenWidthList.get(whichProgram);
-            while(i>currentFrame&&whichProgram<mTextAttrsList.size()-1){
-                whichProgram++;
-                currentFrame+=mProgramLengthList.get(whichProgram);
-            }
-            int other=attrStartAddress+(whichProgram)*6;
-            byte[] textAtt = intToByteArray(other, 3);
-            setInbyteArray(6,textAtt,bytes);
-            i++;
-        }
+        return intToByteArray(attrStartAddress, 3);
     }
 
     private void initItemPart() {
+
         if (mTextScreenWidthList.size()!=0){
-            mFrameCount -= mTextScreenWidthList.get(mTextScreenWidthList.size()-1);
+
         }
         byte[] frameCountByte = intToByteArray(mFrameCount, 2);
         setInbyteArray(1, frameCountByte, mItemPart);

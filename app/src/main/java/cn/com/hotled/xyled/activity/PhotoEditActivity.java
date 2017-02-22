@@ -1,6 +1,5 @@
 package cn.com.hotled.xyled.activity;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -8,7 +7,6 @@ import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 
@@ -24,6 +22,7 @@ import cn.com.hotled.xyled.App;
 import cn.com.hotled.xyled.R;
 import cn.com.hotled.xyled.bean.Program;
 import cn.com.hotled.xyled.dao.ProgramDao;
+import cn.com.hotled.xyled.global.Global;
 import cn.com.hotled.xyled.view.PhotoView;
 
 public class PhotoEditActivity extends BaseActivity {
@@ -33,7 +32,8 @@ public class PhotoEditActivity extends BaseActivity {
     FloatingActionButton fabAdd;
     Bitmap mBitmap;
     private Program mProgram;
-    private boolean isPicChanged;
+    private int mScreenWidth;
+    private int mScreenHeight;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,6 +71,9 @@ public class PhotoEditActivity extends BaseActivity {
         });
         mPhotoView.enable();
         mPhotoView.setMaxScale(8);
+        mScreenWidth = getSharedPreferences(Global.SP_SCREEN_CONFIG, MODE_PRIVATE).getInt(Global.KEY_SCREEN_W, 64);
+        mScreenHeight = getSharedPreferences(Global.SP_SCREEN_CONFIG, MODE_PRIVATE).getInt(Global.KEY_SCREEN_H, 32);
+
     }
 
     public void setImage(){
@@ -87,33 +90,26 @@ public class PhotoEditActivity extends BaseActivity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK && requestCode == REQUEST_CHOOSE_PIC) {
-//            BitmapFactory.Options opt = new BitmapFactory.Options();
-//            Bitmap bitmap = BitmapFactory.decodeFile(data.getData().getPath(),opt);
-//            Bitmap bitmap1 = resizeBitmap(bitmap,opt.outWidth,opt.outHeight);
+            UCrop.Options options = new UCrop.Options();
+            options.setCompressionFormat(Bitmap.CompressFormat.PNG);
+            options.setCompressionQuality(100);
+
+            UCrop uCrop = UCrop.of(data.getData(), Uri.parse(data.toURI()));
+            uCrop = uCrop.withOptions(options);
+            uCrop.start(this);
 //
-//            setBitmapToView(bitmap1);
-//            UCrop.Options options = new UCrop.Options();
-//            options.setCompressionFormat(Bitmap.CompressFormat.JPEG);
-//            options.setCompressionQuality(100);
-//            String destinationFileName = "";
-//            if (mProgram.getPicFile()==null||mProgram.getPicFile().getName().equals("")){
-//                destinationFileName=System.currentTimeMillis()+".jpg";
-//            }else {
-//                destinationFileName=mProgram.getPicFile().getName();
-//            }
-//
-//            UCrop uCrop = UCrop.of(data.getData(), Uri.fromFile(new File(getCacheDir(), destinationFileName)));
-//            uCrop = uCrop.withOptions(options);
-//            uCrop.withAspectRatio(2, 1).withMaxResultSize(100, 100).start(this);
-            Bitmap bitmap = BitmapFactory.decodeFile(data.getData().getPath());
-            Bitmap bitmap1 = resizeBitmap(bitmap, 64, 32);
+        }
+        if (resultCode == RESULT_OK && requestCode == UCrop.REQUEST_CROP) {
+            Uri resultUri = UCrop.getOutput(data);
+            Bitmap bitmap = BitmapFactory.decodeFile(resultUri.getPath());
+            Bitmap bitmap1 = resizeBitmap(bitmap, mScreenWidth, mScreenHeight);
             String destinationFileName="";
             if (mProgram.getPicFile()==null||mProgram.getPicFile().getName().equals("")){
                 File fileDir=new File(getFilesDir().getAbsolutePath() +"/pic");
                 if (!fileDir.exists()) {
                     fileDir.mkdir();
                 }
-                destinationFileName=fileDir.getAbsolutePath() +"/"+ System.currentTimeMillis()+".jpg";
+                destinationFileName=fileDir.getAbsolutePath() +"/"+ System.currentTimeMillis()+".png";
             }else {
                 destinationFileName=mProgram.getPicFile().getAbsolutePath();
             }
@@ -133,42 +129,15 @@ public class PhotoEditActivity extends BaseActivity {
                 e.printStackTrace();
             }
             if (fileOutputStream!=null){
-                bitmap1.compress(Bitmap.CompressFormat.JPEG,100,fileOutputStream);
+                bitmap1.compress(Bitmap.CompressFormat.PNG,100,fileOutputStream);
             }
             setBitmapToView(bitmap1);
-            isPicChanged =true;
             mProgram.setPicFile(file);
-        }
-        if (resultCode == RESULT_OK && requestCode == UCrop.REQUEST_CROP) {
-            Uri resultUri = UCrop.getOutput(data);
-            if (resultUri != null) {
-                Bitmap bitmap = BitmapFactory.decodeFile(resultUri.getPath());
-                Bitmap bitmap1 = resizeBitmap(bitmap, 64, 32);
-                String destinationFileName="";
-                if (mProgram.getPicFile()==null||mProgram.getPicFile().getName().equals("")){
-                    destinationFileName=getFilesDir().getAbsolutePath() +"/"+ System.currentTimeMillis()+".jpg";
-                }else {
-                    destinationFileName=mProgram.getPicFile().getAbsolutePath();
-                }
-                File file= new File(destinationFileName);
-                FileOutputStream fileOutputStream=null;
-                try {
-                    fileOutputStream = new FileOutputStream(file);
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                }
-                if (fileOutputStream!=null){
-                    bitmap1.compress(Bitmap.CompressFormat.JPEG,100,fileOutputStream);
-                }
-                setBitmapToView(bitmap1);
-                isPicChanged =true;
-                mProgram.setPicFile(file);
+
             } else if (resultCode == UCrop.RESULT_ERROR) {
                 final Throwable cropError = UCrop.getError(data);
             }
         }
-
-    }
 
     public  Bitmap resizeBitmap(Bitmap bitmap, int wid, int hei)
     {
@@ -192,27 +161,8 @@ public class PhotoEditActivity extends BaseActivity {
 
     @Override
     public void onBackPressed() {
-        if (isPicChanged) {
-            new AlertDialog.Builder(this)
-                    .setTitle("节目内容已改变，是否保存")
-                    .setNegativeButton("不保存", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            PhotoEditActivity.super.onBackPressed();
-                        }
-                    })
-                    .setPositiveButton("保存", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            ((App) getApplication()).getDaoSession().getProgramDao().insertOrReplace(mProgram);
-
-                            PhotoEditActivity.super.onBackPressed();
-                        }
-                    })
-                    .show();
-        }else {
-            PhotoEditActivity.super.onBackPressed();
-        }
+        ((App) getApplication()).getDaoSession().getProgramDao().insertOrReplace(mProgram);
+        super.onBackPressed();
     }
 
     @Override

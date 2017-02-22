@@ -5,24 +5,39 @@
               android:layout_width="match_parent"
               android:layout_height="wrap_content">
 
-    <TextView
-        android:id="@+id/tv_server"
-        android:text="hello"
-        android:textColor="@color/textPrimary"
-        android:textSize="18sp"
-        android:background="@drawable/serverbuffer"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        <TextView
+            android:id="@+id/tv_message_fromserver"
+            android:layout_marginLeft="10dp"
+            android:text="来自谁"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <TextView
+            android:layout_marginTop="20dp"
+            android:id="@+id/tv_server"
+            android:text="hello"
+            android:textColor="@color/textPrimary"
+            android:textSize="18sp"
+            android:background="@drawable/serverbuffer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <TextView
+            android:layout_alignParentRight="true"
+            android:id="@+id/tv_message_fromme"
+            android:layout_marginRight="10dp"
+            android:text="来自谁"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <TextView
+            android:layout_marginTop="20dp"
+            android:id="@+id/tv_client"
+            android:background="@drawable/clientbuffer"
+            android:textSize="18sp"
+            android:textColor="@color/textPrimary"
+            android:text="how are you"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"/>
 
-    <TextView
-        android:id="@+id/tv_client"
-        android:background="@drawable/clientbuffer"
-        android:textSize="18sp"
-        android:textColor="@color/textPrimary"
-        android:text="how are you"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"/>
 </RelativeLayout>

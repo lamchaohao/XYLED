@@ -43,9 +43,13 @@ public class MessageAdapter extends RecyclerView.Adapter {
         MessageViewHolder viewHolder= (MessageViewHolder) holder;
         if (itemViewType==IS_CLIENT){
             viewHolder.serverTextView.setVisibility(View.GONE);
+            viewHolder.fromServerTv.setVisibility(View.GONE);
             viewHolder.clientTextView.setText(mMessageList.get(position).getMessageText());
+            viewHolder.fromMeTv.setText("来自手机发送的消息");
         }else {
+            viewHolder.fromServerTv.setText("来自控制卡回应的消息");
             viewHolder.clientTextView.setVisibility(View.GONE);
+            viewHolder.fromMeTv.setVisibility(View.GONE);
             viewHolder.serverTextView.setText(mMessageList.get(position).getMessageText());
         }
     }
@@ -67,10 +71,12 @@ public class MessageAdapter extends RecyclerView.Adapter {
     class MessageViewHolder extends RecyclerView.ViewHolder{
         TextView clientTextView;
         TextView serverTextView;
-
-
+        TextView fromServerTv;
+        TextView fromMeTv;
         public MessageViewHolder(View itemView) {
             super(itemView);
+            fromServerTv = (TextView) itemView.findViewById(R.id.tv_message_fromserver);
+            fromMeTv=(TextView)itemView.findViewById(R.id.tv_message_fromme);
             clientTextView = (TextView) itemView.findViewById(R.id.tv_client);
             serverTextView  = (TextView) itemView.findViewById(R.id.tv_server);
         }

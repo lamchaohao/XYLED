@@ -26,11 +26,12 @@ public class TextContent {
     private boolean isSelected;
     private int sortNumber;
     private long programId;
-    @Generated(hash = 2126404718)
+    private int textEffect;
+    @Generated(hash = 112386340)
     public TextContent(long id, String text, File typeface, int textSize,
             int textColor, int textBackgroudColor, boolean isbold, boolean isIlatic,
-            boolean isUnderline, boolean isSelected, int sortNumber,
-            long programId) {
+            boolean isUnderline, boolean isSelected, int sortNumber, long programId,
+            int textEffect) {
         this.id = id;
         this.text = text;
         this.typeface = typeface;
@@ -43,6 +44,7 @@ public class TextContent {
         this.isSelected = isSelected;
         this.sortNumber = sortNumber;
         this.programId = programId;
+        this.textEffect = textEffect;
     }
     @Generated(hash = 1675015659)
     public TextContent() {
@@ -118,6 +120,12 @@ public class TextContent {
     }
     public void setProgramId(long programId) {
         this.programId = programId;
+    }
+    public int getTextEffect() {
+        return this.textEffect;
+    }
+    public void setTextEffect(int textEffect) {
+        this.textEffect = textEffect;
     }
 
 }

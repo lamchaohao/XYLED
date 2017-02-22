@@ -6,17 +6,14 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.Toast;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
@@ -24,10 +21,10 @@ import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 import cn.com.hotled.xyled.R;
 import cn.com.hotled.xyled.adapter.MessageAdapter;
 import cn.com.hotled.xyled.bean.SocketMessage;
+import cn.com.hotled.xyled.global.Global;
 import cn.com.hotled.xyled.util.WifiAdmin;
 
 public class SocketActivity extends BaseActivity implements View.OnClickListener{
@@ -35,15 +32,6 @@ public class SocketActivity extends BaseActivity implements View.OnClickListener
     private static final int ERROR_CODE = 0x100;
     private static final int READ_MSG_CODE = 0x64;
     private static final int ERROR_WIFI = 0x128;
-    @BindView(R.id.socket_address)
-    EditText socket_address;
-    @BindView(R.id.socket_port)
-    EditText socket_port;
-
-    @BindView(R.id.inputText)
-    EditText inputText;
-    @BindView(R.id.send)
-    Button send;
 
     @BindView(R.id.rv_message)
     RecyclerView mRecyclerView;
@@ -57,9 +45,6 @@ public class SocketActivity extends BaseActivity implements View.OnClickListener
     @BindView(R.id.socket_resume)
     Button btResume;
 
-    private String messageText;
-    private String socketAddress;
-    private String socketPort;
     private RecievMsgHandler msgHandler;
     private ArrayList<SocketMessage> mMessageList;
     private MessageAdapter mAdapter;
@@ -88,23 +73,6 @@ public class SocketActivity extends BaseActivity implements View.OnClickListener
         btReset.setOnClickListener(this);
         btResume.setOnClickListener(this);
 
-    }
-
-
-    @OnClick(R.id.send)
-    void sendMessage(){
-        if (TextUtils.isEmpty(inputText.getText().toString())){
-            return;
-        }
-        messageText = inputText.getText().toString();
-        socketAddress = socket_address.getText().toString();
-        socketPort = socket_port.getText().toString();
-        SocketMessage socketMessage = new SocketMessage(messageText,System.currentTimeMillis(),true,false);
-        mMessageList.add(socketMessage);
-        mLinearLayoutManager.scrollToPosition(mMessageList.size());
-        mAdapter.notifyItemInserted(mMessageList.size());
-        inputText.setText("");
-        new SendMessage().start();
     }
 
     @Override
@@ -233,79 +201,6 @@ public class SocketActivity extends BaseActivity implements View.OnClickListener
         mAdapter.notifyDataSetChanged();
     }
 
-
-    class SendMessage extends Thread{
-
-        @Override
-        public void run() {
-            Socket client=null;
-            try {
-                String inputStr = messageText;
-
-                InetAddress addr = InetAddress.getByName(socketAddress);
-                int port = Integer.parseInt(socketPort);
-
-                client = new Socket(addr,port);
-
-                byte[] sendBuf = new byte[64];
-                byte[] readBuf = new byte[128];
-
-                byte[] inputStrBytes = inputStr.getBytes();
-                for (int i=0,index=0;i<inputStrBytes.length;i++,index++){
-                    sendBuf[index]=inputStrBytes[i];
-                }
-                OutputStream os = client.getOutputStream();
-                InputStream is = client.getInputStream();
-
-                os.write(inputStrBytes);
-
-                is.read(readBuf);
-
-                Message msg=new Message();
-                msg.what=READ_MSG_CODE;
-                Bundle b=new Bundle();
-                String recStr = new String(readBuf,"UTF-8");
-                b.putString("result",recStr);
-                msg.setData(b);
-                msgHandler.sendMessage(msg);
-                Log.i("handler-rec",recStr);
-            } catch (SocketException e) {
-                e.printStackTrace();
-                Message msg=new Message();
-                msg.what=ERROR_CODE;
-                Bundle bundle=new Bundle();
-                msg.setData(bundle);
-                bundle.putString("error",e.toString());
-                msgHandler.sendMessage(msg);
-            } catch (UnknownHostException e) {
-                e.printStackTrace();
-                Message msg=new Message();
-                msg.what=ERROR_CODE;
-                Bundle bundle=new Bundle();
-                msg.setData(bundle);
-                bundle.putString("error",e.toString());
-                msgHandler.sendMessage(msg);
-            } catch (IOException e) {
-                e.printStackTrace();
-                Message msg=new Message();
-                msg.what=ERROR_CODE;
-                Bundle bundle=new Bundle();
-                bundle.putString("error",e.toString());
-                msg.setData(bundle);
-                msgHandler.sendMessage(msg);
-            }finally {
-                if (client!=null){
-                    try {
-                        client.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }
-    }
-
-
     class SendCMD extends Thread{
         byte[] msgByte;
         public SendCMD(byte[] msgB) {
@@ -316,10 +211,8 @@ public class SocketActivity extends BaseActivity implements View.OnClickListener
         public void run() {
             Socket client=null;
             try {
-                InetAddress addr = InetAddress.getByName("192.168.3.1");
-//                int port = Integer.parseInt(socketPort);
 
-                client = new Socket(addr,16389);
+                client = new Socket(Global.SERVER_IP,Global.SERVER_PORT);
 
 
                 byte[] readBuf = new byte[16];
@@ -330,16 +223,31 @@ public class SocketActivity extends BaseActivity implements View.OnClickListener
                 os.write(msgByte);
 
                 is.read(readBuf);
-                StringBuilder sb = new StringBuilder();
+                String result="";
                 for (int i = 0; i < readBuf.length; i++) {
-                    String s = readBuf[i] + " ";
-                    sb.append(s);
+                    if (i==11){
+                        switch (readBuf[i]) {
+                            case 0:
+                                result="通信成功";
+                                break;
+                            case 8:
+                                result="暂停成功";
+                                break;
+                            case 12:
+                                result="恢复成功";
+                                break;
+                            case 4:
+                                result="重置成功";
+                                break;
+                        }
+                    }
                 }
+
                 Message msg=new Message();
                 msg.what=READ_MSG_CODE;
                 Bundle b=new Bundle();
 
-                b.putString("result",sb.toString());
+                b.putString("result",result);
                 msg.setData(b);
                 msgHandler.sendMessage(msg);
                 Log.i("handler-rec",toString());

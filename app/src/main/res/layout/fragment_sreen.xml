@@ -87,17 +87,79 @@
         </android.support.v7.widget.RecyclerView>
     </LinearLayout>
 
+    <LinearLayout
+        android:visibility="gone"
+        android:id="@+id/ll_screen_add_submenu"
+        android:orientation="vertical"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginBottom="75dp"
+        android:layout_marginRight="20dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <LinearLayout
+            android:id="@+id/ll_screen_add_text"
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+            <TextView
+                android:padding="3dp"
+                android:layout_marginRight="10dp"
+                android:layout_gravity="center"
+                android:text="文字节目"
+                android:textColor="#FFF3E0"
+                android:background="@drawable/black_rectangle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+            <android.support.design.widget.FloatingActionButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_add_white_24dp"
+                app:elevation="0dp"
+                app:fabSize="normal"
+                app:backgroundTint="#43A047"
+                app:rippleColor="#BBDEFB"
+                />
+        </LinearLayout>
+        <LinearLayout
+            android:id="@+id/ll_screen_add_pic"
+            android:layout_marginTop="5dp"
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+            <TextView
+                android:padding="3dp"
+                android:layout_marginRight="10dp"
+                android:layout_gravity="center"
+                android:text="图片节目"
+                android:textColor="#FFF3E0"
+                android:background="@drawable/black_rectangle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+            <android.support.design.widget.FloatingActionButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_add_white_24dp"
+                app:elevation="0dp"
+                app:fabSize="normal"
+                app:backgroundTint="#F57C00"
+                app:rippleColor="#1E88E5"
+                />
+        </LinearLayout>
+
+    </LinearLayout>
+
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab_screen_add"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:layout_marginBottom="20dp"
-        android:layout_marginRight="20dp"
         android:src="@drawable/ic_add_white_24dp"
         app:backgroundTint="@color/colorAccent"
         app:rippleColor="#BBDEFB"
-        />
+        android:layout_marginBottom="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"/>
+
 
 </RelativeLayout>

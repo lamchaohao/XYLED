@@ -1,25 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:tool="http://schemas.android.com/apk/res-auto"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
               android:orientation="vertical"
               android:layout_width="match_parent"
               android:layout_height="match_parent">
 
-    <cn.com.hotled.xyled.view.RulerView
-        android:id="@+id/ruler_view_vertical"
-        android:layout_width="60dp"
-        android:layout_height="match_parent"
-        android:layout_gravity="center"
+    <cn.com.hotled.xyled.view.numberpicker.NumberPicker
+        android:id="@+id/number_picker_y"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:background="#ffffff"
-        tool:orientation="vertical"
-        tool:fromValue="-100"
-        tool:toValue="100"
-        tool:intervalsBetweenValues="10"
-        tool:valuesInterval="10"
-        tool:interval="5dp"
-        tool:linesColor="#33000000"
-        tool:linesWidth="4px"
-        tool:valuesTextSize="12sp"/>
+        app:np_width="64dp"
+        app:np_height="180dp"
+        app:np_dividerColor="@color/colorPrimary"
+        app:np_max="200"
+        app:np_min="-100"
+        app:np_orientation="vertical"
+        app:np_textColor="@color/colorPrimary"
+        app:np_textSize="20sp"
+        app:np_value="5"/>
 
-</LinearLayout>
+</RelativeLayout>

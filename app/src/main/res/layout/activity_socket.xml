@@ -13,22 +13,6 @@
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-        <EditText
-            android:layout_weight="1"
-            android:id="@+id/socket_address"
-            android:text="192.168.3.1"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:hint="ipAddress"/>
-        <EditText
-            android:layout_marginLeft="5dp"
-            android:layout_weight="1"
-            android:text="16389"
-            android:hint="端口"
-            android:id="@+id/socket_port"
-            android:inputType="number"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content" />
     </LinearLayout>
 
     <android.support.v7.widget.RecyclerView
@@ -45,16 +29,6 @@
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
-            <EditText
-                android:id="@+id/inputText"
-                android:hint="input your word"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-            <Button
-                android:id="@+id/send"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="send"/>
             <LinearLayout
                 android:orientation="horizontal"
                 android:layout_width="match_parent"

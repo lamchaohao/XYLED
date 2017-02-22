@@ -17,4 +17,8 @@ public class Global {
     public static final String KEY_SCREEN_H="screenHeight";
     public static final String KEY_SCREEN_SCAN="screenScanCount";
     public static final String KEY_RGB_ORDER="rgb_order";
+
+    public static final int TEXT_EFFECT_MOVE_LEFT=0;
+    public static final int TEXT_EFFECT_APPEAR=1;
+    public static final int TEXT_EFFECT_STATIC=2;
 }

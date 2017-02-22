@@ -46,7 +46,7 @@ public class ProgramDao extends AbstractDao<Program, Long> {
         public final static Property UseFlowBound = new Property(10, boolean.class, "useFlowBound", false, "USE_FLOW_BOUND");
         public final static Property ProgramType = new Property(11, String.class, "programType", false, "PROGRAM_TYPE");
         public final static Property PicFile = new Property(12, String.class, "picFile", false, "PIC_FILE");
-        public final static Property MTextContent = new Property(13, Long.class, "mTextContent", false, "M_TEXT_CONTENT");
+        public final static Property TextContent = new Property(13, Long.class, "textContent", false, "TEXT_CONTENT");
     }
 
     private DaoSession daoSession;
@@ -81,7 +81,7 @@ public class ProgramDao extends AbstractDao<Program, Long> {
                 "\"USE_FLOW_BOUND\" INTEGER NOT NULL ," + // 10: useFlowBound
                 "\"PROGRAM_TYPE\" TEXT," + // 11: programType
                 "\"PIC_FILE\" TEXT," + // 12: picFile
-                "\"M_TEXT_CONTENT\" INTEGER);"); // 13: mTextContent
+                "\"TEXT_CONTENT\" INTEGER);"); // 13: textContent
     }
 
     /** Drops the underlying database table. */
@@ -240,7 +240,7 @@ public class ProgramDao extends AbstractDao<Program, Long> {
             builder.append(',');
             SqlUtils.appendColumns(builder, "T0", daoSession.getTextContentDao().getAllColumns());
             builder.append(" FROM PROGRAM T");
-            builder.append(" LEFT JOIN TEXT_CONTENT T0 ON T.\"M_TEXT_CONTENT\"=T0.\"_id\"");
+            builder.append(" LEFT JOIN TEXT_CONTENT T0 ON T.\"TEXT_CONTENT\"=T0.\"_id\"");
             builder.append(' ');
             selectDeep = builder.toString();
         }
@@ -251,8 +251,8 @@ public class ProgramDao extends AbstractDao<Program, Long> {
         Program entity = loadCurrent(cursor, 0, lock);
         int offset = getAllColumns().length;
 
-        TextContent mTextContent = loadCurrentOther(daoSession.getTextContentDao(), cursor, offset);
-        entity.setMTextContent(mTextContent);
+        TextContent textContent = loadCurrentOther(daoSession.getTextContentDao(), cursor, offset);
+        entity.setTextContent(textContent);
 
         return entity;    
     }

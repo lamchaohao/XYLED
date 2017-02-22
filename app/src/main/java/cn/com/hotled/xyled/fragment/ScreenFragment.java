@@ -18,6 +18,7 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -40,6 +41,7 @@ import cn.com.hotled.xyled.util.ReadScreenDataUntil;
 
 import static android.app.Activity.RESULT_OK;
 import static android.content.Context.MODE_PRIVATE;
+import static cn.com.hotled.xyled.R.id.fab_screen_add;
 
 /**
  * Created by Lam on 2016/12/1.
@@ -87,7 +89,9 @@ public class ScreenFragment extends Fragment implements View.OnClickListener{
     private TextView mTvCardName;
     private TextView mTvScreenSize;
     private TextView mTvScreenScanCount;
-
+    private LinearLayout subMenuFab;
+    private LinearLayout mLlAddText;
+    private LinearLayout mLlAddPic;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -190,8 +194,13 @@ public class ScreenFragment extends Fragment implements View.OnClickListener{
     }
 
     private void initActionButton(View view) {
-        mFabAdd = (FloatingActionButton) view.findViewById(R.id.fab_screen_add);
+        mFabAdd = (FloatingActionButton) view.findViewById(fab_screen_add);
         mFabAdd.setOnClickListener(this);
+        subMenuFab = (LinearLayout) view.findViewById(R.id.ll_screen_add_submenu);
+        mLlAddText = (LinearLayout) view.findViewById(R.id.ll_screen_add_text);
+        mLlAddPic = (LinearLayout) view.findViewById(R.id.ll_screen_add_pic);
+        mLlAddText.setOnClickListener(this);
+        mLlAddPic.setOnClickListener(this);
     }
 
     private void updateScreenView() {
@@ -199,13 +208,21 @@ public class ScreenFragment extends Fragment implements View.OnClickListener{
         int screenHight = getContext().getSharedPreferences(Global.SP_SCREEN_CONFIG, MODE_PRIVATE).getInt(Global.KEY_SCREEN_H, -32);
         int screenScan = getContext().getSharedPreferences(Global.SP_SCREEN_CONFIG, MODE_PRIVATE).getInt(Global.KEY_SCREEN_SCAN, -1);
         mTvScreenSize.setText(screenWidth+" x "+screenHight);
-        mTvScreenScanCount.setText(screenScan+" 扫");
+        mTvScreenScanCount.setText(screenScan+" S");
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.fab_screen_add:
+
+                if (subMenuFab.getVisibility()== View.VISIBLE) {
+                    subMenuFab.setVisibility(View.GONE);
+                }else {
+                    subMenuFab.setVisibility(View.VISIBLE);
+                }
+                break;
+            case R.id.ll_screen_add_text:
                 int size = mProgramList.size();
                 size++;
                 Program program = new Program();
@@ -224,18 +241,18 @@ public class ScreenFragment extends Fragment implements View.OnClickListener{
             case R.id.iv_screenCatag_refresh:
                 readData();
                 break;
-//            case R.id.fab_addProgramPic:
-//                int proSize = mProgramList.size();
-//                proSize++;
-//                Program picProgram = new Program();
-//                picProgram.setId(System.currentTimeMillis());
-//                picProgram.setProgramName("new pic"+proSize);
-//                picProgram.setSortNumber(mProgramList.size());
-//                picProgram.setProgramType(ProgramType.Text);
-//                ((App) getActivity().getApplication()).getDaoSession().getProgramDao().insert(picProgram);
-//                mProgramList.add(picProgram);
-//                mAdapter.notifyItemInserted(mProgramList.size());
-//                break;
+            case R.id.ll_screen_add_pic:
+                int proSize = mProgramList.size();
+                proSize++;
+                Program picProgram = new Program();
+                picProgram.setId(System.currentTimeMillis());
+                picProgram.setProgramName("new pic"+proSize);
+                picProgram.setSortNumber(mProgramList.size());
+                picProgram.setProgramType(ProgramType.Pic);
+                ((App) getActivity().getApplication()).getDaoSession().getProgramDao().insert(picProgram);
+                mProgramList.add(picProgram);
+                mAdapter.notifyItemInserted(mProgramList.size());
+                break;
         }
     }
 
