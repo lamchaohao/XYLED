@@ -37,8 +37,8 @@ import java.util.List;
 
 import cn.com.hotled.xyled.R;
 import cn.com.hotled.xyled.adapter.ConnectWifiAdapter;
-import cn.com.hotled.xyled.util.DensityUtil;
-import cn.com.hotled.xyled.util.WifiAdmin;
+import cn.com.hotled.xyled.util.android.DensityUtil;
+import cn.com.hotled.xyled.util.android.WifiAdmin;
 
 public class ConnectWifiActivity extends BaseActivity {
 

@@ -11,8 +11,8 @@ import java.util.List;
 import java.util.Map;
 
 import cn.com.hotled.xyled.global.Global;
-import cn.com.hotled.xyled.util.BitmapToPixel;
-import cn.com.hotled.xyled.util.FullCompressAlgorithm;
+import cn.com.hotled.xyled.util.genFile.BitmapToPixel;
+import cn.com.hotled.xyled.util.genFile.FullCompressAlgorithm;
 
 /**
  * Created by Lam on 2017/1/3.

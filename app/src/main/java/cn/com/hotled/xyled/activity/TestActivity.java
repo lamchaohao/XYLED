@@ -20,7 +20,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import cn.com.hotled.xyled.R;
-import cn.com.hotled.xyled.util.TcpSend;
+import cn.com.hotled.xyled.util.communicate.TcpSend;
 
 public class TestActivity extends BaseActivity {
 

@@ -1,4 +1,4 @@
-package cn.com.hotled.xyled.util;
+package cn.com.hotled.xyled.util.genFile;
 
 import java.util.ArrayList;
 import java.util.List;

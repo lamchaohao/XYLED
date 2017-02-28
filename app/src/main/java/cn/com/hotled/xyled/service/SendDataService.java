@@ -23,7 +23,7 @@ import java.net.Socket;
 
 import cn.com.hotled.xyled.R;
 import cn.com.hotled.xyled.activity.MainActivity;
-import cn.com.hotled.xyled.util.WifiAdmin;
+import cn.com.hotled.xyled.util.android.WifiAdmin;
 
 public class SendDataService extends Service {
     private NotificationManager mNotificationManager;

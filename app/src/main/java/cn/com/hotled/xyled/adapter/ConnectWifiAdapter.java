@@ -14,7 +14,7 @@ import java.util.List;
 
 import cn.com.hotled.xyled.R;
 import cn.com.hotled.xyled.activity.ConnectWifiActivity;
-import cn.com.hotled.xyled.util.WifiAdmin;
+import cn.com.hotled.xyled.util.android.WifiAdmin;
 
 /**
  * Created by Lam on 2016/10/18.

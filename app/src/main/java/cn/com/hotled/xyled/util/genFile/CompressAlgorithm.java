@@ -1,4 +1,4 @@
-package cn.com.hotled.xyled.util;
+package cn.com.hotled.xyled.util.genFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -141,6 +141,10 @@ public class CompressAlgorithm {
         return lastCompressStyle;
     }
 
+    /**
+     * 返回经过压缩后的每一列占据多少个字节
+     * @return
+     */
     public byte[] getColByteCount() {
         return colByteCount;
     }

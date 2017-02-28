@@ -40,7 +40,7 @@ import cn.com.hotled.xyled.R;
 import cn.com.hotled.xyled.activity.ConnectHelpDiagActivity;
 import cn.com.hotled.xyled.adapter.ConnectAdapter;
 import cn.com.hotled.xyled.global.Global;
-import cn.com.hotled.xyled.util.WifiAdmin;
+import cn.com.hotled.xyled.util.android.WifiAdmin;
 
 public class ConnectFragment extends Fragment {
 

@@ -28,7 +28,7 @@ import java.util.List;
 
 import cn.com.hotled.xyled.App;
 import cn.com.hotled.xyled.R;
-import cn.com.hotled.xyled.activity.EasyTextActivity;
+import cn.com.hotled.xyled.activity.ChangeLineTextActivity;
 import cn.com.hotled.xyled.activity.PhotoEditActivity;
 import cn.com.hotled.xyled.activity.ProgramManageActivity;
 import cn.com.hotled.xyled.adapter.ProgramAdapter;
@@ -37,7 +37,7 @@ import cn.com.hotled.xyled.bean.ProgramType;
 import cn.com.hotled.xyled.bean.TextContent;
 import cn.com.hotled.xyled.dao.TextContentDao;
 import cn.com.hotled.xyled.global.Global;
-import cn.com.hotled.xyled.util.ReadScreenDataUntil;
+import cn.com.hotled.xyled.util.communicate.ReadScreenDataUntil;
 
 import static android.app.Activity.RESULT_OK;
 import static android.content.Context.MODE_PRIVATE;
@@ -133,7 +133,7 @@ public class ScreenFragment extends Fragment implements View.OnClickListener{
                     mProgramPosition = position;
                     startActivityForResult(intent,PHOTO_REQUEST_CODE);
                 } else if (programType== ProgramType.Text){
-                    Intent intent = new Intent(getContext(), EasyTextActivity.class);
+                    Intent intent = new Intent(getContext(), ChangeLineTextActivity.class);
                     intent.putExtra("programId",mProgramList.get(position).getId());
                     intent.putExtra("programName",mProgramList.get(position).getProgramName());
                     mProgramPosition = position;

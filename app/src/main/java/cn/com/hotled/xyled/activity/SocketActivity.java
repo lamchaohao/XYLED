@@ -25,7 +25,7 @@ import cn.com.hotled.xyled.R;
 import cn.com.hotled.xyled.adapter.MessageAdapter;
 import cn.com.hotled.xyled.bean.SocketMessage;
 import cn.com.hotled.xyled.global.Global;
-import cn.com.hotled.xyled.util.WifiAdmin;
+import cn.com.hotled.xyled.util.android.WifiAdmin;
 
 public class SocketActivity extends BaseActivity implements View.OnClickListener{
 

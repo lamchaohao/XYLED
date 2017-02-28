@@ -1,11 +1,11 @@
 package cn.com.hotled.xyled.activity;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Window;
 import android.view.WindowManager;
 
@@ -16,7 +16,7 @@ import java.io.InputStream;
 
 import cn.com.hotled.xyled.R;
 
-public class WelcomeActivity extends Activity {
+public class WelcomeActivity extends AppCompatActivity {
     private static final int COPY_FINISH = 200;
     private static final int START_ACTIVITY = 300;
     private Handler mHandler=new Handler(){

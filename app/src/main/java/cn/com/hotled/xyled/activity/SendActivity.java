@@ -26,15 +26,19 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.ConnectException;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import cn.com.hotled.xyled.App;
 import cn.com.hotled.xyled.R;
 import cn.com.hotled.xyled.bean.Program;
+import cn.com.hotled.xyled.bean.ProgramType;
+import cn.com.hotled.xyled.bean.TextContent;
+import cn.com.hotled.xyled.dao.TextContentDao;
 import cn.com.hotled.xyled.global.Global;
-import cn.com.hotled.xyled.util.CompressUtil;
-import cn.com.hotled.xyled.util.WifiAdmin;
+import cn.com.hotled.xyled.util.android.WifiAdmin;
+import cn.com.hotled.xyled.util.genFile.GenFileUtil2;
 
 public class SendActivity extends BaseActivity {
     private static final int UPDATE_PROGRESS = 0x11;
@@ -133,8 +137,20 @@ public class SendActivity extends BaseActivity {
         mProgramList.addAll(programs);
         int screenWidth = getSharedPreferences(Global.SP_SCREEN_CONFIG, MODE_PRIVATE).getInt(Global.KEY_SCREEN_W, 64);
         int screenHeight = getSharedPreferences(Global.SP_SCREEN_CONFIG, MODE_PRIVATE).getInt(Global.KEY_SCREEN_H, 32);
-        CompressUtil compressUtil=new CompressUtil(this,mProgramList,screenWidth,screenHeight,mHandler);
-        compressUtil.startGenFile();
+
+//        CompressUtil compressUtil=new CompressUtil(this,mProgramList,screenWidth,screenHeight,mHandler);
+//        compressUtil.startGenFile();
+        TextContentDao textContentDao = ((App) getApplication()).getDaoSession().getTextContentDao();
+        List<TextContent> textContents = new ArrayList<>();
+        for (Program program : mProgramList) {
+            if (program.getProgramType()== ProgramType.Text) {
+                List<TextContent> list = textContentDao.queryBuilder().where(TextContentDao.Properties.ProgramId.eq(program.getId())).list();
+                TextContent textContent = list.get(0);
+                textContents.add(textContent);
+            }
+        }
+        GenFileUtil2 genFileUtil2 = new GenFileUtil2(this,mHandler,mProgramList,textContents,screenWidth,screenHeight);
+        genFileUtil2.startGenFile();
     }
 
 

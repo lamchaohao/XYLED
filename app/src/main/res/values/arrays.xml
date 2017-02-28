@@ -2,12 +2,73 @@
 <resources>
     <array name="textEffect">
         <item>连续左移</item>
-        <item>立刻出现</item>
-        <item>固定</item>
+        <item>连续右移</item>
+        <item>立刻出现并左移</item>
+        <item>立刻出现并右移</item>
+        <item>静态(固定)显示</item>
+        <item>上移</item>
+        <item>下移</item>
     </array>
 
     <array name="flowEffect">
         <item>顺时针</item>
         <item>逆时针</item>
     </array>
+    
+    <string-array name="dataOrientation">
+        <item>0-右到左(横)</item>
+        <item>1----------</item>
+        <item>2----------</item>
+        <item>3-上到下(竖)</item>
+    </string-array>
+    <string-array name="dataOrientation_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
+    <string-array name="pref_special">
+        <item>无</item>
+        <item>链接增高(板高8)</item>
+        <item>链接增高(板高16)</item>
+        <item>链接增高(板高32)</item>
+    </string-array>
+    <string-array name="pref_special_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
+    <array name="pref_rgbSequence">
+        <item>R-G-B</item>
+        <item>R-B-G</item>
+        <item>G-R-B</item>
+        <item>G-B-R</item>
+        <item>B-R-G</item>
+        <item>B-G-R</item>
+    </array>
+    <string-array name="pref_rgbSequence_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+    </string-array>
+    <array name="pref_data">
+        <item>0-同相</item>
+        <item>1-反相</item>
+    </array>
+    <string-array name="pref_data_values">
+        <item>0</item>
+        <item>1</item>
+    </string-array>
+    <array name="pref_oe">
+        <item>0-低电平正常</item>
+        <item>1-高电平正常</item>
+    </array>
+    <string-array name="pref_oe_values">
+        <item>0</item>
+        <item>1</item>
+    </string-array>
 </resources>

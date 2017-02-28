@@ -1,4 +1,4 @@
-package cn.com.hotled.xyled.util;
+package cn.com.hotled.xyled.util.genFile;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
@@ -138,7 +138,6 @@ public class DrawBitmapUtil2 {
         }
         paint.setTextAlign(Paint.Align.LEFT);
         Bitmap bitmap = Bitmap.createBitmap(mWidthList.get(mIndex), mHeightList.get(mIndex), Bitmap.Config.ARGB_4444);
-//        Bitmap bitmap =null;
         if (bitmap != null)
             canvas.setBitmap(bitmap);
         //设置好画笔，开始计算
@@ -147,7 +146,7 @@ public class DrawBitmapUtil2 {
         if (drawWidth > mWidthList.get(mIndex)) {
             mWidth = (int) drawWidth;
             //这里在两边都加上了一段空白区域
-            if (mTextEffect== Global.TEXT_EFFECT_APPEAR) {
+            if (mTextEffect== Global.TEXT_EFFECT_APPEAR_MOVE_LEFT) {
                 mWidth+=mWidthList.get(mIndex);
             }else {
                 mWidth+=mWidthList.get(mIndex)*2;
@@ -164,7 +163,7 @@ public class DrawBitmapUtil2 {
             case Global.TEXT_EFFECT_MOVE_LEFT:
                 canvas.drawText(sb.toString(), mBaseX+mWidthList.get(mIndex), mBaseY, paint);
                 break;
-            case Global.TEXT_EFFECT_APPEAR:
+            case Global.TEXT_EFFECT_APPEAR_MOVE_LEFT:
                 canvas.drawText(sb.toString(), mBaseX, mBaseY, paint);
                 break;
             case Global.TEXT_EFFECT_STATIC:
@@ -189,7 +188,7 @@ public class DrawBitmapUtil2 {
     private void drawBgColor(float drawWidth, Canvas canvas) {
         Paint bgPaint = new Paint();
         bgPaint.setColor(mTextBgColor);
-        if (mTextEffect== Global.TEXT_EFFECT_APPEAR) {
+        if (mTextEffect== Global.TEXT_EFFECT_APPEAR_MOVE_LEFT) {
             canvas.drawRect(0, 0, drawWidth+mWidthList.get(mIndex), mHeightList.get(mIndex), bgPaint);
         }else {
             canvas.drawRect(mBaseX+mWidthList.get(mIndex), 0, drawWidth+mWidthList.get(mIndex), mHeightList.get(mIndex), bgPaint);

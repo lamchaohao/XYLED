@@ -13,8 +13,8 @@
         android:title="@string/pref_header_notifications"/>
 
     <header
-        android:fragment="cn.com.hotled.xyled.activity.ScreenSettingsActivity$DataSyncPreferenceFragment"
+        android:fragment="cn.com.hotled.xyled.activity.ScreenSettingsActivity$ScreenConfigPreferenceFragment"
         android:icon="@drawable/ic_sync_black_24dp"
-        android:title="@string/pref_header_data_sync"/>
+        android:title="屏幕参数"/>
 
 </preference-headers>

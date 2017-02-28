@@ -22,6 +22,10 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.InputType;
+import android.text.Layout;
+import android.text.StaticLayout;
+import android.text.TextPaint;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Gravity;
@@ -71,7 +75,7 @@ import cn.com.hotled.xyled.util.android.DensityUtil;
 import cn.com.hotled.xyled.view.PhotoView;
 import cn.com.hotled.xyled.view.numberpicker.NumberPicker;
 
-public class EasyTextActivity extends BaseActivity implements View.OnClickListener,AdapterView.OnItemSelectedListener {
+public class ChangeLineTextActivity extends BaseActivity implements View.OnClickListener,AdapterView.OnItemSelectedListener {
 
     private static final int SELECT_FLOW_CODE = 202;
     @BindView(R.id.pv_fgText_photo)
@@ -147,6 +151,7 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
     private Program mProgram;
     private Bitmap mFlowBitmap;
     private File mSelectedFontFile;
+    private boolean mIsTranslated;
 
 
     @Override
@@ -310,11 +315,11 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
             @Override
             public void onClick(View v) {
                 saveImageToDisk();
-                Intent intent = new Intent(EasyTextActivity.this, BrowsePhotoActivity.class);
+                Intent intent = new Intent(ChangeLineTextActivity.this, BrowsePhotoActivity.class);
                 ActivityOptionsCompat options =
-                        ActivityOptionsCompat.makeSceneTransitionAnimation(EasyTextActivity.this,
+                        ActivityOptionsCompat.makeSceneTransitionAnimation(ChangeLineTextActivity.this,
                                 mPhotoView, getString(R.string.shareNames));
-                ActivityCompat.startActivity(EasyTextActivity.this, intent, options.toBundle());
+                ActivityCompat.startActivity(ChangeLineTextActivity.this, intent, options.toBundle());
             }
         });
 
@@ -344,9 +349,6 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
         canvas.drawPaint(paint);
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
-
-        //如果图片比所设置的宽，则需加长
-
         //先设置好画笔，才进行计算
         paint.setColor(mTextContent.getTextColor());
         paint.setTextSize(mTextContent.getTextSize());
@@ -391,30 +393,68 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
         //需要加上流水边框的宽度,左右都需要加上
         int tempBaseX=mBaseX;
         int tempBaseY=mBaseY;
+        int translateCount=0;
         if (mFlowBitmap!=null&&mProgram.getUseFlowBound()){
             drawWidth+=mFlowBitmap.getHeight()*2;
             //加上流水边框后，文字需要偏移流水边框的一个宽度
             tempBaseX+=mFlowBitmap.getHeight();
             tempBaseY+=mFlowBitmap.getHeight();
+            translateCount=mFlowBitmap.getHeight();
         }
-        if (drawWidth>mScreenWidth) {
-            int width = (int) drawWidth;
-            targetBitmap = Bitmap.createBitmap(width, mScreenHeight, Bitmap.Config.ARGB_4444);
-            if (targetBitmap != null)
-                canvas.setBitmap(targetBitmap);
-            mPhotoView.setImageBitmap(targetBitmap);
+        //画图时，分两种情况
+        if (mTextContent.getTextEffect()<=Global.TEXT_EFFECT_STATIC){
+            //左移右移和固定
+            if (drawWidth>mScreenWidth) {
+                int width = (int) drawWidth;
+                targetBitmap = Bitmap.createBitmap(width, mScreenHeight, Bitmap.Config.ARGB_4444);
+                if (targetBitmap != null)
+                    canvas.setBitmap(targetBitmap);
+                mPhotoView.setImageBitmap(targetBitmap);
+            }
+            //背景
+            drawBgColor(drawWidth,mScreenHeight);
+            //文本
+            if (mTextContent.getText()!=null&& !TextUtils.isEmpty(mTextContent.getText())) {
+                canvas.drawText(mTextContent.getText(),tempBaseX,tempBaseY,paint);
+            }
+        }else {
+            //上下移动
+            //文本
+            if (mTextContent.getText()!=null){
+                TextPaint textPaint =new TextPaint();
+                textPaint.set(paint);
+                StaticLayout currentLayout = new StaticLayout(mTextContent.getText(), textPaint, mScreenWidth, Layout.Alignment.ALIGN_NORMAL, 1.0f, 0f, false);
+                int height = currentLayout.getHeight();
+                if (height>=3072) {
+                    if (!isWarnShowed) {
+                        Toast.makeText(this, "文字过长，预览图后部分省略，但不会影响屏幕实际显示", Toast.LENGTH_LONG).show();
+                        isWarnShowed=true;
+                    }
+                    height=3072;
+                }
+                height+=translateCount*2;//加上流水边的宽度
+                targetBitmap = Bitmap.createBitmap(mScreenWidth, height, Bitmap.Config.ARGB_4444);
+                if (targetBitmap != null)
+                    canvas.setBitmap(targetBitmap);
+                mPhotoView.setImageBitmap(targetBitmap);
+                //背景
+                drawBgColor(mScreenWidth,height);
+                canvas.translate(translateCount,translateCount);//从(x,y)开始画
+                if (translateCount!=0)
+                    mIsTranslated = true;
+                currentLayout.draw(canvas);
+            }
         }
-
-        //背景
-        drawBgColor(drawWidth);
         if (mFlowBitmap!=null&&mProgram.getUseFlowBound()){
         //流水边框
+            //移动回来，负数代表向左移，上移
+            if (mIsTranslated){
+                canvas.translate(-translateCount,-translateCount);
+                mIsTranslated=false;
+            }
             drawFlowBound();
         }
-        //文本
-        if (mTextContent.getText()!=null){
-            canvas.drawText(mTextContent.getText(),tempBaseX,tempBaseY,paint);
-        }
+
 
     }
 
@@ -440,10 +480,10 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
         return drawWidth;
     }
 
-    private void drawBgColor(float drawWidth) {
+    private void drawBgColor(float drawWidth,int drawHeight) {
         Paint bgPaint=new Paint();
         bgPaint.setColor(mTextContent.getTextBackgroudColor());
-        canvas.drawRect(mBaseX,0,drawWidth,mScreenHeight,bgPaint);
+        canvas.drawRect(mBaseX,0,drawWidth,drawHeight,bgPaint);
     }
     private void drawFlowBound() {
 
@@ -456,7 +496,7 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
             }
         }
 
-        int screenHeight = mScreenHeight;
+        int screenHeight = getTargetBitmap().getHeight();
         int screenWidth = getTargetBitmap().getWidth();
         Paint flowPaint=new Paint();
 
@@ -963,7 +1003,7 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
         mProgram.setFrameTime(getFrameTime());
         mProgramDao.insertOrReplace(mProgram);
 
-        EasyTextActivity.super.onBackPressed();
+        ChangeLineTextActivity.super.onBackPressed();
     }
 
     @Override
@@ -979,7 +1019,7 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
         ivEdit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                MaterialDialog.Builder builder = new MaterialDialog.Builder(EasyTextActivity.this);
+                MaterialDialog.Builder builder = new MaterialDialog.Builder(ChangeLineTextActivity.this);
                 builder.title("修改节目名称")
                         .inputType(InputType.TYPE_CLASS_TEXT)
                         .input("请输入节目名称", mProgram.getProgramName(), new MaterialDialog.InputCallback() {
@@ -1019,7 +1059,13 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         if (parent.getId()==R.id.spn_fgText_textEffect){
-            mTextContent.setTextEffect(position);
+            if (mTextContent.getTextEffect()<= Global.TEXT_EFFECT_STATIC&&position>Global.TEXT_EFFECT_STATIC) {
+                mTextContent.setTextEffect(position);
+                drawText();
+            }else if (mTextContent.getTextEffect()> Global.TEXT_EFFECT_STATIC&&position<=Global.TEXT_EFFECT_STATIC){
+                mTextContent.setTextEffect(position);
+                drawText();
+            }
         }else if (parent.getId()==R.id.spn_fgText_flowShowEffect){
             mProgram.setFlowEffect(position);
         }

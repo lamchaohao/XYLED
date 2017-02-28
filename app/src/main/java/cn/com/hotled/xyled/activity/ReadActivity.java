@@ -13,7 +13,7 @@ import java.io.OutputStream;
 import java.net.Socket;
 
 import cn.com.hotled.xyled.R;
-import cn.com.hotled.xyled.util.WifiAdmin;
+import cn.com.hotled.xyled.util.android.WifiAdmin;
 
 public class ReadActivity extends BaseActivity {
 

@@ -1,4 +1,4 @@
-package cn.com.hotled.xyled.util;
+package cn.com.hotled.xyled.util.genFile;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
@@ -356,7 +356,7 @@ public class CompressUtil {
             else {
                 mTempColbyteCount += mColByteCountList.get(textProgramIndex)[i-1];
             }
-            //map地址
+            //流水边地址
             Integer flowIndex = mFlowMap.get(mTextFrameIndex);
             int tempFlowadd=0;
             for (int j = 0; j < flowIndex; j++) {

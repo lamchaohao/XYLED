@@ -1,4 +1,4 @@
-package cn.com.hotled.xyled.util;
+package cn.com.hotled.xyled.util.android;
 
 import android.content.Context;
 import android.util.TypedValue;

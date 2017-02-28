@@ -1,4 +1,4 @@
-package cn.com.hotled.xyled.util;
+package cn.com.hotled.xyled.util.communicate;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -21,6 +21,7 @@ import java.net.ConnectException;
 import java.net.Socket;
 
 import cn.com.hotled.xyled.R;
+import cn.com.hotled.xyled.util.android.WifiAdmin;
 import cn.com.hotled.xyled.view.NumberProgressBar;
 import cn.com.hotled.xyled.view.OnProgressBarListener;
 

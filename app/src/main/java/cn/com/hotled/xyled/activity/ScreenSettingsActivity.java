@@ -17,14 +17,12 @@ import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
 import android.support.v7.app.ActionBar;
-import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.MenuItem;
 
 import java.util.List;
 
 import cn.com.hotled.xyled.R;
-import cn.com.hotled.xyled.util.ToolBarHelper;
 
 /**
  * A {@link PreferenceActivity} that presents a set of application settings. On
@@ -42,8 +40,6 @@ public class ScreenSettingsActivity extends AppCompatPreferenceActivity {
      * A preference value change listener that updates the preference's summary
      * to reflect its new value.
      */
-    private ToolBarHelper mToolBarHelper ;
-    public Toolbar toolbar ;
     private static Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener = new Preference.OnPreferenceChangeListener() {
         @Override
         public boolean onPreferenceChange(Preference preference, Object value) {
@@ -139,6 +135,7 @@ public class ScreenSettingsActivity extends AppCompatPreferenceActivity {
 
         }
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         boolean result=false;
@@ -174,7 +171,7 @@ public class ScreenSettingsActivity extends AppCompatPreferenceActivity {
     protected boolean isValidFragment(String fragmentName) {
         return PreferenceFragment.class.getName().equals(fragmentName)
                 || GeneralPreferenceFragment.class.getName().equals(fragmentName)
-                || DataSyncPreferenceFragment.class.getName().equals(fragmentName)
+                || ScreenConfigPreferenceFragment.class.getName().equals(fragmentName)
                 || NotificationPreferenceFragment.class.getName().equals(fragmentName);
     }
 
@@ -239,23 +236,22 @@ public class ScreenSettingsActivity extends AppCompatPreferenceActivity {
         }
     }
 
-    /**
-     * This fragment shows data and sync preferences only. It is used when the
-     * activity is showing a two-pane settings UI.
-     */
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    public static class DataSyncPreferenceFragment extends PreferenceFragment {
+    public static class ScreenConfigPreferenceFragment extends PreferenceFragment {
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
-            addPreferencesFromResource(R.xml.pref_data_sync);
+            addPreferencesFromResource(R.xml.pref_screen_config);
             setHasOptionsMenu(true);
 
-            // Bind the summaries of EditText/List/Dialog/Ringtone preferences
-            // to their values. When their values change, their summaries are
-            // updated to reflect the new value, per the Android Design
-            // guidelines.
-            bindPreferenceSummaryToValue(findPreference("sync_frequency"));
+            bindPreferenceSummaryToValue(findPreference("screenWidth"));
+            bindPreferenceSummaryToValue(findPreference("screenHeight"));
+            bindPreferenceSummaryToValue(findPreference("dataOrientation"));
+            bindPreferenceSummaryToValue(findPreference("pref_special"));
+            bindPreferenceSummaryToValue(findPreference("RGB_Sequence"));
+            bindPreferenceSummaryToValue(findPreference("pref_data"));
+            bindPreferenceSummaryToValue(findPreference("pref_OE"));
+
         }
 
         @Override

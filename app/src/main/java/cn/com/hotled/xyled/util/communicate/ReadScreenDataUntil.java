@@ -1,4 +1,4 @@
-package cn.com.hotled.xyled.util;
+package cn.com.hotled.xyled.util.communicate;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -15,6 +15,7 @@ import java.net.Socket;
 
 import cn.com.hotled.xyled.fragment.ScreenFragment;
 import cn.com.hotled.xyled.global.Global;
+import cn.com.hotled.xyled.util.android.WifiAdmin;
 
 import static cn.com.hotled.xyled.fragment.ScreenFragment.READ_FAILE;
 import static cn.com.hotled.xyled.fragment.ScreenFragment.READ_SUCCESS;

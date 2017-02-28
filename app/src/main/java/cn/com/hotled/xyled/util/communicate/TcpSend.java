@@ -1,4 +1,4 @@
-package cn.com.hotled.xyled.util;
+package cn.com.hotled.xyled.util.communicate;
 
 import android.app.AlertDialog;
 import android.content.Context;

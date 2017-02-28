@@ -9,7 +9,11 @@
         <item name="android:windowBackground">@color/window_background</item>
         <item name="android:listDivider">@drawable/devider</item>
     </style>
-
+    <style name="FullscreenForWel" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="windowActionBar">false</item>
+    </style>
     <style name="AppTheme.NoActionBar" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>

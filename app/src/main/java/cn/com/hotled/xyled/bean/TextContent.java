@@ -27,11 +27,12 @@ public class TextContent {
     private int sortNumber;
     private long programId;
     private int textEffect;
-    @Generated(hash = 112386340)
+    private int textSpeed;
+    @Generated(hash = 127409998)
     public TextContent(long id, String text, File typeface, int textSize,
             int textColor, int textBackgroudColor, boolean isbold, boolean isIlatic,
             boolean isUnderline, boolean isSelected, int sortNumber, long programId,
-            int textEffect) {
+            int textEffect, int textSpeed) {
         this.id = id;
         this.text = text;
         this.typeface = typeface;
@@ -45,6 +46,7 @@ public class TextContent {
         this.sortNumber = sortNumber;
         this.programId = programId;
         this.textEffect = textEffect;
+        this.textSpeed = textSpeed;
     }
     @Generated(hash = 1675015659)
     public TextContent() {
@@ -126,6 +128,12 @@ public class TextContent {
     }
     public void setTextEffect(int textEffect) {
         this.textEffect = textEffect;
+    }
+    public int getTextSpeed() {
+        return this.textSpeed;
+    }
+    public void setTextSpeed(int textSpeed) {
+        this.textSpeed = textSpeed;
     }
 
 }

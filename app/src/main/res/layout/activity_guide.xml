@@ -2,13 +2,27 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/activity_guide"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="cn.com.hotled.xyled.activity.WelcomeActivity">
-    <ImageView
+    <LinearLayout
         android:layout_centerInParent="true"
-        android:src="@drawable/newwinglogo"
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content">
+        <ImageView
+            app:srcCompat="@drawable/ic_wifi_green_a700_svg"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"/>
+        <TextView
+            android:text="@string/app_name"
+            android:gravity="center"
+            android:textSize="30sp"
+            android:typeface="serif"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+
 </RelativeLayout>

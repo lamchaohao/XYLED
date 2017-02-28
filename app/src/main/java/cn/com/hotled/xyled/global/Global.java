@@ -19,6 +19,10 @@ public class Global {
     public static final String KEY_RGB_ORDER="rgb_order";
 
     public static final int TEXT_EFFECT_MOVE_LEFT=0;
-    public static final int TEXT_EFFECT_APPEAR=1;
-    public static final int TEXT_EFFECT_STATIC=2;
+    public static final int TEXT_EFFECT_MOVE_RIGHT=1;
+    public static final int TEXT_EFFECT_APPEAR_MOVE_LEFT=2;
+    public static final int TEXT_EFFECT_APPEAR_MOVE_RIGHT=3;
+    public static final int TEXT_EFFECT_STATIC=4;
+    public static final int TEXT_EFFECT_MOVE_UP=5;
+    public static final int TEXT_EFFECT_MOVE_DOWN=6;
 }
