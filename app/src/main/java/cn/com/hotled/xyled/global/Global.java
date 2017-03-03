@@ -18,6 +18,10 @@ public class Global {
     public static final String KEY_SCREEN_SCAN="screenScanCount";
     public static final String KEY_RGB_ORDER="rgb_order";
 
+    //----------extra for activityResult------------
+    public static final String EXTRA_SELECT_FONT= "fontFileName";
+    public static final String EXTRA_SELECT_FLOW = "flowFileName";
+
     public static final int TEXT_EFFECT_MOVE_LEFT=0;
     public static final int TEXT_EFFECT_MOVE_RIGHT=1;
     public static final int TEXT_EFFECT_APPEAR_MOVE_LEFT=2;

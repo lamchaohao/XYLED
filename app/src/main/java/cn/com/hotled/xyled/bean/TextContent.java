@@ -136,4 +136,23 @@ public class TextContent {
         this.textSpeed = textSpeed;
     }
 
+    @Override
+    public String toString() {
+        return "TextContent{" +
+                "id=" + id +
+                ", text='" + text + '\'' +
+                ", typeface=" + typeface +
+                ", textSize=" + textSize +
+                ", textColor=" + textColor +
+                ", textBackgroudColor=" + textBackgroudColor +
+                ", isbold=" + isbold +
+                ", isIlatic=" + isIlatic +
+                ", isUnderline=" + isUnderline +
+                ", isSelected=" + isSelected +
+                ", sortNumber=" + sortNumber +
+                ", programId=" + programId +
+                ", textEffect=" + textEffect +
+                ", textSpeed=" + textSpeed +
+                '}';
+    }
 }

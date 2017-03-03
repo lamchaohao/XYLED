@@ -66,7 +66,9 @@
         </activity>
         <activity android:name=".activity.AboutUsActivity">
         </activity>
-        <activity android:name=".activity.WelcomeActivity" android:theme="@style/FullscreenForWel">
+        <activity
+            android:name=".activity.WelcomeActivity"
+            android:theme="@style/FullscreenForWel">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
@@ -83,6 +85,8 @@
             android:theme="@style/AppTheme">
         </activity>
         <activity android:name=".activity.ChangeLineTextActivity">
+        </activity>
+        <activity android:name=".activity.SelectFontActivity">
         </activity>
     </application>
 

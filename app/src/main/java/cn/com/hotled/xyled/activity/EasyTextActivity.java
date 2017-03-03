@@ -35,10 +35,8 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.Switch;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
@@ -110,8 +108,6 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
     ImageButton ib_inCenter;
     @BindView(R.id.ib_fgText_trainY)
     ImageButton ib_trainY;
-    @BindView(R.id.iv_fgText_setTime)
-    ImageView iv_setTime;
     @BindView(R.id.spn_fgText_textEffect)
     Spinner spnTextEffect;
     @BindView(R.id.rl_fgText_flowLayout)
@@ -120,8 +116,8 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
     ImageView iv_setFlowStyle;
     @BindView(R.id.spn_fgText_flowShowEffect)
     Spinner spn_setFlowEffect;
-    @BindView(R.id.bt_fgText_flowShowSpeed)
-    Button bt_setFlowSpeed;
+    @BindView(R.id.spn_fgText_flowShowSpeed)
+    Spinner spn_setFlowSpeed;
     @BindView(R.id.sw_openFlow)
     Switch swOpenFlow;
     @BindView(R.id.ll_fgText_setFlow)
@@ -262,7 +258,6 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
 
 
     private void initOnclickEven() {
-        iv_setTime.setOnClickListener(this);
         mBt_textSize.setOnClickListener(this);
         mBt_setFont.setOnClickListener(this);
         ib_setBold.setOnClickListener(this);
@@ -282,7 +277,7 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
         spnTextEffect.setOnItemSelectedListener(this);
         rlSelectFlow.setOnClickListener(this);
         spn_setFlowEffect.setOnItemSelectedListener(this);
-        bt_setFlowSpeed.setOnClickListener(this);
+        spn_setFlowSpeed.setOnItemSelectedListener(this);
         swOpenFlow.setOnClickListener(this);
     }
 
@@ -637,65 +632,6 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
         drawText();
     }
 
-    private void setFrameTime() {
-        View view = LayoutInflater.from(this).inflate(R.layout.content_setframetime, null);
-        SeekBar sb_speed = (SeekBar) view.findViewById(R.id.sb_frameTime_speed);
-        final TextView tv_speed = (TextView) view.findViewById(R.id.tv_frameTime_speed);
-        SeekBar sb_stay = (SeekBar) view.findViewById(R.id.sb_frameTime_stayTime);
-        final TextView tv_stayTime = (TextView) view.findViewById(R.id.tv_frameTime_stayTime);
-        final float[] frameTime = {0};
-        final float[] stayTime = {0};
-
-        sb_speed.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                int i = (progress * 20);
-                tv_speed.setText("速度:"+i+"ms/帧");
-                frameTime[0] = (float) (progress*2.56);
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-
-            }
-        });
-
-        sb_stay.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                int i = progress*20;
-                tv_stayTime.setText("停留时间:"+i+"ms");
-                stayTime[0] = (float) (progress*2.56);
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-            }
-        });
-        sb_speed.setProgress((int) (getFrameTime()/2.56));
-        sb_stay.setProgress((int) (getStayTime()/2.56));
-
-        new AlertDialog.Builder(this)
-                .setTitle("设置时间")
-                .setView(view)
-                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        mFrameTime = frameTime[0];
-                        mStayTime = stayTime[0];
-                    }
-                })
-                .show();
-    }
 
     private void setUnderLine() {
         mTextContent.setIsUnderline(!mTextContent.getIsUnderline());
@@ -823,9 +759,6 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
             case R.id.ib_fgText_setUnderLine:
                 setUnderLine();
                 break;
-            case R.id.iv_fgText_setTime:
-                setFrameTime();
-                break;
             case R.id.ib_fgText_textColorRed:
                 setTextColor(Color.RED);
                 break;
@@ -864,9 +797,6 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
                 break;
             case R.id.rl_fgText_flowLayout:
                 startActivityForResult(new Intent(this,SelectFlowActivity.class),SELECT_FLOW_CODE);
-                break;
-            case R.id.bt_fgText_flowShowSpeed:
-
                 break;
         }
     }

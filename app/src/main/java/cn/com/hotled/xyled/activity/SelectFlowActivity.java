@@ -13,6 +13,7 @@ import java.util.List;
 
 import cn.com.hotled.xyled.R;
 import cn.com.hotled.xyled.adapter.FlowAdapter;
+import cn.com.hotled.xyled.global.Global;
 
 public class SelectFlowActivity extends BaseActivity {
 
@@ -50,7 +51,7 @@ public class SelectFlowActivity extends BaseActivity {
             public void onItemClick(View view, int position) {
                 File selectFile = mFileList.get(position);
                 Intent intent = new Intent();
-                intent.putExtra("fileName",selectFile.getAbsolutePath());
+                intent.putExtra(Global.EXTRA_SELECT_FLOW,selectFile.getAbsolutePath());
                 setResult(RESULT_OK,intent);
                 SelectFlowActivity.this.finish();
             }

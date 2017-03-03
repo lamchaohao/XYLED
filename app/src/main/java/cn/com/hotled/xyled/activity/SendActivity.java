@@ -96,6 +96,7 @@ public class SendActivity extends BaseActivity {
                     break;
                 case GENFILE_DONE:
                     fileReady=true;
+                    isGeningFile = false;
                     mPbSend.setVisibility(View.GONE);
                     mBtSend.setEnabled(true);
                     Toast.makeText(SendActivity.this,"文件已生成，开始传送",Toast.LENGTH_SHORT).show();
@@ -115,6 +116,7 @@ public class SendActivity extends BaseActivity {
     private ImageView msendRoundOutside;
     private Animation mSendOutsideAnim;
     private Button mBtSend;
+    private boolean isGeningFile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -151,6 +153,7 @@ public class SendActivity extends BaseActivity {
         }
         GenFileUtil2 genFileUtil2 = new GenFileUtil2(this,mHandler,mProgramList,textContents,screenWidth,screenHeight);
         genFileUtil2.startGenFile();
+        isGeningFile= true;
     }
 
 
@@ -174,6 +177,8 @@ public class SendActivity extends BaseActivity {
                 }
             }
         });
+        //进入开始录制时候，外圈动画开始
+        msendRoundOutside.startAnimation(mSendOutsideAnim);
     }
 
     public void send(){
@@ -504,6 +509,17 @@ public class SendActivity extends BaseActivity {
         if (isSending){
             new AlertDialog.Builder(this)
                     .setMessage("正在传送，确定退出吗？")
+                    .setPositiveButton("退出", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            SendActivity.super.onBackPressed();
+                        }
+                    })
+                    .setNegativeButton("不退出",null)
+                    .show();
+        }else if(isGeningFile){
+            new AlertDialog.Builder(this)
+                    .setMessage("正在转换数据，确定退出吗？")
                     .setPositiveButton("退出", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {

@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:tools="http://schemas.android.com/tools"
               android:orientation="vertical"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
@@ -13,26 +12,20 @@
         android:background="#EEEEEE"
         android:transitionName="@string/shareNames"/>
 
-    <LinearLayout
-        android:layout_gravity="bottom"
-        android:orientation="horizontal"
+    <android.support.design.widget.TextInputLayout
+        android:layout_margin="5dp"
+        android:background="@color/colorPrimary"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-        <EditText
-            android:layout_weight="1"
+        <android.support.design.widget.TextInputEditText
+            android:layout_margin="3dp"
             android:id="@+id/et_fgText_input"
             android:hint="请输入文本"
-            android:maxLines="3"
-            android:layout_gravity="bottom"
-            android:layout_width="0dp"
-            android:layout_height="match_parent" />
-        <ImageView
-            android:id="@+id/iv_fgText_setTime"
-            android:src="@drawable/ic_access_time_black_48dp"
-            android:layout_gravity="center"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-    </LinearLayout>
+            android:gravity="left"
+            android:background="#FFFFFF"
+            android:layout_width="match_parent"
+            android:layout_height="70dp" />
+    </android.support.design.widget.TextInputLayout>
 
     <include layout="@layout/content_textsetting"/>
 

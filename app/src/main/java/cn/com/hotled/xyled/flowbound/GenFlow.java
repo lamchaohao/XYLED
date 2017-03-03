@@ -36,6 +36,7 @@ public class GenFlow extends BaseFlowBound{
 
     public GenFlow(Context context, int screenWidth, int screenHeight, File[] flowFile, int[] programLengths, boolean[] useFlows, int[] flowEffect) {
         super(context, screenWidth, screenHeight);
+        mFlowMap=new HashMap<>();
         this.flowFile = flowFile;
         this.programLengthArrays = programLengths;
         this.useFlows = useFlows;

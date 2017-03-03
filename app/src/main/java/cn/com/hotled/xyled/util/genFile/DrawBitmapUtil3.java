@@ -17,8 +17,6 @@ import cn.com.hotled.xyled.bean.Program;
 import cn.com.hotled.xyled.bean.TextContent;
 import cn.com.hotled.xyled.global.Global;
 
-import static android.graphics.Color.BLACK;
-
 /**
  * Created by Lam on 2017/2/24.
  */
@@ -28,7 +26,6 @@ public class DrawBitmapUtil3 {
     private TextContent mTextContent;
     private int mTextSize;
     private int mTextColor = Color.RED;
-    private int mTextBgColor = BLACK;
     private boolean isBold;
     private boolean isItalic;
     private boolean isUnderLine;
@@ -49,7 +46,6 @@ public class DrawBitmapUtil3 {
 
 
     public Bitmap drawBitmap() {
-        mTextBgColor = mTextContent.getTextBackgroudColor();
         mTextColor = mTextContent.getTextColor();
         mTextSize = mTextContent.getTextSize();
         isUnderLine = mTextContent.getIsUnderline();
@@ -66,9 +62,7 @@ public class DrawBitmapUtil3 {
     private Bitmap drawText() {
         Paint paint = new Paint();
         Canvas canvas = new Canvas();
-        StringBuilder sb = new StringBuilder();
-        sb.append(mTextContent.getText());
-
+        String text = mTextContent.getText();
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
         canvas.drawPaint(paint);
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
@@ -112,15 +106,12 @@ public class DrawBitmapUtil3 {
             paint.setUnderlineText(false);
         }
         paint.setTextAlign(Paint.Align.LEFT);
-        Bitmap bitmap = Bitmap.createBitmap(mWidth, mHeight, Bitmap.Config.ARGB_4444);
-        if (bitmap != null)
-            canvas.setBitmap(bitmap);
-
+        Bitmap bitmap =null;
         //画图时，分两种情况
         if (mTextContent.getTextEffect()<=Global.TEXT_EFFECT_STATIC){
             //左移右移和固定
             int tempWidth =0;
-            float drawWidth = computeWidth(sb.toString(), paint);
+            float drawWidth = computeWidth(text, paint);
             if (drawWidth > mWidth) {
                 tempWidth = (int) drawWidth;
             }else {
@@ -133,7 +124,10 @@ public class DrawBitmapUtil3 {
             }else if (mTextEffect== Global.TEXT_EFFECT_MOVE_LEFT
                     ||mTextEffect== Global.TEXT_EFFECT_MOVE_RIGHT){
                 tempWidth+=mWidth*2;//左移右移的加上两边过渡
-            }else { //静止显示的
+            }else if (mTextEffect==Global.TEXT_EFFECT_STATIC){
+                //静止显示的
+                tempWidth = mWidth;
+            } else {
                 tempWidth=mWidth;
             }
             bitmap = Bitmap.createBitmap(tempWidth, mHeight, Bitmap.Config.ARGB_4444);
@@ -144,37 +138,65 @@ public class DrawBitmapUtil3 {
             //文本
             switch (mTextEffect){
                 case Global.TEXT_EFFECT_MOVE_LEFT:
-                    canvas.drawText(sb.toString(), mBaseX+mWidth, mBaseY, paint);
+                    canvas.drawText(text, mBaseX+mWidth, mBaseY, paint);
                     break;
                 case Global.TEXT_EFFECT_MOVE_RIGHT:
+                    StringBuilder sb = new StringBuilder();
+                    for (int i = text.length()-1; i >=0 ; i--) {
+                        String substring = text.substring(i, i + 1);
+                        sb.append(substring);
+                    }
+                    canvas.drawText(sb.toString(), mBaseX+mWidth, mBaseY, paint);
                     break;
                 case Global.TEXT_EFFECT_APPEAR_MOVE_LEFT:
-                    canvas.drawText(sb.toString(), mBaseX, mBaseY, paint);
+                    canvas.drawText(text, mBaseX, mBaseY, paint);
                     break;
                 case Global.TEXT_EFFECT_APPEAR_MOVE_RIGHT:
-                    canvas.drawText(sb.toString(), mBaseX, mBaseY, paint);
+                    StringBuilder sbRight = new StringBuilder();
+                    for (int i = text.length()-1; i >=0 ; i--) {
+                        String substring = text.substring(i, i+1);
+                        sbRight.append(substring);
+                    }
+                    canvas.drawText(sbRight.toString(), mBaseX+mWidth, mBaseY, paint);
                     break;
                 case Global.TEXT_EFFECT_STATIC://这里应该居中显示
-                    canvas.drawText(sb.toString(), mBaseX, mBaseY, paint);
+                    paint.setTextAlign(Paint.Align.CENTER);
+                    canvas.drawText(text, tempWidth/2, mBaseY, paint);
                     break;
             }
         }else {
             //上下移动
-                //文本
+
             if (mTextContent.getText()!=null){
                 TextPaint textPaint =new TextPaint();
                 textPaint.set(paint);
-                StaticLayout currentLayout = new StaticLayout(mTextContent.getText(), textPaint, mWidth, Layout.Alignment.ALIGN_NORMAL, 1.0f, 0f, false);
+                StaticLayout currentLayout = null;
+                switch (mTextEffect){
+                    case Global.TEXT_EFFECT_MOVE_UP:
+                        currentLayout = new StaticLayout(text, textPaint, mWidth, Layout.Alignment.ALIGN_CENTER, 1.0f, 0f, false);
+                        break;
+                    case Global.TEXT_EFFECT_MOVE_DOWN:
+                        StringBuilder sb = new StringBuilder();
+                        for (int i = text.length()-1; i >=0 ; i--) {
+                            String substring = text.substring(i, i + 1);
+                            sb.append(substring);
+                        }
+                        currentLayout = new StaticLayout(sb.toString(), textPaint, mWidth, Layout.Alignment.ALIGN_CENTER, 1.0f, 0f, false);
+                        break;
+                }
                 int height = currentLayout.getHeight();
                 if (height<=mHeight){
                     height=mHeight;
                 }
+                //加上过渡
+                height+=mHeight*2;
                 bitmap = Bitmap.createBitmap(mWidth, height, Bitmap.Config.ARGB_4444);
                 if (bitmap != null)
                     canvas.setBitmap(bitmap);
                 //背景
                 drawBgColor(mWidth,height,canvas);
-                canvas.translate(0,0);//从(x,y)开始画
+                canvas.translate(0,mHeight);//从(x,y)开始画
+                //文本
                 currentLayout.draw(canvas);
             }
         }

@@ -12,13 +12,10 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.InputType;
@@ -27,7 +24,6 @@ import android.text.StaticLayout;
 import android.text.TextPaint;
 import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -56,28 +52,25 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import cn.com.hotled.xyled.App;
 import cn.com.hotled.xyled.R;
-import cn.com.hotled.xyled.adapter.TypefaceAdapter;
 import cn.com.hotled.xyled.bean.Program;
 import cn.com.hotled.xyled.bean.TextContent;
-import cn.com.hotled.xyled.bean.TypefaceFile;
 import cn.com.hotled.xyled.dao.ProgramDao;
 import cn.com.hotled.xyled.dao.TextContentDao;
-import cn.com.hotled.xyled.decoration.WifiItemDecoration;
 import cn.com.hotled.xyled.global.Global;
 import cn.com.hotled.xyled.util.android.DensityUtil;
 import cn.com.hotled.xyled.view.PhotoView;
 import cn.com.hotled.xyled.view.numberpicker.NumberPicker;
 
-public class ChangeLineTextActivity extends BaseActivity implements View.OnClickListener,AdapterView.OnItemSelectedListener {
+public class ChangeLineTextActivity extends BaseActivity implements View.OnClickListener,AdapterView.OnItemSelectedListener,SeekBar.OnSeekBarChangeListener {
 
     private static final int SELECT_FLOW_CODE = 202;
+    private static final int SELECT_FONT_CODE = 303;
     @BindView(R.id.pv_fgText_photo)
     PhotoView mPhotoView;
     @BindView(R.id.et_fgText_input)
@@ -114,8 +107,6 @@ public class ChangeLineTextActivity extends BaseActivity implements View.OnClick
     ImageButton ib_inCenter;
     @BindView(R.id.ib_fgText_trainY)
     ImageButton ib_trainY;
-    @BindView(R.id.iv_fgText_setTime)
-    ImageView iv_setTime;
     @BindView(R.id.spn_fgText_textEffect)
     Spinner spnTextEffect;
     @BindView(R.id.rl_fgText_flowLayout)
@@ -124,12 +115,20 @@ public class ChangeLineTextActivity extends BaseActivity implements View.OnClick
     ImageView iv_setFlowStyle;
     @BindView(R.id.spn_fgText_flowShowEffect)
     Spinner spn_setFlowEffect;
-    @BindView(R.id.bt_fgText_flowShowSpeed)
-    Button bt_setFlowSpeed;
+    @BindView(R.id.spn_fgText_flowShowSpeed)
+    Spinner spn_setFlowSpeed;
     @BindView(R.id.sw_openFlow)
     Switch swOpenFlow;
     @BindView(R.id.ll_fgText_setFlow)
     LinearLayout llSetFlow;
+    @BindView(R.id.sb_fgText_stayTime)
+    SeekBar sb_stayTime;
+    @BindView(R.id.sb_fgText_speed)
+    SeekBar sb_speed;
+    @BindView(R.id.tv_fgText_showSpeed)
+    TextView tv_showSpeed;
+    @BindView(R.id.tv_fgText_showStaytime)
+    TextView tv_showStaytime;
 
     private Canvas canvas;
     private Bitmap targetBitmap;
@@ -140,18 +139,13 @@ public class ChangeLineTextActivity extends BaseActivity implements View.OnClick
     private int mBaseX;
     private int mBaseY;
     private TextContent mTextContent;
-    private TypefaceAdapter typefaceAdapter;
-    private float mFrameTime;
-    private float mStayTime;
     private long mProgramId;
-    private TextContentDao mTextButtonDao;
+    private TextContentDao mTextContentDao;
     private boolean isLoadData;
     private boolean isWarnShowed;
     private ProgramDao mProgramDao;
     private Program mProgram;
     private Bitmap mFlowBitmap;
-    private File mSelectedFontFile;
-    private boolean mIsTranslated;
 
 
     @Override
@@ -175,13 +169,13 @@ public class ChangeLineTextActivity extends BaseActivity implements View.OnClick
         mTextContent.setTextBackgroudColor(Color.BLACK);
 
         mProgramId = getIntent().getLongExtra("programId", -1);
-        mTextButtonDao = ((App) getApplication()).getDaoSession().getTextContentDao();
+        mTextContentDao = ((App) getApplication()).getDaoSession().getTextContentDao();
         mProgramDao = ((App) getApplication()).getDaoSession().getProgramDao();
         List<Program> programList=null;
         List<TextContent> textContentsList = null;
         if (mProgramId!=-1) {
             programList = mProgramDao.queryBuilder().where(ProgramDao.Properties.Id.eq(mProgramId)).list();
-            textContentsList = mTextButtonDao.queryBuilder().where(TextContentDao.Properties.ProgramId.eq(mProgramId)).list();
+            textContentsList = mTextContentDao.queryBuilder().where(TextContentDao.Properties.ProgramId.eq(mProgramId)).list();
         }
 
         if (programList!=null&&programList.size()==1){
@@ -201,8 +195,15 @@ public class ChangeLineTextActivity extends BaseActivity implements View.OnClick
             }
             mBaseX = mProgram.getBaseX();
 
-            mFrameTime=mProgram.getFrameTime();
-            mStayTime = mProgram.getStayTime();
+            float frameTime=mProgram.getFrameTime();
+            float stayTime = mProgram.getStayTime();
+            frameTime /=2;
+            frameTime --;
+            frameTime *=5;
+            sb_speed.setProgress((int) frameTime);
+            stayTime--;
+            stayTime *=10;
+            sb_stayTime.setProgress((int) stayTime);
             spn_setFlowEffect.setSelection(mProgram.getFlowEffect());
             if (textContentsList!=null&&textContentsList.size()==1&&textContentsList.get(0)!=null){
 
@@ -231,6 +232,9 @@ public class ChangeLineTextActivity extends BaseActivity implements View.OnClick
                 }
                 //读取完后绘图
                 drawText();
+            }else {
+                sb_speed.setProgress(50);
+                sb_stayTime.setProgress(50);
             }
             swOpenFlow.setChecked(mProgram.getUseFlowBound());
             if (swOpenFlow.isChecked()) {
@@ -267,7 +271,6 @@ public class ChangeLineTextActivity extends BaseActivity implements View.OnClick
 
 
     private void initOnclickEven() {
-        iv_setTime.setOnClickListener(this);
         mBt_textSize.setOnClickListener(this);
         mBt_setFont.setOnClickListener(this);
         ib_setBold.setOnClickListener(this);
@@ -287,8 +290,10 @@ public class ChangeLineTextActivity extends BaseActivity implements View.OnClick
         spnTextEffect.setOnItemSelectedListener(this);
         rlSelectFlow.setOnClickListener(this);
         spn_setFlowEffect.setOnItemSelectedListener(this);
-        bt_setFlowSpeed.setOnClickListener(this);
+        spn_setFlowSpeed.setOnItemSelectedListener(this);
         swOpenFlow.setOnClickListener(this);
+        sb_stayTime.setOnSeekBarChangeListener(this);
+        sb_speed.setOnSeekBarChangeListener(this);
     }
 
     private void initPhotoView() {
@@ -403,27 +408,55 @@ public class ChangeLineTextActivity extends BaseActivity implements View.OnClick
         }
         //画图时，分两种情况
         if (mTextContent.getTextEffect()<=Global.TEXT_EFFECT_STATIC){
-            //左移右移和固定
-            if (drawWidth>mScreenWidth) {
-                int width = (int) drawWidth;
-                targetBitmap = Bitmap.createBitmap(width, mScreenHeight, Bitmap.Config.ARGB_4444);
+            //固定
+            if (mTextContent.getTextEffect()==Global.TEXT_EFFECT_STATIC){
+                targetBitmap = Bitmap.createBitmap(mScreenWidth, mScreenHeight, Bitmap.Config.ARGB_4444);
                 if (targetBitmap != null)
                     canvas.setBitmap(targetBitmap);
                 mPhotoView.setImageBitmap(targetBitmap);
+                //背景
+                drawBgColor(drawWidth,mScreenHeight);
+                //文本
+                paint.setTextAlign(Paint.Align.CENTER);
+                canvas.drawText(mTextContent.getText(), mScreenWidth/2, mBaseY, paint);
+            }else {//左移右移
+                if (drawWidth>mScreenWidth) {
+                    int width = (int) drawWidth;
+                    targetBitmap = Bitmap.createBitmap(width, mScreenHeight, Bitmap.Config.ARGB_4444);
+                    if (targetBitmap != null)
+                        canvas.setBitmap(targetBitmap);
+                    mPhotoView.setImageBitmap(targetBitmap);
+                }
+                //背景
+                drawBgColor(drawWidth,mScreenHeight);
+                //文本
+                if (mTextContent.getText()!=null&& !TextUtils.isEmpty(mTextContent.getText())) {
+                    canvas.drawText(mTextContent.getText(),tempBaseX,tempBaseY,paint);
+                }
             }
-            //背景
-            drawBgColor(drawWidth,mScreenHeight);
-            //文本
-            if (mTextContent.getText()!=null&& !TextUtils.isEmpty(mTextContent.getText())) {
-                canvas.drawText(mTextContent.getText(),tempBaseX,tempBaseY,paint);
-            }
+
         }else {
             //上下移动
             //文本
             if (mTextContent.getText()!=null){
                 TextPaint textPaint =new TextPaint();
                 textPaint.set(paint);
-                StaticLayout currentLayout = new StaticLayout(mTextContent.getText(), textPaint, mScreenWidth, Layout.Alignment.ALIGN_NORMAL, 1.0f, 0f, false);
+                //Layout.Alignment.ALIGN_CENTER 表明居中
+                StaticLayout currentLayout = null;
+                switch (mTextContent.getTextEffect()){
+                    case Global.TEXT_EFFECT_MOVE_UP:
+                        currentLayout = new StaticLayout(mTextContent.getText(), textPaint, mScreenWidth, Layout.Alignment.ALIGN_CENTER, 1.0f, 0f, false);
+                        break;
+                    case Global.TEXT_EFFECT_MOVE_DOWN:
+                        StringBuilder sb = new StringBuilder();
+                        for (int i = mTextContent.getText().length()-1; i >=0 ; i--) {
+                            String substring = mTextContent.getText().substring(i, i + 1);
+                            sb.append(substring);
+                        }//如果是下移的话就倒叙文字
+                        currentLayout = new StaticLayout(sb.toString(), textPaint, mScreenWidth, Layout.Alignment.ALIGN_CENTER, 1.0f, 0f, false);
+                        break;
+                }
+
                 int height = currentLayout.getHeight();
                 if (height>=3072) {
                     if (!isWarnShowed) {
@@ -439,19 +472,11 @@ public class ChangeLineTextActivity extends BaseActivity implements View.OnClick
                 mPhotoView.setImageBitmap(targetBitmap);
                 //背景
                 drawBgColor(mScreenWidth,height);
-                canvas.translate(translateCount,translateCount);//从(x,y)开始画
-                if (translateCount!=0)
-                    mIsTranslated = true;
                 currentLayout.draw(canvas);
             }
         }
         if (mFlowBitmap!=null&&mProgram.getUseFlowBound()){
         //流水边框
-            //移动回来，负数代表向左移，上移
-            if (mIsTranslated){
-                canvas.translate(-translateCount,-translateCount);
-                mIsTranslated=false;
-            }
             drawFlowBound();
         }
 
@@ -466,7 +491,6 @@ public class ChangeLineTextActivity extends BaseActivity implements View.OnClick
             for (int i = 0; i < widths.length; i++) {
                 drawWidth+=widths[i];
             }
-            Log.i("advance", "computeWidth:drawWidth "+drawWidth);
         }
 
         //为了避免OOM，bitmap的最大宽度设置为2048,bitmap的最大尺寸为4096*4096
@@ -677,65 +701,6 @@ public class ChangeLineTextActivity extends BaseActivity implements View.OnClick
         drawText();
     }
 
-    private void setFrameTime() {
-        View view = LayoutInflater.from(this).inflate(R.layout.content_setframetime, null);
-        SeekBar sb_speed = (SeekBar) view.findViewById(R.id.sb_frameTime_speed);
-        final TextView tv_speed = (TextView) view.findViewById(R.id.tv_frameTime_speed);
-        SeekBar sb_stay = (SeekBar) view.findViewById(R.id.sb_frameTime_stayTime);
-        final TextView tv_stayTime = (TextView) view.findViewById(R.id.tv_frameTime_stayTime);
-        final float[] frameTime = {0};
-        final float[] stayTime = {0};
-
-        sb_speed.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                int i = (progress * 20);
-                tv_speed.setText("速度:"+i+"ms/帧");
-                frameTime[0] = (float) (progress*2.56);
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-
-            }
-        });
-
-        sb_stay.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                int i = progress*20;
-                tv_stayTime.setText("停留时间:"+i+"ms");
-                stayTime[0] = (float) (progress*2.56);
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-            }
-        });
-        sb_speed.setProgress((int) (getFrameTime()/2.56));
-        sb_stay.setProgress((int) (getStayTime()/2.56));
-
-        new AlertDialog.Builder(this)
-                .setTitle("设置时间")
-                .setView(view)
-                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        mFrameTime = frameTime[0];
-                        mStayTime = stayTime[0];
-                    }
-                })
-                .show();
-    }
 
     private void setUnderLine() {
         mTextContent.setIsUnderline(!mTextContent.getIsUnderline());
@@ -767,62 +732,6 @@ public class ChangeLineTextActivity extends BaseActivity implements View.OnClick
         drawText();
     }
 
-    private void setFont() {
-        File file =new File("/system/fonts");
-        File[] files = file.listFiles();
-        File downloadFontDir = new File(Environment.getExternalStorageDirectory()+"/fonts/xyledfonts");
-        if (!downloadFontDir.exists()){
-            downloadFontDir.mkdir();
-        }
-        File[] downloadFonts = downloadFontDir.listFiles();
-        final List<TypefaceFile> fileList=new ArrayList<>();
-        if(downloadFonts!=null)
-            for (File downloadFont : downloadFonts) {
-                fileList.add(new TypefaceFile(downloadFont,false));
-            }
-        for (int i=0;i<files.length;i++){
-            String name = files[i].getName();
-            if(name.contains("-Regular")&&!name.contains("MiuiEx")){
-                fileList.add(new TypefaceFile(files[i],false));
-            }
-        }
-        View view = LayoutInflater.from(this).inflate(R.layout.typeface_list, null);
-        RecyclerView typefaceRecycler = (RecyclerView) view.findViewById(R.id.typeFaceListView);
-        typefaceRecycler.setLayoutManager(new LinearLayoutManager(this));
-        typefaceAdapter = new TypefaceAdapter(fileList, this);
-        typefaceRecycler.setAdapter(typefaceAdapter);
-        typefaceRecycler.addItemDecoration(new WifiItemDecoration(this,WifiItemDecoration.VERTICAL_LIST));
-        mSelectedFontFile = null;
-        typefaceAdapter.setOnItemClickListener(new TypefaceAdapter.OnItemOnClickListener() {
-            @Override
-            public void onItemClick(View view, int position) {
-                //1.先获取选择了哪个字体
-                mSelectedFontFile = fileList.get(position).getFile();
-                mTextContent.setTypeface(fileList.get(position).getFile());
-            }
-        });
-
-
-        new AlertDialog.Builder(this)
-                .setTitle("Choose Typeface")
-                .setView(view)
-                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        if (mSelectedFontFile!=null){
-                            mTextContent.setTypeface(mSelectedFontFile);
-                            int lastIndexOf = mSelectedFontFile.getName().lastIndexOf(".");
-                            String fontFile = mSelectedFontFile.getName().substring(0, lastIndexOf);
-                            mBt_setFont.setText(fontFile);
-                            dialog.dismiss();
-                            drawText();
-                        }
-
-                    }
-                })
-                .setNegativeButton("cancle",null)
-                .show();
-    }
 
     private void setTextSize(){
         View outerView = LayoutInflater.from(this).inflate(R.layout.wheel_view, null);
@@ -852,7 +761,8 @@ public class ChangeLineTextActivity extends BaseActivity implements View.OnClick
                 setTextSize();
                 break;
             case R.id.bt_fgText_font: //字体
-                setFont();
+                Intent intent = new Intent(this,SelectFontActivity.class);
+                startActivityForResult(intent,SELECT_FONT_CODE);
                 break;
             case R.id.ib_fgText_setBold:
                 setBold();
@@ -862,9 +772,6 @@ public class ChangeLineTextActivity extends BaseActivity implements View.OnClick
                 break;
             case R.id.ib_fgText_setUnderLine:
                 setUnderLine();
-                break;
-            case R.id.iv_fgText_setTime:
-                setFrameTime();
                 break;
             case R.id.ib_fgText_textColorRed:
                 setTextColor(Color.RED);
@@ -905,9 +812,7 @@ public class ChangeLineTextActivity extends BaseActivity implements View.OnClick
             case R.id.rl_fgText_flowLayout:
                 startActivityForResult(new Intent(this,SelectFlowActivity.class),SELECT_FLOW_CODE);
                 break;
-            case R.id.bt_fgText_flowShowSpeed:
 
-                break;
         }
     }
 
@@ -938,17 +843,6 @@ public class ChangeLineTextActivity extends BaseActivity implements View.OnClick
         }
     }
 
-    public float getFrameTime() {
-        if (mFrameTime==0)
-            return 20;
-        return mFrameTime;
-    }
-
-    public float getStayTime() {
-        if (mStayTime==0)
-            return mFrameTime;//如果staytime没有设置，则与帧速一致
-        return mStayTime;
-    }
 
     public Bitmap getTargetBitmap() {
         return targetBitmap;
@@ -958,10 +852,19 @@ public class ChangeLineTextActivity extends BaseActivity implements View.OnClick
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode==RESULT_OK&&requestCode==SELECT_FLOW_CODE){
-            String fileName = data.getStringExtra("fileName");
+            String fileName = data.getStringExtra(Global.EXTRA_SELECT_FLOW);
             mProgram.setFlowBoundFile(new File(fileName));
             setFlowBound(fileName,true,true);
-
+        }else if (resultCode==RESULT_OK&&requestCode==SELECT_FONT_CODE){
+            String fileName = data.getStringExtra(Global.EXTRA_SELECT_FONT);
+            File fontFile = new File(fileName);
+            if (fontFile.exists()){
+                mTextContent.setTypeface(fontFile);
+                int lastIndexOf = fontFile.getName().lastIndexOf(".");
+                String fontFileName = fontFile.getName().substring(0, lastIndexOf);
+                mBt_setFont.setText(fontFileName);
+                drawText();
+            }
         }
     }
 
@@ -995,14 +898,11 @@ public class ChangeLineTextActivity extends BaseActivity implements View.OnClick
     public void onBackPressed() {
         if (mTextContent.getId()==0)
             mTextContent.setId(System.currentTimeMillis()*2);
-        mTextContent.setProgramId(mProgramId);
-        mTextButtonDao.insertOrReplaceInTx(mTextContent);
+        mTextContent.setProgramId(mProgram.getId());
+        mTextContentDao.insertOrReplace(mTextContent);
         mProgram.setBaseY(mBaseY);
         mProgram.setBaseX(mBaseX);
-        mProgram.setStayTime(getStayTime());
-        mProgram.setFrameTime(getFrameTime());
         mProgramDao.insertOrReplace(mProgram);
-
         ChangeLineTextActivity.super.onBackPressed();
     }
 
@@ -1058,22 +958,51 @@ public class ChangeLineTextActivity extends BaseActivity implements View.OnClick
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        if (parent.getId()==R.id.spn_fgText_textEffect){
-            if (mTextContent.getTextEffect()<= Global.TEXT_EFFECT_STATIC&&position>Global.TEXT_EFFECT_STATIC) {
+        switch (parent.getId()) {
+            case R.id.spn_fgText_flowShowSpeed:
+                mProgram.setFlowSpeed(position);
+                break;
+            case R.id.spn_fgText_textEffect:
                 mTextContent.setTextEffect(position);
                 drawText();
-            }else if (mTextContent.getTextEffect()> Global.TEXT_EFFECT_STATIC&&position<=Global.TEXT_EFFECT_STATIC){
-                mTextContent.setTextEffect(position);
-                drawText();
-            }
-        }else if (parent.getId()==R.id.spn_fgText_flowShowEffect){
-            mProgram.setFlowEffect(position);
+                break;
+            case R.id.spn_fgText_flowShowEffect:
+                mProgram.setFlowEffect(position);
+                break;
         }
 
     }
 
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
+
+    }
+
+    @Override
+    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+            switch (seekBar.getId()) {
+                case R.id.sb_fgText_speed:
+                    int i = progress/5 +1;
+                    tv_showSpeed.setText(i+"");
+                    mProgram.setFrameTime(i*2);
+                    break;
+                case R.id.sb_fgText_stayTime:
+                    int second = progress/10 + 1;
+                    tv_showStaytime.setText(second+" s");
+                    mProgram.setStayTime(second);
+                    break;
+
+            }
+
+    }
+
+    @Override
+    public void onStartTrackingTouch(SeekBar seekBar) {
+
+    }
+
+    @Override
+    public void onStopTrackingTouch(SeekBar seekBar) {
 
     }
 }

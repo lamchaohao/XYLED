@@ -23,7 +23,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -162,11 +161,9 @@ public class ConnectFragment extends Fragment {
         WifiConfiguration exsitsConfig = mWifiAdmin.isExsits(mWifiList.get(position).SSID);//这里的SSID 打印出来没有双引号包括
         if (exsitsConfig!=null){
             // 1.已连接过，直接使用该配置进行连接
-            Log.i("connecAct","已连接过，直接使用该配置进行连接");
             mWifiAdmin.setMaxPriority(exsitsConfig);//已经连接过的，需要设置优先级为最大的才能连上
             mWifiAdmin.connectWifi(exsitsConfig.networkId);
         }else {
-            Log.i("connecAct","使用密码连接");
             WifiConfiguration wifiInfo2 = mWifiAdmin.createWifiInfo2(mWifiList.get(position), Global.CARD_PASSWORD);
             mWifiAdmin.addNetWork(wifiInfo2);
         }
@@ -231,7 +228,6 @@ public class ConnectFragment extends Fragment {
                         mTvState.setText("已断开");
                     }
 
-                    Log.i("connecAct","networkInfo.getState()="+networkInfo.getState());
                     // 刷新状态显示
                     refreshWifiList();
                 }

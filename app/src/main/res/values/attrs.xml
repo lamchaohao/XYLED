@@ -73,5 +73,4 @@
         <attr name="np_wheelItemCount" format="integer" />
         <attr name="np_wrapSelectorWheel" format="boolean" />
     </declare-styleable>
-
 </resources>
