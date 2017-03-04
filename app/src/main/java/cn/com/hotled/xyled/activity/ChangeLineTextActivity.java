@@ -184,7 +184,7 @@ public class ChangeLineTextActivity extends BaseActivity implements View.OnClick
             //新增的节目的话就是0，所以让其居中
             if (mProgram.getBaseY()==0) {
                 if (mScreenHeight==32) {
-                    mBaseY=24;
+                    mBaseY=28;
                 }else if (mScreenHeight==64){
                     mBaseY=57;
                 }else {
@@ -205,6 +205,7 @@ public class ChangeLineTextActivity extends BaseActivity implements View.OnClick
             stayTime *=10;
             sb_stayTime.setProgress((int) stayTime);
             spn_setFlowEffect.setSelection(mProgram.getFlowEffect());
+            spn_setFlowSpeed.setSelection(mProgram.getFlowSpeed());
             if (textContentsList!=null&&textContentsList.size()==1&&textContentsList.get(0)!=null){
 
                 mTextContent = textContentsList.get(0);
@@ -987,7 +988,7 @@ public class ChangeLineTextActivity extends BaseActivity implements View.OnClick
                     mProgram.setFrameTime(i*2);
                     break;
                 case R.id.sb_fgText_stayTime:
-                    int second = progress/10 + 1;
+                    int second = progress/10;
                     tv_showStaytime.setText(second+" s");
                     mProgram.setStayTime(second);
                     break;

@@ -21,6 +21,9 @@ import cn.com.hotled.xyled.bean.ProgramType;
 import cn.com.hotled.xyled.bean.TextContent;
 import cn.com.hotled.xyled.flowbound.GenFlow;
 import cn.com.hotled.xyled.global.Global;
+import cn.com.hotled.xyled.util.timeaxis.MoveDown;
+import cn.com.hotled.xyled.util.timeaxis.MoveRight;
+import cn.com.hotled.xyled.util.timeaxis.MoveUp;
 
 import static cn.com.hotled.xyled.util.genFile.ByteUtil.intToByteArray;
 import static cn.com.hotled.xyled.util.genFile.ByteUtil.setInbyteArray;
@@ -344,7 +347,7 @@ public class GenFileUtil2 {
      */
     private void setTextProgramTimeAxis(int textProgramIndex) {
         int frameOfThisProgram=mFrameCountArrays[textProgramIndex];
-        Log.i("genfile2","frameOfThis=="+frameOfThisProgram+",textProgramIndex="+textProgramIndex+",frameOfThisProgram="+frameOfThisProgram);
+        Log.i("genfile2","frameOfThis=="+frameOfThisProgram+",textProgramIndex="+textProgramIndex);
         //流水边所占空间 用于计算文字地址
         int flowBoundslength = 0;
         for (byte[] bytes : mFlowByteList) {
@@ -357,14 +360,26 @@ public class GenFileUtil2 {
         }
         //文字地址  6*(mTextAttrsList.size()+1)加1代表把图片的文字属性加入
         int textContentAddressInt = FIRST_PRAT_LENGTH + 6*(mTextAttrsList.size()+1) +mBlackBG.length+ pictureLength +flowBoundslength ;
-
+        Program program = mTextProgramList.get(textProgramIndex);
         switch (mTextContentList.get(textProgramIndex).getTextEffect()){
             case Global.TEXT_EFFECT_APPEAR_MOVE_LEFT:
                 setMoveLeftTimeAxis(textContentAddressInt,textProgramIndex,frameOfThisProgram, mHorizontalIndex,flowBoundslength);
+//                byte[] attrAddress = getAttrAddress(textProgramIndex);
+//                MoveLeft moveLeft = new MoveLeft(program,mFlowMap,mFlowByteList,mTimeAxisList,mColbyteCountIndicator,mColByteCountList,mTextFrameIndicator,mFrameCount,attrAddress);
+//                moveLeft.setTimeAxis(textContentAddressInt,frameOfThisProgram,mHorizontalIndex,flowBoundslength);
+//                mColbyteCountIndicator = moveLeft.getColbyteCountIndicator();
+//                mFrameCount = moveLeft.getFrameCount();
+//                mTextFrameIndicator = moveLeft.getTextFrameIndicator();
                 mHorizontalIndex++;
                 break;
             case Global.TEXT_EFFECT_MOVE_LEFT:
                 setMoveLeftTimeAxis(textContentAddressInt,textProgramIndex,frameOfThisProgram, mHorizontalIndex,flowBoundslength);
+//                byte[] attrAddress2 = getAttrAddress(textProgramIndex);
+//                MoveLeft moveLeft2 = new MoveLeft(program,mFlowMap,mFlowByteList,mTimeAxisList,mColbyteCountIndicator,mColByteCountList,mTextFrameIndicator,mFrameCount,attrAddress2);
+//                moveLeft2.setTimeAxis(textContentAddressInt,frameOfThisProgram,mHorizontalIndex,flowBoundslength);
+//                mColbyteCountIndicator = moveLeft2.getColbyteCountIndicator();
+//                mFrameCount = moveLeft2.getFrameCount();
+//                mTextFrameIndicator = moveLeft2.getTextFrameIndicator();
                 mHorizontalIndex++;
                 break;
             case Global.TEXT_EFFECT_APPEAR_MOVE_RIGHT:
@@ -372,7 +387,14 @@ public class GenFileUtil2 {
                 mHorizontalIndex++;
                 break;
             case Global.TEXT_EFFECT_MOVE_RIGHT:
-                setMoveRightTimeAxis(textContentAddressInt,textProgramIndex,frameOfThisProgram, mHorizontalIndex,flowBoundslength);
+                byte[] attrAddress2 = getAttrAddress(textProgramIndex);
+                Integer screenwidth = mTextScreenWidthList.get(textProgramIndex);
+                MoveRight moveRight = new MoveRight(program,mFlowMap,mFlowByteList,mTimeAxisList,mColbyteCountIndicator,mColByteCountList,mTextFrameIndicator,mFrameCount,attrAddress2);
+                moveRight.setTimeAxis(textContentAddressInt,frameOfThisProgram,mHorizontalIndex,flowBoundslength,screenwidth);
+                mColbyteCountIndicator = moveRight.getColbyteCountIndicator();
+                mFrameCount = moveRight.getFrameCount();
+                mTextFrameIndicator = moveRight.getTextFrameIndicator();
+//                setMoveRightTimeAxis(textContentAddressInt,textProgramIndex,frameOfThisProgram, mHorizontalIndex,flowBoundslength);
                 mHorizontalIndex++;
                 break;
             case Global.TEXT_EFFECT_STATIC:
@@ -380,11 +402,25 @@ public class GenFileUtil2 {
                 mHorizontalIndex++;
                 break;
             case Global.TEXT_EFFECT_MOVE_UP:
-                setMoveUpTimeAxis(textContentAddressInt,textProgramIndex,frameOfThisProgram, mVerticalIndex,flowBoundslength);
+//                setMoveUpTimeAxis(textContentAddressInt,textProgramIndex,frameOfThisProgram, mVerticalIndex,flowBoundslength);
+                byte[] attrAddress = getAttrAddress(textProgramIndex);
+                Integer screenHeight = mTextScreenWidthList.get(textProgramIndex);
+                MoveUp moveUp = new MoveUp(program,mFlowMap,mFlowByteList,mTimeAxisList,mVerticalAddressIndicator,mVerticalTextFrameCountList,mHorizontalTextByteList,mTextFrameIndicator,mFrameCount,attrAddress);
+                moveUp.setTimeAxis(textContentAddressInt,frameOfThisProgram,mVerticalIndex,flowBoundslength,screenHeight);
+                mFrameCount = moveUp.getFrameCount();
+                mTextFrameIndicator = moveUp.getTextFrameIndicator();
+                mVerticalAddressIndicator = moveUp.getVerticalAddressIndicator();
                 mVerticalIndex++;
                 break;
             case Global.TEXT_EFFECT_MOVE_DOWN:
-                setMoveDownTimeAxis(textContentAddressInt,textProgramIndex,frameOfThisProgram, mVerticalIndex,flowBoundslength);
+//                setMoveDownTimeAxis(textContentAddressInt,textProgramIndex,frameOfThisProgram, mVerticalIndex,flowBoundslength);
+                byte[] attrAddressDown = getAttrAddress(textProgramIndex);
+                Integer screenHeightDown = mTextScreenWidthList.get(textProgramIndex);
+                MoveDown moveDown = new MoveDown(program,mFlowMap,mFlowByteList,mTimeAxisList,mVerticalAddressIndicator,mVerticalTextFrameCountList,mHorizontalTextByteList,mTextFrameIndicator,mFrameCount,attrAddressDown);
+                moveDown.setTimeAxis(textContentAddressInt,frameOfThisProgram,mVerticalIndex,flowBoundslength,screenHeightDown);
+                mFrameCount = moveDown.getFrameCount();
+                mTextFrameIndicator = moveDown.getTextFrameIndicator();
+                mVerticalAddressIndicator = moveDown.getVerticalAddressIndicator();
                 mVerticalIndex++;
                 break;
         }
@@ -395,11 +431,16 @@ public class GenFileUtil2 {
     private void setMoveLeftTimeAxis(int textContentAddressInt, int textProgramIndex, int frameOfThisProgram,int horizontalIndex,int flowBoundslength){
         //文字属性地址
         byte[] attrAddress = getAttrAddress(textProgramIndex);
-        float frameTime = mTextProgramList.get(textProgramIndex).getFrameTime();
-        for (int i = 0; i < frameOfThisProgram; i++){
-            byte[] timeAxis = new byte[16];
-            timeAxis[0] = (byte) frameTime;
-            timeAxis[1] = 0;
+        Program programOfThis = mTextProgramList.get(textProgramIndex);
+        float frameTime = programOfThis.getFrameTime();
+        float stayTime = programOfThis.getStayTime();
+        //流水边速度
+        int flowSpeed = programOfThis.getFlowSpeed();
+        //先获取所有的流水边地址
+        int[] flowAddress= new int[frameOfThisProgram];
+        //也获取所有的文字地址
+        int[] textAddress = new int[frameOfThisProgram];
+        for (int i = 0; i < frameOfThisProgram; i++) {
 
             if (i == 0 && horizontalIndex==0) {
                 mColbyteCountIndicator = 0;
@@ -410,6 +451,7 @@ public class GenFileUtil2 {
                 mColbyteCountIndicator += mColByteCountList.get(horizontalIndex)[i-1];
             }
             int tempTextAddress=textContentAddressInt+mColbyteCountIndicator;
+            textAddress[i] = tempTextAddress;
             //流水边地址
             int tempFlowadd=0;
             if (mFlowMap!=null) {
@@ -417,8 +459,43 @@ public class GenFileUtil2 {
                 for (int j = 0; flowIndex!=null&&j < flowIndex; j++) {
                     tempFlowadd+=mFlowByteList.get(j).length;
                 }
+                flowAddress[i]=tempFlowadd;
             }
-            int tempPicAddress= textContentAddressInt-flowBoundslength+tempFlowadd;
+            mTextFrameIndicator++;
+            //这一个非常重要！是防止出现字幕乱跳的必须
+            if (i==frameOfThisProgram-1){
+                //如果是节目的最后一帧，则压缩的mColbyteCountIndicator应该加上还没有的录入的
+                byte[] bytes = mColByteCountList.get(horizontalIndex);
+                for (int k = i+1; k < bytes.length; k++) {
+                    mColbyteCountIndicator+=bytes[k];
+                }
+            }
+        }
+
+        int flowIndicator = 0;
+        Integer screenWidth = mTextScreenWidthList.get(textProgramIndex);
+        for (int i = 0; i < frameOfThisProgram; i++){
+            byte[] timeAxis = new byte[16];
+            timeAxis[0] = (byte) frameTime;
+            timeAxis[1] = 0;
+            //文字地址
+            int tempTextAddress=textAddress[i];
+            //流水边地址
+            int tempPicAddress= 0;
+
+            if (flowSpeed==0){
+                tempPicAddress= textContentAddressInt-flowBoundslength+flowAddress[0]; //静止
+            }else {
+                if (i==0){
+                    flowIndicator = 0;
+                }else if (i%flowSpeed==0){
+                    flowIndicator++;
+                }
+                if (flowIndicator>=flowAddress.length){
+                    flowIndicator -=flowAddress.length;
+                }
+                tempPicAddress= textContentAddressInt-flowBoundslength+flowAddress[flowIndicator];//流水边地址
+            }
             byte[] picAddress = intToByteArray(tempPicAddress, 4);//当方式为跳向指定帧时这个地址是指向时间轴上的一个时间点(头0开始)
             byte[] textContentAddress = intToByteArray(tempTextAddress, 4);
             byte[] clockOrTem = new byte[3];
@@ -429,15 +506,34 @@ public class GenFileUtil2 {
             setInbyteArray(13, clockOrTem, timeAxis);
 
             mTimeAxisList.add(timeAxis);
-            mTextFrameIndicator++;
-            //这一个非常重要！是防止出现字幕乱跳的必须
-            if (i==frameOfThisProgram-1){
-                //如果是节目的最后一帧，则压缩的mTempColbyteCount应该加上还没有的录入的
-                byte[] bytes = mColByteCountList.get(horizontalIndex);
-                for (int k = i+1; k < bytes.length; k++) {
-                    mColbyteCountIndicator+=bytes[k];
+            if (i%screenWidth==0){
+                int stayFrame = (int) (stayTime*screenWidth/4);
+                for (int j = 0; j < stayFrame; j++) {
+                    byte[] timeAxisStay = new byte[16];
+                    timeAxisStay[0] = (byte) frameTime;
+                    timeAxisStay[1] = 0;
+                    if (flowSpeed==0){
+                        //nothing for avoid divide by zero
+                    } else if (j%flowSpeed==0){
+                        flowIndicator++;
+                    }
+                    if (flowIndicator>=flowAddress.length){
+                        flowIndicator -=flowAddress.length;
+                    }
+                    int stayPicAddress= textContentAddressInt-flowBoundslength+flowAddress[flowIndicator];
+                    byte[] staypicAddress = intToByteArray(stayPicAddress, 4);//当方式为跳向指定帧时这个地址是指向时间轴上的一个时间点(头0开始)
+                    byte[] staytextContentAddress = intToByteArray(tempTextAddress, 4);
+                    byte[] stayclockOrTem = new byte[3];
+
+                    setInbyteArray(2, staypicAddress, timeAxisStay);
+                    setInbyteArray(6, attrAddress, timeAxisStay);
+                    setInbyteArray(9, staytextContentAddress, timeAxisStay);
+                    setInbyteArray(13, stayclockOrTem, timeAxisStay);
+                    mTimeAxisList.add(timeAxisStay);
                 }
+                mFrameCount +=stayFrame;
             }
+
         }
     }
 
@@ -616,11 +712,12 @@ public class GenFileUtil2 {
         }
         int downIndicator = mVerticalAddressIndicator;
         //文字属性地址
+        float frameTime = mTextProgramList.get(textProgramIndex).getFrameTime();
         byte[] attrAddress = getAttrAddress(textProgramIndex);
         for (int i = frameOfThisProgram; i >= 0; i--) {
             int tempTextAddress = textContentAddressInt + horizontalLength;
             byte[] timeAxis = new byte[16];
-            timeAxis[0] = (byte) mTextProgramList.get(textProgramIndex).getFrameTime();
+            timeAxis[0] = (byte) frameTime;
             timeAxis[1] = 0;
 
             //文字地址

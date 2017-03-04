@@ -12,12 +12,12 @@
         android:background="#EEEEEE"
         android:transitionName="@string/shareNames"/>
 
-    <android.support.design.widget.TextInputLayout
-        android:layout_margin="5dp"
+    <FrameLayout
+        android:layout_margin="3dp"
         android:background="@color/colorPrimary"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-        <android.support.design.widget.TextInputEditText
+        <EditText
             android:layout_margin="3dp"
             android:id="@+id/et_fgText_input"
             android:hint="请输入文本"
@@ -25,7 +25,7 @@
             android:background="#FFFFFF"
             android:layout_width="match_parent"
             android:layout_height="70dp" />
-    </android.support.design.widget.TextInputLayout>
+    </FrameLayout>
 
     <include layout="@layout/content_textsetting"/>
 

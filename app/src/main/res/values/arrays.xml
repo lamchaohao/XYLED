@@ -15,6 +15,7 @@
         <item>逆时针</item>
     </array>
     <array name="flowSpeed">
+        <item>静 止</item>
         <item>速度 1</item>
         <item>速度 2</item>
         <item>速度 3</item>
