@@ -12,17 +12,10 @@ import static cn.com.hotled.xyled.util.genFile.ByteUtil.setInbyteArray;
  * Created by Lam on 2017/3/4.
  */
 
-public class MoveUp {
-    private Program mProgram;
-    private Map<Integer, Integer> mFlowMap;
-    private List<byte[]> mFlowByteList;
-    private List<byte[]> mTimeAxisList;
-    private int mVerticalAddressIndicator;
-    private List<List<Integer>> mVerticalTextFrameCountList;//记录每个上下移节目的每一帧有多少个字节的list的List
-    private List<byte[]> mHorizontalTextByteList;
-    private int mTextFrameIndicator;
-    private int mFrameCount;
-    private byte[] attrAddress;
+public class MoveUp extends BaseTimeAxis{
+
+    public MoveUp() {
+    }
 
     public MoveUp(Program program, Map<Integer, Integer> flowMap, List<byte[]> flowByteList, List<byte[]> timeAxisList, int verticalAddressIndicator, List<List<Integer>> verticalTextFrameCountList, List<byte[]> horizontalTextByteList, int textFrameIndicator, int frameCount, byte[] attrAddress) {
 
@@ -38,6 +31,7 @@ public class MoveUp {
         this.attrAddress = attrAddress;
     }
 
+    @Override
     public void setTimeAxis(int textContentAddressInt, int frameOfThisProgram, int verticalIndex, int flowBoundslength,int screenHeight){
         List<Integer> frameCountList = mVerticalTextFrameCountList.get(verticalIndex);
         int horizontalLength = 0;
@@ -147,14 +141,15 @@ public class MoveUp {
 
     }
 
-    public int getVerticalAddressIndicator() {
+    @Override
+    public int getAddressIndicator() {
         return mVerticalAddressIndicator;
     }
-
+    @Override
     public int getTextFrameIndicator() {
         return mTextFrameIndicator;
     }
-
+    @Override
     public int getFrameCount() {
         return mFrameCount;
     }

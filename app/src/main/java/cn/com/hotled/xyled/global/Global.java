@@ -17,6 +17,13 @@ public class Global {
     public static final String KEY_SCREEN_H="screenHeight";
     public static final String KEY_SCREEN_SCAN="screenScanCount";
     public static final String KEY_RGB_ORDER="rgb_order";
+    public static final String KEY_CARD_SERIES="cardSeries";
+    public static final String KEY_TRACE_SELECT="traceSelected";
+    public static final String KEY_DATA_ORIENTATION="dataOrientation";
+    public static final String KEY_SPECIAL="special";
+    public static final String KEY_DATA="data";
+    public static final String KEY_OE="OE";
+    public static final String KEY_138CODE="138code";
 
     //----------extra for activityResult------------
     public static final String EXTRA_SELECT_FONT= "fontFileName";

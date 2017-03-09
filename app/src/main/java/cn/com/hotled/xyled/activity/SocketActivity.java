@@ -18,6 +18,8 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -26,6 +28,8 @@ import cn.com.hotled.xyled.adapter.MessageAdapter;
 import cn.com.hotled.xyled.bean.SocketMessage;
 import cn.com.hotled.xyled.global.Global;
 import cn.com.hotled.xyled.util.android.WifiAdmin;
+
+import static cn.com.hotled.xyled.fragment.ScreenFragment.WIFI_ERRO;
 
 public class SocketActivity extends BaseActivity implements View.OnClickListener{
 
@@ -90,15 +94,45 @@ public class SocketActivity extends BaseActivity implements View.OnClickListener
             msgHandler.sendMessage(msg);
             return;
         }
-        String mac1 = macStr.substring(0, 2);
-        String mac2 = macStr.substring(2, 4);
-        String mac3 = macStr.substring(4, 6);
-        String mac4 = macStr.substring(6, 8);
+        String regEx = "[0-9a-fA-F]{6}";
+        Pattern pat = Pattern.compile(regEx);
+        Matcher mat = pat.matcher(macStr);
+        //旧的8位
+        String regExEight = "[0-9a-fA-F]{8}";
+        Pattern patEight = Pattern.compile(regExEight);
+        Matcher matcEight = patEight.matcher(macStr);
+        int macInt1 = 0;
+        int macInt2 = 0;
+        int macInt3 = 0;
+        int macInt4 = 0;
+        if(mat.matches()){
+            String mac0 = "80";
+            String mac1 = macStr.substring(0, 2);
+            String mac2 = macStr.substring(2, 4);
+            String mac3 = macStr.substring(4, 6);
 
-        int macInt1 = Integer.parseInt(mac1, 16);
-        int macInt2 = Integer.parseInt(mac2, 16);
-        int macInt3 = Integer.parseInt(mac3, 16);
-        int macInt4 = Integer.parseInt(mac4, 16);
+            macInt1 = Integer.parseInt(mac0, 16);
+            macInt2 = Integer.parseInt(mac1, 16);
+            macInt3 = Integer.parseInt(mac2, 16);
+            macInt4 = Integer.parseInt(mac3, 16);
+            Log.i("socketAct","six-matches="+macInt1+":"+macInt2+":"+macInt3+":"+macInt4);
+        }else if (matcEight.matches()){
+            String mac1 = macStr.substring(0, 2);
+            String mac2 = macStr.substring(2, 4);
+            String mac3 = macStr.substring(4, 6);
+            String mac4 = macStr.substring(6, 8);
+
+            macInt1 = Integer.parseInt(mac1, 16);
+            macInt2 = Integer.parseInt(mac2, 16);
+            macInt3 = Integer.parseInt(mac3, 16);
+            macInt4 = Integer.parseInt(mac4, 16);
+            Log.i("socketAct","eight-matches="+macInt1+":"+macInt2+":"+macInt3+":"+macInt4);
+        } else{
+            Message message = msgHandler.obtainMessage();
+            message.what=WIFI_ERRO;
+            msgHandler.sendMessage(message);
+            return;
+        }
 
         switch (v.getId()){
             case R.id.socket_pause:

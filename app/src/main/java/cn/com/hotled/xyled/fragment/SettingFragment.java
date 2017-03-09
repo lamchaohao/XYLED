@@ -10,8 +10,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import cn.com.hotled.xyled.R;
-import cn.com.hotled.xyled.activity.MutilConnectActivity;
-import cn.com.hotled.xyled.activity.ScreenSettingsActivity;
+import cn.com.hotled.xyled.activity.RemoteActivity;
+import cn.com.hotled.xyled.activity.SettingActivity;
 import cn.com.hotled.xyled.activity.SocketActivity;
 
 /**
@@ -46,21 +46,17 @@ public class SettingFragment extends Fragment {
         view.findViewById(R.id.ll_setting_screenConfig).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(getContext(), ScreenSettingsActivity.class));
+                startActivity(new Intent(getContext(), SettingActivity.class));
             }
         });
-        view.findViewById(R.id.ll_setting_language).setOnClickListener(new View.OnClickListener() {
+
+        view.findViewById(R.id.ll_setting_language).setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-//                new AlertDialog.Builder(getContext())
-//                        .setTitle("coming soon")
-//                        .setMessage("正在开发")
-//                        .setPositiveButton("好的",null)
-//                        .show();
-                startActivity(new Intent(getContext(), MutilConnectActivity.class));
+                startActivity(new Intent(getContext(), RemoteActivity.class));
             }
         });
-    }
 
+    }
 
 }

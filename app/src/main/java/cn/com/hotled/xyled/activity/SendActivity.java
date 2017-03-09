@@ -29,6 +29,8 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import cn.com.hotled.xyled.App;
 import cn.com.hotled.xyled.R;
@@ -211,15 +213,43 @@ public class SendActivity extends BaseActivity {
             mHandler.sendMessage(message);
             return;
         }
-        String mac1 = macStr.substring(0, 2);
-        String mac2 = macStr.substring(2, 4);
-        String mac3 = macStr.substring(4, 6);
-        String mac4 = macStr.substring(6, 8);
+        String regEx = "[0-9a-fA-F]{6}";
+        Pattern pat = Pattern.compile(regEx);
+        Matcher mat = pat.matcher(macStr);
+        //旧的8位
+        String regExEight = "[0-9a-fA-F]{8}";
+        Pattern patEight = Pattern.compile(regExEight);
+        Matcher matcEight = patEight.matcher(macStr);
+        int macInt1 = 0;
+        int macInt2 = 0;
+        int macInt3 = 0;
+        int macInt4 = 0;
+        if(mat.matches()){
+            String mac0 = "80";
+            String mac1 = macStr.substring(0, 2);
+            String mac2 = macStr.substring(2, 4);
+            String mac3 = macStr.substring(4, 6);
 
-        int macInt1 = Integer.parseInt(mac1, 16);
-        int macInt2 = Integer.parseInt(mac2, 16);
-        int macInt3 = Integer.parseInt(mac3, 16);
-        int macInt4 = Integer.parseInt(mac4, 16);
+            macInt1 = Integer.parseInt(mac0, 16);
+            macInt2 = Integer.parseInt(mac1, 16);
+            macInt3 = Integer.parseInt(mac2, 16);
+            macInt4 = Integer.parseInt(mac3, 16);
+        }else if (matcEight.matches()){
+            String mac1 = macStr.substring(0, 2);
+            String mac2 = macStr.substring(2, 4);
+            String mac3 = macStr.substring(4, 6);
+            String mac4 = macStr.substring(6, 8);
+
+            macInt1 = Integer.parseInt(mac1, 16);
+            macInt2 = Integer.parseInt(mac2, 16);
+            macInt3 = Integer.parseInt(mac3, 16);
+            macInt4 = Integer.parseInt(mac4, 16);
+        } else{
+            Message message = mHandler.obtainMessage();
+            message.what=WIFI_ERRO;
+            mHandler.sendMessage(message);
+            return;
+        }
         Log.w("tcpSend","mac = "+macInt1+":"+macInt2+":"+macInt3+":"+macInt4);
         try {
             socket = new Socket(Global.SERVER_IP,Global.SERVER_PORT);

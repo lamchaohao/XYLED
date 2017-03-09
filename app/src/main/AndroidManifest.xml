@@ -79,14 +79,17 @@
             android:name=".activity.ConnectHelpDiagActivity"
             android:theme="@style/Theme.AppCompat.Light.Dialog">
         </activity>
-        <activity
-            android:name=".activity.ScreenSettingsActivity"
-            android:label="@string/title_activity_screen_settings"
-            android:theme="@style/AppTheme">
-        </activity>
         <activity android:name=".activity.ChangeLineTextActivity">
         </activity>
         <activity android:name=".activity.SelectFontActivity">
+        </activity>
+        <activity
+            android:name=".activity.SettingActivity"
+            android:windowSoftInputMode="stateHidden|stateUnchanged">
+        </activity>
+        <activity android:name=".activity.TraceSetActivity">
+        </activity>
+        <activity android:name=".activity.RemoteActivity">
         </activity>
     </application>
 

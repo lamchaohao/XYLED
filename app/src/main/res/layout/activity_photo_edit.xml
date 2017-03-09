@@ -12,7 +12,30 @@
         android:background="#EEEEEE"
         android:layout_width="match_parent"
         android:layout_height="200dp"/>
-
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:textSize="18sp"
+            android:text="停留时间:"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:layout_centerInParent="true"
+            android:id="@+id/tv_photo_showStaytime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </RelativeLayout>
+    <SeekBar
+        style="@style/TextEditIcon"
+        android:id="@+id/sb_photo_stayTime"
+        android:layout_marginRight="10dp"
+        android:layout_marginLeft="10dp"
+        android:padding="10dp"
+        android:layout_marginBottom="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:soundEffectsEnabled="false"/>
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">

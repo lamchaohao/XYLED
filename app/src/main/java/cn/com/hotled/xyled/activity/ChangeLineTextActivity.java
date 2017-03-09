@@ -201,9 +201,11 @@ public class ChangeLineTextActivity extends BaseActivity implements View.OnClick
             frameTime --;
             frameTime *=5;
             sb_speed.setProgress((int) frameTime);
-            stayTime--;
             stayTime *=10;
             sb_stayTime.setProgress((int) stayTime);
+            if (stayTime==0){
+                tv_showStaytime.setText("0 s");
+            }
             spn_setFlowEffect.setSelection(mProgram.getFlowEffect());
             spn_setFlowSpeed.setSelection(mProgram.getFlowSpeed());
             if (textContentsList!=null&&textContentsList.size()==1&&textContentsList.get(0)!=null){
@@ -432,7 +434,16 @@ public class ChangeLineTextActivity extends BaseActivity implements View.OnClick
                 drawBgColor(drawWidth,mScreenHeight);
                 //文本
                 if (mTextContent.getText()!=null&& !TextUtils.isEmpty(mTextContent.getText())) {
-                    canvas.drawText(mTextContent.getText(),tempBaseX,tempBaseY,paint);
+                    if (mTextContent.getTextEffect()==Global.TEXT_EFFECT_MOVE_RIGHT){
+                        StringBuilder sb = new StringBuilder();
+                        for (int i = mTextContent.getText().length()-1; i >=0 ; i--) {
+                            String substring = mTextContent.getText().substring(i, i + 1);
+                            sb.append(substring);
+                        }//右移的话倒叙文字
+                        canvas.drawText(sb.toString(),tempBaseX,tempBaseY,paint);
+                    }else {
+                        canvas.drawText(mTextContent.getText(),tempBaseX,tempBaseY,paint);
+                    }
                 }
             }
 

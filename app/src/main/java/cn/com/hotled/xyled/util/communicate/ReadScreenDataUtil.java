@@ -12,6 +12,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import cn.com.hotled.xyled.fragment.ScreenFragment;
 import cn.com.hotled.xyled.global.Global;
@@ -25,11 +27,11 @@ import static cn.com.hotled.xyled.fragment.ScreenFragment.WIFI_ERRO;
  * Created by Lam on 2017/2/10.
  */
 
-public class ReadScreenDataUntil {
+public class ReadScreenDataUtil {
 
     private Context mContext;
     private Handler mHandler;
-    public ReadScreenDataUntil(Context context,Handler handler) {
+    public ReadScreenDataUtil(Context context, Handler handler) {
         mContext = context;
         mHandler = handler;
     }
@@ -60,15 +62,44 @@ public class ReadScreenDataUntil {
             mHandler.sendMessage(message);
             return;
         }
-        String mac1 = macStr.substring(0, 2);
-        String mac2 = macStr.substring(2, 4);
-        String mac3 = macStr.substring(4, 6);
-        String mac4 = macStr.substring(6, 8);
+        String regEx = "[0-9a-fA-F]{6}";
+        Pattern pat = Pattern.compile(regEx);
+        Matcher mat = pat.matcher(macStr);
+        //旧的8位
+        String regExEight = "[0-9a-fA-F]{8}";
+        Pattern patEight = Pattern.compile(regExEight);
+        Matcher matcEight = patEight.matcher(macStr);
+        int macInt1 = 0;
+        int macInt2 = 0;
+        int macInt3 = 0;
+        int macInt4 = 0;
+        if(mat.matches()){
+            String mac0 = "80";
+            String mac1 = macStr.substring(0, 2);
+            String mac2 = macStr.substring(2, 4);
+            String mac3 = macStr.substring(4, 6);
 
-        int macInt1 = Integer.parseInt(mac1, 16);
-        int macInt2 = Integer.parseInt(mac2, 16);
-        int macInt3 = Integer.parseInt(mac3, 16);
-        int macInt4 = Integer.parseInt(mac4, 16);
+            macInt1 = Integer.parseInt(mac0, 16);
+            macInt2 = Integer.parseInt(mac1, 16);
+            macInt3 = Integer.parseInt(mac2, 16);
+            macInt4 = Integer.parseInt(mac3, 16);
+        }else if (matcEight.matches()){
+            String mac1 = macStr.substring(0, 2);
+            String mac2 = macStr.substring(2, 4);
+            String mac3 = macStr.substring(4, 6);
+            String mac4 = macStr.substring(6, 8);
+
+            macInt1 = Integer.parseInt(mac1, 16);
+            macInt2 = Integer.parseInt(mac2, 16);
+            macInt3 = Integer.parseInt(mac3, 16);
+            macInt4 = Integer.parseInt(mac4, 16);
+        } else{
+            Message message = mHandler.obtainMessage();
+            message.what=WIFI_ERRO;
+            mHandler.sendMessage(message);
+            return;
+        }
+
         Log.w("tcpSend","mac = "+macInt1+":"+macInt2+":"+macInt3+":"+macInt4);
         try {
             socket = new Socket(Global.SERVER_IP, Global.SERVER_PORT);
@@ -163,6 +194,9 @@ public class ReadScreenDataUntil {
 
             for (int i = 0; i < readMsg.length; i++) {
                 if(testCMD[i]!=readMsg[i]){
+                    for (int i1 = 0; i1 < readMsg.length; i1++) {
+                        Log.w("tcpSend","i1"+i1+"msg="+readMsg[i1]);
+                    }
                     Log.w("tcpSend","握手不成功 readMsg.equals(testCMD) false");
                     mHandler.sendEmptyMessageDelayed(ScreenFragment.READ_FAILE,1500);
                 }else {
@@ -234,6 +268,17 @@ public class ReadScreenDataUntil {
             Message message = mHandler.obtainMessage();
             message.what=READ_FAILE;
             mHandler.sendMessage(message);
+        }finally {
+            try {
+                os.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            try {
+                socket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 

@@ -9,6 +9,8 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.SeekBar;
+import android.widget.TextView;
 
 import com.yalantis.ucrop.UCrop;
 
@@ -25,7 +27,7 @@ import cn.com.hotled.xyled.dao.ProgramDao;
 import cn.com.hotled.xyled.global.Global;
 import cn.com.hotled.xyled.view.PhotoView;
 
-public class PhotoEditActivity extends BaseActivity {
+public class PhotoEditActivity extends BaseActivity implements SeekBar.OnSeekBarChangeListener{
 
     private static final int REQUEST_CHOOSE_PIC = 210;
     PhotoView mPhotoView;
@@ -34,6 +36,8 @@ public class PhotoEditActivity extends BaseActivity {
     private Program mProgram;
     private int mScreenWidth;
     private int mScreenHeight;
+    private SeekBar mSbStaytime;
+    private TextView mTvShowStaytime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +61,12 @@ public class PhotoEditActivity extends BaseActivity {
                 Bitmap bitmap = BitmapFactory.decodeFile(picFile.getAbsolutePath());
                 setBitmapToView(bitmap);
             }
+            float stayTime = mProgram.getStayTime();
+            stayTime *=2;
+            if (stayTime==0){
+                stayTime = 2;
+            }
+            mSbStaytime.setProgress((int) stayTime);
         }
     }
 
@@ -73,7 +83,9 @@ public class PhotoEditActivity extends BaseActivity {
         mPhotoView.setMaxScale(8);
         mScreenWidth = getSharedPreferences(Global.SP_SCREEN_CONFIG, MODE_PRIVATE).getInt(Global.KEY_SCREEN_W, 64);
         mScreenHeight = getSharedPreferences(Global.SP_SCREEN_CONFIG, MODE_PRIVATE).getInt(Global.KEY_SCREEN_H, 32);
-
+        mSbStaytime = (SeekBar) findViewById(R.id.sb_photo_stayTime);
+        mTvShowStaytime = (TextView) findViewById(R.id.tv_photo_showStaytime);
+        mSbStaytime.setOnSeekBarChangeListener(this);
     }
 
     public void setImage(){
@@ -169,5 +181,26 @@ public class PhotoEditActivity extends BaseActivity {
     public void onCreateCustomToolBar(Toolbar toolbar) {
         super.onCreateCustomToolBar(toolbar);
         toolbar.setTitle(getIntent().getStringExtra("programName"));
+    }
+
+    @Override
+    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+        switch (seekBar.getId()) {
+            case R.id.sb_photo_stayTime:
+                int second = progress/2;
+                mTvShowStaytime.setText(second+" s");
+                mProgram.setStayTime(second);
+                break;
+        }
+    }
+
+    @Override
+    public void onStartTrackingTouch(SeekBar seekBar) {
+
+    }
+
+    @Override
+    public void onStopTrackingTouch(SeekBar seekBar) {
+
     }
 }

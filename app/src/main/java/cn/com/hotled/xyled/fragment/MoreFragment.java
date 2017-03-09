@@ -51,6 +51,13 @@ public class MoreFragment extends Fragment {
                         .show();
             }
         });
+
+        view.findViewById(R.id.ll_more_help).setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
     }
 
 

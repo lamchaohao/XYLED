@@ -9,11 +9,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Window;
 import android.view.WindowManager;
 
+import org.greenrobot.greendao.database.Database;
+
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import cn.com.hotled.xyled.App;
 import cn.com.hotled.xyled.R;
 
 public class WelcomeActivity extends AppCompatActivity {
@@ -51,14 +55,24 @@ public class WelcomeActivity extends AppCompatActivity {
 
         boolean isFirstIn = mSharePref.getBoolean("isFirstIn", true);
         File flowFileDir=new File(getFilesDir()+"/flow");
-        if (isFirstIn&&!flowFileDir.exists()) {
+        File traceFileDir = new File(getFilesDir()+"/trace");
+        if (!flowFileDir.exists()) {
+            flowFileDir.mkdir();
+        }
+        if (!traceFileDir.exists()){
+            traceFileDir.mkdir();
+        }
+        if (isFirstIn) {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
                     copyFilesFassets("flow",getFilesDir()+"/flow");
+                    copyFilesFassets("trace",getFilesDir()+"/trace");
+                    insertToDb();
                     Message message = mHandler.obtainMessage();
                     message.what=COPY_FINISH;
                     mHandler.sendMessage(message);
+                    mSharePref.edit().putBoolean("isFirstIn",false).apply();
                 }
             }).start();
 
@@ -66,6 +80,45 @@ public class WelcomeActivity extends AppCompatActivity {
            countDownAndEnter();
         }
 
+    }
+
+    private void insertToDb() {
+        Database db = ((App) getApplication()).getDb();
+        InputStream is =null;
+        ByteArrayOutputStream bos=null;
+        try {
+            is = getAssets().open("file/trace_file.sql");
+            bos = new ByteArrayOutputStream();
+            byte[] data=new byte[1024];
+            int length=-1;
+            while( (length = is.read(data))!= -1){
+                bos.write(data,0,length);
+            }
+            bos.flush();
+            String sql = bos.toString();
+            db.beginTransaction();
+            String[] sqls = sql.split(";");
+            for (int i = 0; i < sqls.length; i++) {
+                String s = sqls[i] += ";";
+                db.execSQL(s);
+            }
+            db.setTransactionSuccessful();
+            db.endTransaction();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }finally {
+            try {
+                is.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            try {
+                bos.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private void countDownAndEnter() {

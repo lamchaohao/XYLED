@@ -12,16 +12,10 @@ import static cn.com.hotled.xyled.util.genFile.ByteUtil.setInbyteArray;
  * Created by Lam on 2017/3/4.
  */
 
-public class MoveLeft {
-    private Program mProgram;
-    private Map<Integer, Integer> mFlowMap;
-    private List<byte[]> mFlowByteList;
-    private List<byte[]> mTimeAxisList;
-    private int mColbyteCountIndicator;
-    private List<byte[]> mColByteCountList;
-    private int mTextFrameIndicator;
-    private int mFrameCount;
-    private byte[] attrAddress;
+public class MoveLeft extends BaseTimeAxis{
+
+    public MoveLeft() {
+    }
 
     public MoveLeft(Program program, Map<Integer, Integer> flowMap, List<byte[]> flowByteList, List<byte[]> timeAxisList, int colbyteCountIndicator, List<byte[]> colByteCountList, int textFrameIndicator, int frameCount, byte[] attrAddress) {
 
@@ -36,6 +30,7 @@ public class MoveLeft {
         this.attrAddress = attrAddress;
     }
 
+    @Override
     public void setTimeAxis(int textContentAddressInt, int frameOfThisProgram, int horizontalIndex, int flowBoundslength,int screenWidth){
         float frameTime = mProgram.getFrameTime();
         //流水边速度
@@ -137,15 +132,15 @@ public class MoveLeft {
             }
         }
     }
-
-    public int getColbyteCountIndicator() {
+    @Override
+    public int getAddressIndicator() {
         return mColbyteCountIndicator;
     }
-
+    @Override
     public int getTextFrameIndicator() {
         return mTextFrameIndicator;
     }
-
+    @Override
     public int getFrameCount() {
         return mFrameCount;
     }

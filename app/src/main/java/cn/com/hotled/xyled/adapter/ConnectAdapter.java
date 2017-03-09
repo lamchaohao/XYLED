@@ -25,7 +25,7 @@ public class ConnectAdapter extends RecyclerView.Adapter {
     Context mContextAct;
     List<ScanResult> mWifiList;
     public OnItemOnClickListener mOnItemClickLitener;
-    public WifiInfo wifiInfo;
+    public WifiInfo mWifiInfo;
     WifiAdmin mWifiAdmin;
     /**
      * 点击事件监听借口
@@ -81,6 +81,12 @@ public class ConnectAdapter extends RecyclerView.Adapter {
                 }
             });
         }
+        if (mWifiAdmin.getWifiInfo().getSSID().equals("\""+mWifiList.get(position).SSID+"\"")){
+            viewHolder.iv_isConnected.setVisibility(View.VISIBLE);
+        }else {
+            viewHolder.iv_isConnected.setVisibility(View.INVISIBLE);
+        }
+
     }
 
     private boolean needToVisibility(String ssid) {
@@ -126,6 +132,7 @@ public class ConnectAdapter extends RecyclerView.Adapter {
         ImageView iv_wifiLevel;
         TextView tv_wifiName;
         ImageView iv_identifyWifi;
+        ImageView iv_isConnected;
         View rl_wifilist;
 
         public WifiAdapterViewHolder(View itemView) {
@@ -134,7 +141,12 @@ public class ConnectAdapter extends RecyclerView.Adapter {
             iv_wifiLevel = (ImageView) itemView.findViewById(R.id.iv_idwifi_wifiLevel);
             tv_wifiName = (TextView) itemView.findViewById(R.id.tv_idwifi_wifiName);
             iv_identifyWifi = (ImageView) itemView.findViewById(R.id.iv_idwifi_logo);
+            iv_isConnected = (ImageView) itemView.findViewById(R.id.iv_idwifi_connected);
         }
+    }
+
+    public void setWifiInfo(WifiInfo wifiInfo) {
+        mWifiInfo = wifiInfo;
     }
 }
 

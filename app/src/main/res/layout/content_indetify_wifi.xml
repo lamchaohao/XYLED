@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <RelativeLayout
-            android:padding="10dp"
+            android:padding="5dp"
             android:id="@+id/rl_idwifi"
             android:background="@drawable/recycler_bg"
             android:layout_width="match_parent"
@@ -29,11 +29,19 @@
                 android:textColor="@color/textPrimary"
                 android:text="newWing"
                 android:ellipsize="marquee"
+                android:layout_centerVertical="true"
                 android:layout_toRightOf="@+id/iv_idwifi_wifiLevel"
                 android:layout_marginLeft="10dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
-
+            <ImageView
+                android:visibility="invisible"
+                android:id="@+id/iv_idwifi_connected"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="60dp"
+                android:src="@drawable/ic_check_circle_green_700_36dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
             <ImageView
                 android:id="@+id/iv_idwifi_logo"
                 android:src="@drawable/identify_led_logo_60dp"

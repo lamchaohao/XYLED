@@ -14,17 +14,22 @@ import cn.com.hotled.xyled.dao.DaoSession;
 public class App extends Application {
     public static final boolean ENCRYPTED = false;
     private DaoSession daoSession;
+    private Database mDb;
 
     @Override
     public void onCreate() {
         super.onCreate();
         DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(this, ENCRYPTED ? "screen-db-encrypted" : "screen-db");
-        Database db = ENCRYPTED ? helper.getEncryptedWritableDb("super-secret") : helper.getWritableDb();
-        daoSession = new DaoMaster(db).newSession();
+        mDb = ENCRYPTED ? helper.getEncryptedWritableDb("super-secret") : helper.getWritableDb();
+
+        daoSession = new DaoMaster(mDb).newSession();
     }
 
     public DaoSession getDaoSession() {
         return daoSession;
     }
 
+    public Database getDb() {
+        return mDb;
+    }
 }

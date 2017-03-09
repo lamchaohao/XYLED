@@ -27,29 +27,63 @@
         <item>速度 9</item>
         <item>速度 10</item>
     </array>
+    
+    <array name="space_trace">
+        <item>全部点距</item>
+        <item>P1.8</item>
+        <item>P2</item>
+        <item>P3</item>
+        <item>P4</item>
+        <item>P5</item>
+        <item>P6</item>
+        <item>P7.62</item>
+        <item>P8</item>
+        <item>P10</item>
+        <item>P13.33</item>
+        <item>P16</item>
+        <item>P20</item>
+    </array>
+    <array name="scan_trace">
+        <item>全部扫描</item>
+        <item>Scan 1</item>
+        <item>Scan 2</item>
+        <item>Scan 3</item>
+        <item>Scan 4</item>
+        <item>Scan 5</item>
+        <item>Scan 6</item>
+        <item>Scan 7</item>
+        <item>Scan 8</item>
+        <item>Scan 16</item>
+        <item>Scan 32</item>
+    </array>
+    <array name="size_trace">
+        <item>全部尺寸</item>
+        <item>16*8</item>
+        <item>16*16</item>
+        <item>32*16</item>
+        <item>32*32</item>
+        <item>64*32</item>
+        <item>24*12</item>
+        <item>20*10</item>
+    </array>
+    <array name="hub_trace">
+        <item>全部接口</item>
+        <item>hub-75</item>
+        <item>hub-08</item>
+        <item>hub-12</item>
+        <item>hub-75-1</item>
+    </array>
     <string-array name="dataOrientation">
         <item>0-右到左(横)</item>
         <item>1----------</item>
         <item>2----------</item>
         <item>3-上到下(竖)</item>
     </string-array>
-    <string-array name="dataOrientation_values">
-        <item>0</item>
-        <item>1</item>
-        <item>2</item>
-        <item>3</item>
-    </string-array>
     <string-array name="pref_special">
         <item>无</item>
         <item>链接增高(板高8)</item>
         <item>链接增高(板高16)</item>
         <item>链接增高(板高32)</item>
-    </string-array>
-    <string-array name="pref_special_values">
-        <item>0</item>
-        <item>1</item>
-        <item>2</item>
-        <item>3</item>
     </string-array>
     <string-array name="pref_rgbSequence">
         <item>R-G-B</item>
@@ -59,60 +93,19 @@
         <item>B-R-G</item>
         <item>B-G-R</item>
     </string-array>
-    <string-array name="pref_rgbSequence_values">
-        <item>0</item>
-        <item>1</item>
-        <item>2</item>
-        <item>3</item>
-        <item>4</item>
-        <item>5</item>
-    </string-array>
     <array name="pref_data">
         <item>0-同相</item>
         <item>1-反相</item>
     </array>
-    <string-array name="pref_data_values">
-        <item>0</item>
-        <item>1</item>
-    </string-array>
     <array name="pref_oe">
         <item>0-低电平正常</item>
         <item>1-高电平正常</item>
     </array>
-    <string-array name="pref_oe_values">
-        <item>0</item>
-        <item>1</item>
-    </string-array>
 
-    <string-array name="text_speed_char">
-        <item>1</item>
-        <item>2</item>
-        <item>3</item>
-        <item>4</item>
-        <item>5</item>
-        <item>6</item>
-        <item>7</item>
-        <item>8</item>
-        <item>9</item>
-        <item>10</item>
-        <item>11</item>
-        <item>12</item>
-    </string-array>
-
-    <string-array name="text_stay_time">
-        <item>0</item>
-        <item>1</item>
-        <item>2</item>
-        <item>3</item>
-        <item>4</item>
-        <item>5</item>
-        <item>6</item>
-        <item>7</item>
-        <item>8</item>
-        <item>9</item>
-        <item>10</item>
-        <item>11</item>
-        <item>12</item>
+    <string-array name="pref_138code">
+        <item>0-有138行译码</item>
+        <item>1-无138行译码</item>
+        <item>2-使用595逐行扫描</item>
     </string-array>
 
 </resources>
