@@ -34,24 +34,32 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" >
                 <Button
+                    android:layout_margin="2dp"
+                    android:background="@drawable/sendbutton_bg"
                     android:id="@+id/socket_test"
                     android:layout_weight="1"
                     android:text="Test"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"/>
                 <Button
+                    android:layout_margin="2dp"
+                    android:background="@drawable/sendbutton_bg"
                     android:id="@+id/socket_rest"
                     android:layout_weight="1"
                     android:text="Rest"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"/>
                 <Button
+                    android:layout_margin="2dp"
+                    android:background="@drawable/sendbutton_bg"
                     android:id="@+id/socket_pause"
                     android:layout_weight="1"
                     android:text="Pause"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"/>
                 <Button
+                    android:layout_margin="2dp"
+                    android:background="@drawable/sendbutton_bg"
                     android:id="@+id/socket_resume"
                     android:layout_weight="1"
                     android:text="Resume"

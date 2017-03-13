@@ -13,13 +13,13 @@ import java.net.Socket;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import cn.com.hotled.xyled.fragment.ScreenFragment;
 import cn.com.hotled.xyled.global.Global;
 import cn.com.hotled.xyled.util.android.WifiAdmin;
 
-import static cn.com.hotled.xyled.fragment.ScreenFragment.READ_FAILE;
-import static cn.com.hotled.xyled.fragment.ScreenFragment.READ_SUCCESS;
-import static cn.com.hotled.xyled.fragment.ScreenFragment.WIFI_ERRO;
+import static cn.com.hotled.xyled.global.Global.READ_FAILE;
+import static cn.com.hotled.xyled.global.Global.READ_SUCCESS;
+import static cn.com.hotled.xyled.global.Global.WIFI_ERRO;
+
 
 /**
  * 此工具用于切换节目
@@ -176,7 +176,7 @@ public class RemoteSwitchUtil {
             for (int i = 0; i < readMsg.length; i++) {
                 if(pauseCMD[i]!=readMsg[i]){
                     Log.d("tcpSend","暂停不成功 pauseCMD[i]!=readMsg[i]");
-                    mHandler.sendEmptyMessageDelayed(ScreenFragment.READ_FAILE,1500);
+                    mHandler.sendEmptyMessageDelayed(READ_FAILE,1500);
                     pauseSuccess = false;
                 }
             }
@@ -211,16 +211,20 @@ public class RemoteSwitchUtil {
             message.what=READ_FAILE;
             mHandler.sendMessage(message);
         }finally {
-            try {
-                os.close();
-            } catch (IOException e) {
-                e.printStackTrace();
+            if (os!=null){
+                try {
+                    os.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
-            try {
-                socket.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+           if (socket!=null&&!socket.isClosed()){
+               try {
+                   socket.close();
+               } catch (IOException e) {
+                   e.printStackTrace();
+               }
+           }
         }
     }
 
@@ -371,7 +375,7 @@ public class RemoteSwitchUtil {
                     for (int i1 = 0; i1 < readMsg.length; i1++) {
                         Log.w("tcpSend","i1"+i1+"msg="+readMsg[i1]);
                     }
-                    mHandler.sendEmptyMessageDelayed(ScreenFragment.READ_FAILE,1500);
+                    mHandler.sendEmptyMessageDelayed(READ_FAILE,1500);
                 }else {
 
                 }
@@ -383,7 +387,7 @@ public class RemoteSwitchUtil {
             boolean pauseSuccess = true;
             for (int i = 0; i < readMsg.length; i++) {
                 if(pauseCMD[i]!=readMsg[i]){
-                    mHandler.sendEmptyMessageDelayed(ScreenFragment.READ_FAILE,1500);
+                    mHandler.sendEmptyMessageDelayed(READ_FAILE,1500);
                     pauseSuccess = false;
                 }
             }
@@ -422,17 +426,20 @@ public class RemoteSwitchUtil {
             message.what=READ_FAILE;
             mHandler.sendMessage(message);
         }finally {
-            try {
-                os.close();
-            } catch (IOException e) {
-                e.printStackTrace();
+            if (os!=null){
+                try {
+                    os.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
-            try {
-                socket.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
+           if (socket!=null){
+               try {
+                   socket.close();
+               } catch (IOException e) {
+                   e.printStackTrace();
+               }
+           }
         }
     }
 

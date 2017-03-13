@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             android:layout_width="match_parent"
-             android:layout_height="match_parent"
-              android:orientation="vertical"
-             xmlns:app="http://schemas.android.com/apk/res-auto">
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                xmlns:app="http://schemas.android.com/apk/res-auto">
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
@@ -79,7 +79,7 @@
             </LinearLayout>
         </android.support.v7.widget.CardView>
         <android.support.v7.widget.RecyclerView
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="5dp"
             android:id="@+id/rv_fragmScreen"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
@@ -87,79 +87,41 @@
         </android.support.v7.widget.RecyclerView>
     </LinearLayout>
 
-    <LinearLayout
-        android:visibility="gone"
-        android:id="@+id/ll_screen_add_submenu"
-        android:orientation="vertical"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:layout_marginBottom="85dp"
-        android:layout_marginRight="20dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
-        <LinearLayout
-            android:id="@+id/ll_screen_add_text"
-            android:orientation="horizontal"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-            <TextView
-                android:padding="3dp"
-                android:layout_marginRight="10dp"
-                android:layout_gravity="center"
-                android:text="文字节目"
-                android:textColor="#FFF3E0"
-                android:background="@drawable/black_rectangle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-            <android.support.design.widget.FloatingActionButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_add_white_24dp"
-                app:elevation="0dp"
-                app:fabSize="normal"
-                app:backgroundTint="#43A047"
-                app:rippleColor="#BBDEFB"
-                />
-        </LinearLayout>
-        <LinearLayout
-            android:id="@+id/ll_screen_add_pic"
-            android:layout_marginTop="5dp"
-            android:orientation="horizontal"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-            <TextView
-                android:padding="3dp"
-                android:layout_marginRight="10dp"
-                android:layout_gravity="center"
-                android:text="图片节目"
-                android:textColor="#FFF3E0"
-                android:background="@drawable/black_rectangle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-            <android.support.design.widget.FloatingActionButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:src="@drawable/ic_add_white_24dp"
-                app:elevation="0dp"
-                app:fabSize="normal"
-                app:backgroundTint="#F57C00"
-                app:rippleColor="#1E88E5"
-                />
-        </LinearLayout>
 
-    </LinearLayout>
-
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab_screen_add"
+    <com.github.clans.fab.FloatingActionMenu
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_add_white_24dp"
-        app:backgroundTint="@color/colorAccent"
-        app:rippleColor="#BBDEFB"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
         android:layout_marginBottom="20dp"
         android:layout_marginRight="20dp"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentBottom="true"/>
+        app:menu_openDirection="up"
+        app:menu_colorNormal="@color/colorAccent"
+        app:menu_colorPressed="#E91E63"
+        app:menu_colorRipple="#99FFFFFF"
+        app:menu_labels_showAnimation="@anim/fab_slide_in_from_right"
+        app:menu_labels_hideAnimation="@anim/fab_slide_out_to_right">
 
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/fab_screen_add_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:fab_colorNormal="#43A047"
+            app:fab_colorPressed="#4CAF50"
+            app:fab_colorRipple="#99FFFFFF"
+            android:src="@drawable/ic_text_fields_white_24dp"
+            app:fab_size="normal"
+            app:fab_label="文字节目" />
+        <com.github.clans.fab.FloatingActionButton
+            android:id="@+id/fab_screen_add_pic"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:fab_colorNormal="#FF5722"
+            app:fab_colorPressed="#E75043"
+            app:fab_colorRipple="#99FFFFFF"
+            android:src="@drawable/ic_photo_white_24dp"
+            app:fab_size="normal"
+            app:fab_label="图片节目" />
+    </com.github.clans.fab.FloatingActionMenu>
 
 </RelativeLayout>

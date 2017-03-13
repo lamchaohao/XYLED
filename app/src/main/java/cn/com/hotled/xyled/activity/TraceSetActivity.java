@@ -1,9 +1,9 @@
 package cn.com.hotled.xyled.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -22,6 +22,7 @@ import cn.com.hotled.xyled.adapter.TraceSelectAdapter;
 import cn.com.hotled.xyled.bean.Trace;
 import cn.com.hotled.xyled.bean.TraceFile;
 import cn.com.hotled.xyled.dao.TraceFileDao;
+import cn.com.hotled.xyled.global.Global;
 
 public class TraceSetActivity extends BaseActivity implements AdapterView.OnItemSelectedListener{
 
@@ -48,6 +49,7 @@ public class TraceSetActivity extends BaseActivity implements AdapterView.OnItem
     private TraceFileDao mTraceFileDao;
     private List<Trace> mTraceList;
     private TraceSelectAdapter mTraceAdapter;
+    private TraceFile mTraceFile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,14 +72,14 @@ public class TraceSetActivity extends BaseActivity implements AdapterView.OnItem
     }
 
     private void initView() {
-
+        mTraceFile = new TraceFile();
         mRvSelectFile.setLayoutManager(new LinearLayoutManager(this));
         mTraceAdapter = new TraceSelectAdapter(mTraceList, this);
         mRvSelectFile.setAdapter(mTraceAdapter);
         mTraceAdapter.setOnItemClickListener(new TraceSelectAdapter.OnItemOnClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                Log.i("Trace","position="+position);
+               mTraceFile = mTraceList.get(position).getTraceFile();
             }
         });
         mSpnTracePixel.setOnItemSelectedListener(this);
@@ -91,6 +93,12 @@ public class TraceSetActivity extends BaseActivity implements AdapterView.OnItem
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.bt_traceset_commit:
+                if (mTraceFile.getId()!=0) {
+                    Intent intent=new Intent();
+                    intent.putExtra(Global.EXTRA_SELECT_TRACE,mTraceFile.getId());
+                    setResult(RESULT_OK,intent);
+                    TraceSetActivity.this.finish();
+                }
                 break;
             case R.id.bt_traceset_showAll:
                 updateData(true);

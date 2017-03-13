@@ -35,6 +35,12 @@ public class TraceFileDao extends AbstractDao<TraceFile, Long> {
         public final static Property Scan = new Property(5, int.class, "scan", false, "SCAN");
         public final static Property Size = new Property(6, int.class, "size", false, "SIZE");
         public final static Property Hub = new Property(7, int.class, "hub", false, "HUB");
+        public final static Property ScanCount = new Property(8, int.class, "scanCount", false, "SCAN_COUNT");
+        public final static Property FoldCount = new Property(9, int.class, "foldCount", false, "FOLD_COUNT");
+        public final static Property ModuleWidth = new Property(10, int.class, "moduleWidth", false, "MODULE_WIDTH");
+        public final static Property ModuleHeight = new Property(11, int.class, "moduleHeight", false, "MODULE_HEIGHT");
+        public final static Property RGBCount = new Property(12, int.class, "RGBCount", false, "RGBCOUNT");
+        public final static Property DotCount = new Property(13, int.class, "dotCount", false, "DOT_COUNT");
     }
 
     private final FileConverter filePathConverter = new FileConverter();
@@ -58,7 +64,13 @@ public class TraceFileDao extends AbstractDao<TraceFile, Long> {
                 "\"PIXEL\" INTEGER NOT NULL ," + // 4: pixel
                 "\"SCAN\" INTEGER NOT NULL ," + // 5: scan
                 "\"SIZE\" INTEGER NOT NULL ," + // 6: size
-                "\"HUB\" INTEGER NOT NULL );"); // 7: hub
+                "\"HUB\" INTEGER NOT NULL ," + // 7: hub
+                "\"SCAN_COUNT\" INTEGER NOT NULL ," + // 8: scanCount
+                "\"FOLD_COUNT\" INTEGER NOT NULL ," + // 9: foldCount
+                "\"MODULE_WIDTH\" INTEGER NOT NULL ," + // 10: moduleWidth
+                "\"MODULE_HEIGHT\" INTEGER NOT NULL ," + // 11: moduleHeight
+                "\"RGBCOUNT\" INTEGER NOT NULL ," + // 12: RGBCount
+                "\"DOT_COUNT\" INTEGER NOT NULL );"); // 13: dotCount
     }
 
     /** Drops the underlying database table. */
@@ -90,6 +102,12 @@ public class TraceFileDao extends AbstractDao<TraceFile, Long> {
         stmt.bindLong(6, entity.getScan());
         stmt.bindLong(7, entity.getSize());
         stmt.bindLong(8, entity.getHub());
+        stmt.bindLong(9, entity.getScanCount());
+        stmt.bindLong(10, entity.getFoldCount());
+        stmt.bindLong(11, entity.getModuleWidth());
+        stmt.bindLong(12, entity.getModuleHeight());
+        stmt.bindLong(13, entity.getRGBCount());
+        stmt.bindLong(14, entity.getDotCount());
     }
 
     @Override
@@ -115,6 +133,12 @@ public class TraceFileDao extends AbstractDao<TraceFile, Long> {
         stmt.bindLong(6, entity.getScan());
         stmt.bindLong(7, entity.getSize());
         stmt.bindLong(8, entity.getHub());
+        stmt.bindLong(9, entity.getScanCount());
+        stmt.bindLong(10, entity.getFoldCount());
+        stmt.bindLong(11, entity.getModuleWidth());
+        stmt.bindLong(12, entity.getModuleHeight());
+        stmt.bindLong(13, entity.getRGBCount());
+        stmt.bindLong(14, entity.getDotCount());
     }
 
     @Override
@@ -132,7 +156,13 @@ public class TraceFileDao extends AbstractDao<TraceFile, Long> {
             cursor.getInt(offset + 4), // pixel
             cursor.getInt(offset + 5), // scan
             cursor.getInt(offset + 6), // size
-            cursor.getInt(offset + 7) // hub
+            cursor.getInt(offset + 7), // hub
+            cursor.getInt(offset + 8), // scanCount
+            cursor.getInt(offset + 9), // foldCount
+            cursor.getInt(offset + 10), // moduleWidth
+            cursor.getInt(offset + 11), // moduleHeight
+            cursor.getInt(offset + 12), // RGBCount
+            cursor.getInt(offset + 13) // dotCount
         );
         return entity;
     }
@@ -147,6 +177,12 @@ public class TraceFileDao extends AbstractDao<TraceFile, Long> {
         entity.setScan(cursor.getInt(offset + 5));
         entity.setSize(cursor.getInt(offset + 6));
         entity.setHub(cursor.getInt(offset + 7));
+        entity.setScanCount(cursor.getInt(offset + 8));
+        entity.setFoldCount(cursor.getInt(offset + 9));
+        entity.setModuleWidth(cursor.getInt(offset + 10));
+        entity.setModuleHeight(cursor.getInt(offset + 11));
+        entity.setRGBCount(cursor.getInt(offset + 12));
+        entity.setDotCount(cursor.getInt(offset + 13));
      }
     
     @Override

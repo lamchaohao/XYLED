@@ -27,8 +27,6 @@
             android:name=".activity.SocketActivity"
             android:windowSoftInputMode="adjustPan"/>
         <activity android:name=".activity.ConnectWifiActivity"/>
-        <activity android:name=".activity.TestActivity">
-        </activity>
         <activity
             android:name=".activity.BrowsePhotoActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
@@ -44,8 +42,6 @@
             android:name=".activity.EasyTextActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden">
-        </activity>
-        <activity android:name=".activity.AddScreenActivity">
         </activity>
         <activity android:name=".activity.MutilConnectActivity">
         </activity>
@@ -90,6 +86,8 @@
         <activity android:name=".activity.TraceSetActivity">
         </activity>
         <activity android:name=".activity.RemoteActivity">
+        </activity>
+        <activity android:name=".activity.AdvanceSetActivity">
         </activity>
     </application>
 

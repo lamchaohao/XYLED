@@ -102,11 +102,13 @@
             <TextView
                 android:id="@+id/tv_set_trace"
                 android:textSize="18sp"
-                android:gravity="center"
+                android:gravity="right"
+                android:ellipsize="marquee"
                 android:text="P4_32*16_16S"
+                android:maxLines="1"
                 android:layout_centerVertical="true"
                 android:layout_alignParentRight="true"
-                android:layout_width="wrap_content"
+                android:layout_width="150dp"
                 android:layout_height="match_parent"/>
         </RelativeLayout>
 
@@ -126,44 +128,7 @@
                 android:layout_height="match_parent"/>
         </RelativeLayout>
 
-        <LinearLayout
-            android:background="@drawable/recycler_bg"
-            android:padding="5dp"
-            android:layout_margin="5dp"
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            <TextView
-                android:text="数据方向"
-                android:textSize="18sp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-            <Spinner
-                android:id="@+id/spn_set_dataOrientation"
-                android:entries="@array/dataOrientation"
-                android:layout_width="match_parent"
-                android:padding="10dp"
-                android:layout_height="wrap_content"/>
-        </LinearLayout>
-        <LinearLayout
-            android:background="@drawable/recycler_bg"
-            android:padding="5dp"
-            android:layout_margin="5dp"
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-            <TextView
-                android:text="增高加长"
-                android:textSize="18sp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-            <Spinner
-                android:id="@+id/spn_set_special"
-                android:entries="@array/pref_special"
-                android:layout_width="match_parent"
-                android:padding="10dp"
-                android:layout_height="wrap_content"/>
-        </LinearLayout>
+
         <LinearLayout
             android:background="@drawable/recycler_bg"
             android:padding="5dp"
@@ -221,6 +186,7 @@
                 android:padding="10dp"
                 android:layout_height="wrap_content"/>
         </LinearLayout>
+
         <LinearLayout
             android:background="@drawable/recycler_bg"
             android:padding="5dp"

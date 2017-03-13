@@ -66,7 +66,7 @@ import cn.com.hotled.xyled.dao.TextContentDao;
 import cn.com.hotled.xyled.decoration.WifiItemDecoration;
 import cn.com.hotled.xyled.global.Global;
 import cn.com.hotled.xyled.util.android.DensityUtil;
-import cn.com.hotled.xyled.view.PhotoView;
+import cn.com.hotled.xyled.view.photoview.PhotoView;
 import cn.com.hotled.xyled.view.numberpicker.NumberPicker;
 
 public class EasyTextActivity extends BaseActivity implements View.OnClickListener,AdapterView.OnItemSelectedListener {

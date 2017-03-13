@@ -294,4 +294,10 @@ public class ConnectFragment extends Fragment {
             startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
         }
     }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        getContext().unregisterReceiver(wifiStateReceiver);//取消监听广播
+    }
 }

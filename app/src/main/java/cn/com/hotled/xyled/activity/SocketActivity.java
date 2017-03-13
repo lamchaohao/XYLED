@@ -29,7 +29,7 @@ import cn.com.hotled.xyled.bean.SocketMessage;
 import cn.com.hotled.xyled.global.Global;
 import cn.com.hotled.xyled.util.android.WifiAdmin;
 
-import static cn.com.hotled.xyled.fragment.ScreenFragment.WIFI_ERRO;
+import static cn.com.hotled.xyled.global.Global.WIFI_ERRO;
 
 public class SocketActivity extends BaseActivity implements View.OnClickListener{
 
@@ -64,8 +64,6 @@ public class SocketActivity extends BaseActivity implements View.OnClickListener
         mAdapter = new MessageAdapter(this, mMessageList);
         mLinearLayoutManager = new LinearLayoutManager(this);
         mLinearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-        boolean b = mLinearLayoutManager.canScrollVertically();
-        Log.i("socket","canscrollvertically="+b);
         mRecyclerView.setLayoutManager(mLinearLayoutManager);
         mRecyclerView.setAdapter(mAdapter);
         setOnclick();
@@ -86,7 +84,6 @@ public class SocketActivity extends BaseActivity implements View.OnClickListener
         String ssid = wifiInfo.getSSID();
         String macStr = "";
         if (ssid.contains("HC-LED")){
-            Log.w("tcpSend","ssid = "+ssid);
             macStr = ssid.substring(ssid.indexOf("[")+1, ssid.indexOf("]"));
         }else {
             Message msg=new Message();
@@ -115,7 +112,6 @@ public class SocketActivity extends BaseActivity implements View.OnClickListener
             macInt2 = Integer.parseInt(mac1, 16);
             macInt3 = Integer.parseInt(mac2, 16);
             macInt4 = Integer.parseInt(mac3, 16);
-            Log.i("socketAct","six-matches="+macInt1+":"+macInt2+":"+macInt3+":"+macInt4);
         }else if (matcEight.matches()){
             String mac1 = macStr.substring(0, 2);
             String mac2 = macStr.substring(2, 4);
@@ -126,7 +122,6 @@ public class SocketActivity extends BaseActivity implements View.OnClickListener
             macInt2 = Integer.parseInt(mac2, 16);
             macInt3 = Integer.parseInt(mac3, 16);
             macInt4 = Integer.parseInt(mac4, 16);
-            Log.i("socketAct","eight-matches="+macInt1+":"+macInt2+":"+macInt3+":"+macInt4);
         } else{
             Message message = msgHandler.obtainMessage();
             message.what=WIFI_ERRO;
@@ -142,17 +137,8 @@ public class SocketActivity extends BaseActivity implements View.OnClickListener
                 pauseCMD[2]= (byte) macInt3;
                 pauseCMD[3]= (byte) macInt4;
                 pauseCMD[4]= 16;
-                pauseCMD[5]= 0;//Data Length
-                pauseCMD[6]= 0;//Data Length
-                pauseCMD[7]= 0;//Data Length
-                pauseCMD[8]= 0;//包序Serial Number
-                pauseCMD[9]= 0;//包序Serial Number
-                pauseCMD[10]= 0;//包序Serial Number
                 pauseCMD[11]= 8; //cmd
-                pauseCMD[12]= 0;
-                pauseCMD[13]= 0;
-                pauseCMD[14]= 0;
-                pauseCMD[15]= 0;
+
                 SendCMD pause=new SendCMD(pauseCMD);
                 new Thread(pause).start();
                 SocketMessage pauseMSG = new SocketMessage("Pause指令",System.currentTimeMillis(),true,false);
@@ -165,17 +151,8 @@ public class SocketActivity extends BaseActivity implements View.OnClickListener
                 resetCMD[2]= (byte) macInt3;
                 resetCMD[3]= (byte) macInt4;
                 resetCMD[4]= 16;
-                resetCMD[5]= 0;//Data Length
-                resetCMD[6]= 0;//Data Length
-                resetCMD[7]= 0;//Data Length
-                resetCMD[8]= 0;//包序Serial Number
-                resetCMD[9]= 0;//包序Serial Number
-                resetCMD[10]= 0;//包序Serial Number
                 resetCMD[11]= 4; //cmd 0x00000100
-                resetCMD[12]= 0;
-                resetCMD[13]= 0;
-                resetCMD[14]= 0;
-                resetCMD[15]= 0;
+
                 SendCMD reset=new SendCMD(resetCMD);
                 new Thread(reset).start();
                 SocketMessage reSetMSG = new SocketMessage("RESET指令",System.currentTimeMillis(),true,false);
@@ -188,17 +165,8 @@ public class SocketActivity extends BaseActivity implements View.OnClickListener
                 resumeCMD[2]= (byte) macInt3;
                 resumeCMD[3]= (byte) macInt4;
                 resumeCMD[4]= 16;
-                resumeCMD[5]= 0;//Data Length
-                resumeCMD[6]= 0;//Data Length
-                resumeCMD[7]= 0;//Data Length
-                resumeCMD[8]= 0;//包序Serial Number
-                resumeCMD[9]= 0;//包序Serial Number
-                resumeCMD[10]= 0;//包序Serial Number
                 resumeCMD[11]= 12; //cmd 0x00000100
-                resumeCMD[12]= 0;
-                resumeCMD[13]= 0;
-                resumeCMD[14]= 0;
-                resumeCMD[15]= 0;
+
                 SendCMD resume=new SendCMD(resumeCMD);
                 new Thread(resume).start();
                 SocketMessage resumeMSG = new SocketMessage("Resume指令",System.currentTimeMillis(),true,false);
@@ -214,17 +182,8 @@ public class SocketActivity extends BaseActivity implements View.OnClickListener
                 testCMD[2]= (byte) macInt3;
                 testCMD[3]= (byte) macInt4;
                 testCMD[4]= 16;
-                testCMD[5]= 0;//Data Length
-                testCMD[6]= 0;//Data Length
-                testCMD[7]= 0;//Data Length
-                testCMD[8]= 0;//包序Serial Number
-                testCMD[9]= 0;//包序Serial Number
-                testCMD[10]= 0;//包序Serial Number
                 testCMD[11]= 0; //cmd
-                testCMD[12]= 0;
-                testCMD[13]= 0;
-                testCMD[14]= 0;
-                testCMD[15]= 0;
+
                 SendCMD test=new SendCMD(testCMD);
                 new Thread(test).start();
 
@@ -233,6 +192,7 @@ public class SocketActivity extends BaseActivity implements View.OnClickListener
                 break;
         }
         mAdapter.notifyDataSetChanged();
+        mRecyclerView.smoothScrollToPosition(mMessageList.size());
     }
 
     class SendCMD extends Thread{
@@ -329,15 +289,24 @@ public class SocketActivity extends BaseActivity implements View.OnClickListener
             switch (msg.what){
                 case ERROR_CODE:
                     Bundle bundle = msg.getData();
-                    SocketMessage error=new SocketMessage(bundle.getString("error"),System.currentTimeMillis(),true,true);
+                    String error1 = bundle.getString("error");
+                    String message = "";
+                    if (error1.contains("ECONNREFUSED")) {
+                        message= "连接错误";//android.system.ErrnoException: connect failed: ECONNREFUSED (Connection refused)
+                    }else {
+                        message= "连接超时";
+                    }
+                    SocketMessage error=new SocketMessage(message,System.currentTimeMillis(),false,true);
                     mMessageList.add(error);
                     mAdapter.notifyItemInserted(mMessageList.size());
+                    mRecyclerView.smoothScrollToPosition(mMessageList.size());
                     break;
                 case READ_MSG_CODE:
                     Bundle data = msg.getData();
                     SocketMessage smsg=new SocketMessage(data.getString("result"),System.currentTimeMillis(),true,true);
                     mMessageList.add(smsg);
                     mAdapter.notifyItemInserted(mMessageList.size());
+                    mRecyclerView.smoothScrollToPosition(mMessageList.size());
                     break;
                 case ERROR_WIFI:
                     Toast.makeText(SocketActivity.this,"所连接WiFi非本公司产品，请切换WiFi",Toast.LENGTH_LONG).show();

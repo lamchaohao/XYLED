@@ -64,8 +64,11 @@ import cn.com.hotled.xyled.dao.ProgramDao;
 import cn.com.hotled.xyled.dao.TextContentDao;
 import cn.com.hotled.xyled.global.Global;
 import cn.com.hotled.xyled.util.android.DensityUtil;
-import cn.com.hotled.xyled.view.PhotoView;
+import cn.com.hotled.xyled.view.photoview.PhotoView;
 import cn.com.hotled.xyled.view.numberpicker.NumberPicker;
+
+import static cn.com.hotled.xyled.global.Global.EXTRA_TEXT_CONTENT;
+import static cn.com.hotled.xyled.global.Global.TEXT_CONTENT_CHANGE_CODE;
 
 public class ChangeLineTextActivity extends BaseActivity implements View.OnClickListener,AdapterView.OnItemSelectedListener,SeekBar.OnSeekBarChangeListener {
 
@@ -915,6 +918,9 @@ public class ChangeLineTextActivity extends BaseActivity implements View.OnClick
         mProgram.setBaseY(mBaseY);
         mProgram.setBaseX(mBaseX);
         mProgramDao.insertOrReplace(mProgram);
+        Intent intent = new Intent();
+        intent.putExtra(EXTRA_TEXT_CONTENT,mTextContent.getText());
+        setResult(TEXT_CONTENT_CHANGE_CODE,intent);
         ChangeLineTextActivity.super.onBackPressed();
     }
 

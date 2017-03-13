@@ -25,7 +25,7 @@ import cn.com.hotled.xyled.R;
 import cn.com.hotled.xyled.bean.Program;
 import cn.com.hotled.xyled.dao.ProgramDao;
 import cn.com.hotled.xyled.global.Global;
-import cn.com.hotled.xyled.view.PhotoView;
+import cn.com.hotled.xyled.view.photoview.PhotoView;
 
 public class PhotoEditActivity extends BaseActivity implements SeekBar.OnSeekBarChangeListener{
 

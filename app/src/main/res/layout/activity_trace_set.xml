@@ -77,7 +77,7 @@
             android:layout_weight="1"
             android:id="@+id/bt_traceset_commit"
             android:text="确定"
-            android:background="@drawable/recycler_bg"
+            android:background="@drawable/sendbutton_bg"
             android:layout_width="0dp"
             android:layout_height="wrap_content"/>
         <Button
@@ -85,7 +85,7 @@
             android:layout_weight="1"
             android:id="@+id/bt_traceset_showAll"
             android:text="全部"
-            android:background="@drawable/recycler_bg"
+            android:background="@drawable/sendbutton_bg"
             android:layout_width="0dp"
             android:layout_height="wrap_content"/>
     </LinearLayout>

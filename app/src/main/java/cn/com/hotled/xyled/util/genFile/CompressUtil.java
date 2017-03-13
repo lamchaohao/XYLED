@@ -15,10 +15,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import cn.com.hotled.xyled.activity.SendActivity;
 import cn.com.hotled.xyled.bean.Program;
 import cn.com.hotled.xyled.bean.ProgramType;
 import cn.com.hotled.xyled.flowbound.ClockwiseFlow;
+
+import static cn.com.hotled.xyled.global.Global.GENFILE_DONE;
 
 /**
  * Created by Lam on 2016/12/15.
@@ -533,7 +534,7 @@ public class CompressUtil {
             Log.i("move", "genfile done--------------------------------");
 
             Message message = mHandler.obtainMessage();
-            message.what= SendActivity.GENFILE_DONE;
+            message.what= GENFILE_DONE;
             mHandler.sendMessage(message);
 
         } catch (FileNotFoundException e) {

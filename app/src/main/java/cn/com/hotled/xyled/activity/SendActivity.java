@@ -42,12 +42,13 @@ import cn.com.hotled.xyled.global.Global;
 import cn.com.hotled.xyled.util.android.WifiAdmin;
 import cn.com.hotled.xyled.util.genFile.GenFileUtil2;
 
+import static cn.com.hotled.xyled.global.Global.CONNECT_NORESPONE;
+import static cn.com.hotled.xyled.global.Global.CONNECT_TIMEOUT;
+import static cn.com.hotled.xyled.global.Global.GENFILE_DONE;
+import static cn.com.hotled.xyled.global.Global.UPDATE_PROGRESS;
+import static cn.com.hotled.xyled.global.Global.WIFI_ERRO;
+
 public class SendActivity extends BaseActivity {
-    private static final int UPDATE_PROGRESS = 0x11;
-    private static final int WIFI_ERRO = 0x114;
-    private static final int CONN_ERRO = 0x124;
-    private static final int CONN_OUT_OF_TIME = 0x134;
-    public static final int GENFILE_DONE=0x204;
     private TextView mTvStatus;
     private boolean isSending=false;
     private boolean fileReady=false;
@@ -82,14 +83,14 @@ public class SendActivity extends BaseActivity {
                     startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
                     isSending=false;
                     break;
-                case CONN_ERRO:
+                case CONNECT_NORESPONE:
                     Toast.makeText(SendActivity.this,"连接错误，请重新连接屏幕",Toast.LENGTH_LONG).show();
                     mTvStatus.setText("无法发送，请重新连接屏幕");
                     mSendAnim.cancel();
                     mSendOutsideAnim.cancel();
                     isSending=false;
                     break;
-                case CONN_OUT_OF_TIME:
+                case CONNECT_TIMEOUT:
                     Toast.makeText(SendActivity.this,"连接超时，请重试",Toast.LENGTH_LONG).show();
                     mTvStatus.setText("连接超时，请重试");
                     mSendAnim.cancel();
@@ -142,8 +143,6 @@ public class SendActivity extends BaseActivity {
         int screenWidth = getSharedPreferences(Global.SP_SCREEN_CONFIG, MODE_PRIVATE).getInt(Global.KEY_SCREEN_W, 64);
         int screenHeight = getSharedPreferences(Global.SP_SCREEN_CONFIG, MODE_PRIVATE).getInt(Global.KEY_SCREEN_H, 32);
 
-//        CompressUtil compressUtil=new CompressUtil(this,mProgramList,screenWidth,screenHeight,mHandler);
-//        compressUtil.startGenFile();
         TextContentDao textContentDao = ((App) getApplication()).getDaoSession().getTextContentDao();
         List<TextContent> textContents = new ArrayList<>();
         for (Program program : mProgramList) {
@@ -250,10 +249,9 @@ public class SendActivity extends BaseActivity {
             mHandler.sendMessage(message);
             return;
         }
-        Log.w("tcpSend","mac = "+macInt1+":"+macInt2+":"+macInt3+":"+macInt4);
         try {
             socket = new Socket(Global.SERVER_IP,Global.SERVER_PORT);
-//            socket.setSoTimeout(3000);
+            socket.setSoTimeout(10000);
             File file =new File(getFilesDir()+"/color.prg");
             fis = new FileInputStream(file);
             os = socket.getOutputStream();
@@ -263,25 +261,11 @@ public class SendActivity extends BaseActivity {
             long fileLength = file.length();
 
             byte[] testCMD=new byte[16];
-            //8032364e 128 50 35 78
-            //
-            //8030ed86  128 48 237 134
             testCMD[0]= (byte) macInt1;
             testCMD[1]= (byte) macInt2;
             testCMD[2]= (byte) macInt3;
             testCMD[3]= (byte) macInt4;
             testCMD[4]= 16;
-            testCMD[5]= 0;//Data Length
-            testCMD[6]= 0;//Data Length
-            testCMD[7]= 0;//Data Length
-            testCMD[8]= 0;//包序Serial Number
-            testCMD[9]= 0;//包序Serial Number
-            testCMD[10]= 0;//包序Serial Number
-            testCMD[11]= 0; //cmd
-            testCMD[12]= 0;
-            testCMD[13]= 0;
-            testCMD[14]= 0;
-            testCMD[15]= 0;
 
             byte[] pauseCMD = new byte[16];
             pauseCMD[0]= (byte) macInt1;
@@ -289,17 +273,7 @@ public class SendActivity extends BaseActivity {
             pauseCMD[2]= (byte) macInt3;
             pauseCMD[3]= (byte) macInt4;
             pauseCMD[4]= 16;
-            pauseCMD[5]= 0;//Data Length
-            pauseCMD[6]= 0;//Data Length
-            pauseCMD[7]= 0;//Data Length
-            pauseCMD[8]= 0;//包序Serial Number
-            pauseCMD[9]= 0;//包序Serial Number
-            pauseCMD[10]= 0;//包序Serial Number
             pauseCMD[11]= 8; //cmd
-            pauseCMD[12]= 0;
-            pauseCMD[13]= 0;
-            pauseCMD[14]= 0;
-            pauseCMD[15]= 0;
 
             byte[] resetCMD=new byte[16];
             resetCMD[0]= (byte) macInt1;
@@ -307,17 +281,7 @@ public class SendActivity extends BaseActivity {
             resetCMD[2]= (byte) macInt3;
             resetCMD[3]= (byte) macInt4;
             resetCMD[4]= 16;
-            resetCMD[5]= 0;//Data Length
-            resetCMD[6]= 0;//Data Length
-            resetCMD[7]= 0;//Data Length
-            resetCMD[8]= 0;//包序Serial Number
-            resetCMD[9]= 0;//包序Serial Number
-            resetCMD[10]= 0;//包序Serial Number
             resetCMD[11]= 4; //cmd
-            resetCMD[12]= 0;
-            resetCMD[13]= 0;
-            resetCMD[14]= 0;
-            resetCMD[15]= 0;
 
             //执行测试指令
             os.write(testCMD);
@@ -327,11 +291,9 @@ public class SendActivity extends BaseActivity {
 
             for (int i = 0; i < readMsg.length; i++) {
                 if(testCMD[i]!=readMsg[i]){
-                    Log.w("tcpSend","握手不成功 readMsg.equals(testCMD) false");
                 }else {
 
                 }
-//                Log.w("tcpSend","返回的 testCMD msg="+readMsg[i]);
             }
 
             //执行暂停指令
@@ -341,12 +303,10 @@ public class SendActivity extends BaseActivity {
             boolean pauseSuccess = true;
             for (int i = 0; i < readMsg.length; i++) {
                 if(pauseCMD[i]!=readMsg[i]){
-                    Log.d("tcpSend","暂停不成功 pauseCMD[i]!=readMsg[i]");
                     pauseSuccess = false;
                 }
             }
             if (pauseSuccess) {
-                Log.d("tcpSend","暂停成功");
                 //暂停了,开始写数据
                 Log.d("tcpSend","开始写数据");
                 Log.d("tcpSend","mFile size--"+file.length()+" byte");
@@ -396,33 +356,20 @@ public class SendActivity extends BaseActivity {
                     byte[] dataPackLength = intToByteArray(512, 3);
                     byte[] serialNumBytes = intToByteArray(serialNum, 3);
                     byte[] flashAddBytes = intToByteArray(flashAddress, 4);
+
                     setInbyteArray(5,dataPackLength,writeCMD);//包长度
                     setInbyteArray(8,serialNumBytes,writeCMD); //包序
                     setInbyteArray(12,flashAddBytes,writeCMD); //flash地址
 
-                    StringBuilder writeSB = new StringBuilder();
-                    for (int i = 0; i < writeCMD.length; i++) {
-                        String s = writeCMD[i] + " ";
-                        writeSB.append(s);
-                    }
-//                    Log.d("tcpSend","writeSB == "+writeSB.toString());
                     setInbyteArray(0,writeCMD,sendPack);//写指令
                     setInbyteArray(16,buf,sendPack);//文件数据
 
-//                    Log.d("tcpSend","flashAddress == "+flashAddress+",serialNum= "+serialNum);
-                    Log.d("tcpSend","serialNum == "+serialNum);
                     os.write(sendPack,0,sendPack.length);
-                    flashAddress += 512;
-                    serialNum --;
-
                     socket.getInputStream().read(feedBackData);//读取返回的数据
 
-                    StringBuilder sb = new StringBuilder();
-                    for (int i = 0; i < feedBackData.length; i++) {
-                        String s = feedBackData[i] + " ";
-                        sb.append(s);
-                    }
-//                    Log.d("tcpSend","feedBackData == "+sb.toString());
+                    flashAddress += 512;
+                    serialNum --;
+                    //检车是否发送成功
                     for(int startIndex =5;startIndex<8;startIndex++ ){
                         if(feedBackData[startIndex]==0){
                             writeSuccess=true;
@@ -431,8 +378,7 @@ public class SendActivity extends BaseActivity {
                             continue;
                         }
                     }
-
-//                    Log.d("tcpSend","writeSuccess == "+writeSuccess+" ");
+                    //更新进度
                     progress+=len;
                     float sumProgress = (progress / fileLength)*100;
                     Message msg=mHandler.obtainMessage();
@@ -441,7 +387,6 @@ public class SendActivity extends BaseActivity {
                     mHandler.sendMessage(msg);
                 }
                 //最后发送第一个包
-
                 byte[] sendPack = new byte[16+512];
                 byte[] dataPackLength = intToByteArray(512, 3);
                 byte[] serialNumBytes = intToByteArray(0, 3);
@@ -452,8 +397,7 @@ public class SendActivity extends BaseActivity {
 
                 setInbyteArray(0,writeCMD,sendPack);//暂停指令
                 setInbyteArray(16,firstPackage,sendPack);//文件数据
-//                Log.w("tcpSend","firstPackage == "+firstPackage);
-                Log.d("tcpSend","flashAddress == "+0+",serialNum= "+0);
+
                 os.write(sendPack,0,sendPack.length);
                 progress+=firstPackage.length;
                 float sumProgress = (progress / fileLength)*100;
@@ -461,24 +405,22 @@ public class SendActivity extends BaseActivity {
                 msg.arg1= (int) sumProgress;
                 msg.what=UPDATE_PROGRESS;
                 mHandler.sendMessage(msg);
-                Log.d("tcpSend","sumProgress == "+msg.arg1);
 
                 socket.getInputStream().read(feedBackData);
 
                 os.write(resetCMD);
                 socket.getInputStream().read(feedBackData);
-                Log.d("tcpSend","写入reset指令后读取 == "+0+",feedBackData= "+0);
                 Log.d("tcpSend","send file done");
             }
 
         } catch (ConnectException e){
             Message message = mHandler.obtainMessage();
-            message.what=CONN_ERRO;
+            message.what=CONNECT_NORESPONE;
             mHandler.sendMessage(message);
         } catch (IOException e) {
             e.printStackTrace();
             Message message = mHandler.obtainMessage();
-            message.what=CONN_OUT_OF_TIME;
+            message.what=CONNECT_TIMEOUT;
             mHandler.sendMessage(message);
         }finally {
             if (socket!=null&&!socket.isClosed()){

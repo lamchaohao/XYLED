@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import cn.com.hotled.xyled.activity.SendActivity;
 import cn.com.hotled.xyled.bean.Program;
 import cn.com.hotled.xyled.bean.ProgramType;
 import cn.com.hotled.xyled.bean.TextContent;
@@ -28,6 +27,7 @@ import cn.com.hotled.xyled.util.timeaxis.MoveRight;
 import cn.com.hotled.xyled.util.timeaxis.MoveUp;
 import cn.com.hotled.xyled.util.timeaxis.StaticShow;
 
+import static cn.com.hotled.xyled.global.Global.GENFILE_DONE;
 import static cn.com.hotled.xyled.util.genFile.ByteUtil.intToByteArray;
 import static cn.com.hotled.xyled.util.genFile.ByteUtil.setInbyteArray;
 
@@ -644,7 +644,7 @@ public class GenFileUtil2 {
                 Log.i("genfile2", "genfile done--------------------------------");
 
                 Message message = mHandler.obtainMessage();
-                message.what= SendActivity.GENFILE_DONE;
+                message.what= GENFILE_DONE;
                 mHandler.sendMessage(message);
 
             } catch (FileNotFoundException e) {

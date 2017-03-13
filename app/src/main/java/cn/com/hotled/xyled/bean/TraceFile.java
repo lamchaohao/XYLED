@@ -23,9 +23,17 @@ public class TraceFile {
     private int scan;
     private int size;
     private int hub;
-    @Generated(hash = 31877040)
+    private int scanCount;
+    private int foldCount;
+    private int moduleWidth;
+    private int moduleHeight;
+    private int RGBCount;
+    private int dotCount;
+    @Generated(hash = 1885271922)
     public TraceFile(long id, String traceLineFile_en, String traceLineFile_zh,
-            File filePath, int pixel, int scan, int size, int hub) {
+            File filePath, int pixel, int scan, int size, int hub, int scanCount,
+            int foldCount, int moduleWidth, int moduleHeight, int RGBCount,
+            int dotCount) {
         this.id = id;
         this.traceLineFile_en = traceLineFile_en;
         this.traceLineFile_zh = traceLineFile_zh;
@@ -34,6 +42,12 @@ public class TraceFile {
         this.scan = scan;
         this.size = size;
         this.hub = hub;
+        this.scanCount = scanCount;
+        this.foldCount = foldCount;
+        this.moduleWidth = moduleWidth;
+        this.moduleHeight = moduleHeight;
+        this.RGBCount = RGBCount;
+        this.dotCount = dotCount;
     }
     @Generated(hash = 1553351687)
     public TraceFile() {
@@ -85,6 +99,42 @@ public class TraceFile {
     }
     public void setHub(int hub) {
         this.hub = hub;
+    }
+    public int getScanCount() {
+        return this.scanCount;
+    }
+    public void setScanCount(int scanCount) {
+        this.scanCount = scanCount;
+    }
+    public int getFoldCount() {
+        return this.foldCount;
+    }
+    public void setFoldCount(int foldCount) {
+        this.foldCount = foldCount;
+    }
+    public int getModuleWidth() {
+        return this.moduleWidth;
+    }
+    public void setModuleWidth(int moduleWidth) {
+        this.moduleWidth = moduleWidth;
+    }
+    public int getModuleHeight() {
+        return this.moduleHeight;
+    }
+    public void setModuleHeight(int moduleHeight) {
+        this.moduleHeight = moduleHeight;
+    }
+    public int getRGBCount() {
+        return this.RGBCount;
+    }
+    public void setRGBCount(int RGBCount) {
+        this.RGBCount = RGBCount;
+    }
+    public int getDotCount() {
+        return this.dotCount;
+    }
+    public void setDotCount(int dotCount) {
+        this.dotCount = dotCount;
     }
 
     

@@ -15,13 +15,12 @@ import java.net.Socket;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import cn.com.hotled.xyled.fragment.ScreenFragment;
 import cn.com.hotled.xyled.global.Global;
 import cn.com.hotled.xyled.util.android.WifiAdmin;
 
-import static cn.com.hotled.xyled.fragment.ScreenFragment.READ_FAILE;
-import static cn.com.hotled.xyled.fragment.ScreenFragment.READ_SUCCESS;
-import static cn.com.hotled.xyled.fragment.ScreenFragment.WIFI_ERRO;
+import static cn.com.hotled.xyled.global.Global.READ_FAILE;
+import static cn.com.hotled.xyled.global.Global.READ_SUCCESS;
+import static cn.com.hotled.xyled.global.Global.WIFI_ERRO;
 
 /**
  * Created by Lam on 2017/2/10.
@@ -187,18 +186,13 @@ public class ReadScreenDataUtil {
 
             //执行测试指令
             os.write(testCMD);
-            Log.w("tcpSend","发送测试指令");
             byte[] readMsg = new byte[16];
             socket.getInputStream().read(readMsg);//读取返回
 
 
             for (int i = 0; i < readMsg.length; i++) {
                 if(testCMD[i]!=readMsg[i]){
-                    for (int i1 = 0; i1 < readMsg.length; i1++) {
-                        Log.w("tcpSend","i1"+i1+"msg="+readMsg[i1]);
-                    }
-                    Log.w("tcpSend","握手不成功 readMsg.equals(testCMD) false");
-                    mHandler.sendEmptyMessageDelayed(ScreenFragment.READ_FAILE,1500);
+                    mHandler.sendEmptyMessageDelayed(READ_FAILE,1500);
                 }else {
 
                 }
@@ -210,8 +204,7 @@ public class ReadScreenDataUtil {
             boolean pauseSuccess = true;
             for (int i = 0; i < readMsg.length; i++) {
                 if(pauseCMD[i]!=readMsg[i]){
-                    Log.d("tcpSend","暂停不成功 pauseCMD[i]!=readMsg[i]");
-                    mHandler.sendEmptyMessageDelayed(ScreenFragment.READ_FAILE,1500);
+                    mHandler.sendEmptyMessageDelayed(READ_FAILE,1500);
                     pauseSuccess = false;
                 }
             }
@@ -222,8 +215,6 @@ public class ReadScreenDataUtil {
 
                 int ra=129024;
                 int ea=131071;
-                Log.i("read","ra="+ra);
-                Log.i("read","ea="+ea);
                 for (int k = 0; k < 4; k++) {
                     byte[] bytes = intToByteArray(ra, 4);
                     setInbyteArray(12,bytes,readCMD);
@@ -269,15 +260,19 @@ public class ReadScreenDataUtil {
             message.what=READ_FAILE;
             mHandler.sendMessage(message);
         }finally {
-            try {
-                os.close();
-            } catch (IOException e) {
-                e.printStackTrace();
+            if (os!=null){
+                try {
+                    os.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
-            try {
-                socket.close();
-            } catch (IOException e) {
-                e.printStackTrace();
+            if (socket!=null&&!socket.isClosed()){
+                try {
+                    socket.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }

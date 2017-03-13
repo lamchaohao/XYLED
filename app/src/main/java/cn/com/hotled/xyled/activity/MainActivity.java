@@ -3,6 +3,7 @@ package cn.com.hotled.xyled.activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -26,7 +27,6 @@ import cn.com.hotled.xyled.fragment.SettingFragment;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private static final int ADD_SCREEN_CODE = 366;
     @BindView(R.id.iv_main_screen)
     ImageView ivScreen;
     @BindView(R.id.iv_main_connect)
@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private ViewPager mViewPager;
     private ArrayList<Fragment> fragmentList = new ArrayList<>();
-    private android.support.v4.app.FragmentManager mFragmentManager;
+    private FragmentManager mFragmentManager;
     private TextView mToolbarTitle;
     private ScreenFragment mScreenFragment;
     private SettingFragment mSettingFragment;

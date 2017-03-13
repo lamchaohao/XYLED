@@ -7,7 +7,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="cn.com.hotled.xyled.activity.PhotoEditActivity">
-    <cn.com.hotled.xyled.view.PhotoView
+    <cn.com.hotled.xyled.view.photoview.PhotoView
         android:id="@+id/pv_photo"
         android:background="#EEEEEE"
         android:layout_width="match_parent"

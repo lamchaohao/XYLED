@@ -12,7 +12,7 @@ import android.widget.ImageView;
 import java.io.File;
 
 import cn.com.hotled.xyled.R;
-import cn.com.hotled.xyled.view.PhotoView;
+import cn.com.hotled.xyled.view.photoview.PhotoView;
 
 
 public class BrowsePhotoActivity extends Activity {

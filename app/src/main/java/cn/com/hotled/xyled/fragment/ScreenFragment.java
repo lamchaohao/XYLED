@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
@@ -19,7 +18,6 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,29 +34,29 @@ import cn.com.hotled.xyled.adapter.ProgramAdapter;
 import cn.com.hotled.xyled.bean.Program;
 import cn.com.hotled.xyled.bean.ProgramType;
 import cn.com.hotled.xyled.bean.TextContent;
+import cn.com.hotled.xyled.dao.ProgramDao;
 import cn.com.hotled.xyled.dao.TextContentDao;
 import cn.com.hotled.xyled.global.Global;
 import cn.com.hotled.xyled.util.communicate.ReadScreenDataUtil;
 
 import static android.app.Activity.RESULT_OK;
 import static android.content.Context.MODE_PRIVATE;
-import static cn.com.hotled.xyled.R.id.fab_screen_add;
+import static cn.com.hotled.xyled.global.Global.READ_FAILE;
+import static cn.com.hotled.xyled.global.Global.READ_SUCCESS;
+import static cn.com.hotled.xyled.global.Global.TEXT_CONTENT_CHANGE_CODE;
+import static cn.com.hotled.xyled.global.Global.WIFI_ERRO;
 
 /**
  * Created by Lam on 2016/12/1.
  */
 
 public class ScreenFragment extends Fragment implements View.OnClickListener {
-    private static final String TAG = "ScreenFragment";
     private static final int EASY_TEXT_REQUEST_CODE = 0x23;
     private static final int PHOTO_REQUEST_CODE = 0x24;
     private static final int ITEM_MANAGE_REQUEST_CODE = 0x25;
-    public static final int WIFI_ERRO = 101;
-    public static final int READ_SUCCESS = 200;
-    public static final int READ_FAILE = 400;
+
     private RecyclerView mRecyclerView;
     private ProgramAdapter mAdapter;
-    private android.support.design.widget.FloatingActionButton mFabAdd;
     private String mTitlePart;
     private int mProgramPosition;
     private List<Program> mProgramList;
@@ -99,9 +97,7 @@ public class ScreenFragment extends Fragment implements View.OnClickListener {
     private TextView mTvCardName;
     private TextView mTvScreenSize;
     private TextView mTvScreenScanCount;
-    private LinearLayout subMenuFab;
-    private LinearLayout mLlAddText;
-    private LinearLayout mLlAddPic;
+    private ProgramDao mProgramDao;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -122,6 +118,7 @@ public class ScreenFragment extends Fragment implements View.OnClickListener {
 
     private void initView(View view) {
         initActionButton(view);
+        TextContentDao textContentDao = ((App) (getActivity().getApplication())).getDaoSession().getTextContentDao();
         mScreenView = view.findViewById(R.id.cv_contentScreen_screen);
         mIvRefresh = (ImageView) view.findViewById(R.id.iv_screenCatag_refresh);
         mTvCardName = (TextView) view.findViewById(R.id.tv_screenCatag_card);
@@ -130,7 +127,7 @@ public class ScreenFragment extends Fragment implements View.OnClickListener {
         mScreenView.setOnClickListener(this);
         mIvRefresh.setOnClickListener(this);
         mRecyclerView = (RecyclerView) view.findViewById(R.id.rv_fragmScreen);
-        mAdapter = new ProgramAdapter(getContext(), mProgramList);
+        mAdapter = new ProgramAdapter(getContext(), mProgramList,textContentDao);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         mRecyclerView.setAdapter(mAdapter);
         mAdapter.setOnItemClickListener(new ProgramAdapter.OnItemClickListener() {
@@ -192,9 +189,18 @@ public class ScreenFragment extends Fragment implements View.OnClickListener {
 
     }
 
+    private void initActionButton(View view) {
+        View fabAddText = view.findViewById(R.id.fab_screen_add_text);
+        View fabAddPic = view.findViewById(R.id.fab_screen_add_pic);
+        fabAddText.setOnClickListener(this);
+        fabAddPic.setOnClickListener(this);
+    }
+
     private void loadData() {
         mProgramList = new ArrayList<>();
-        List<Program> tempPrograms = ((App) (getActivity().getApplication())).getDaoSession().getProgramDao().queryBuilder().list();
+        mProgramDao = ((App) (getActivity().getApplication())).getDaoSession().getProgramDao();
+
+        List<Program> tempPrograms = mProgramDao.queryBuilder().list();
         Program[] sortProgramList = new Program[tempPrograms.size()];
         for (Program program : tempPrograms) {
             sortProgramList[program.getSortNumber()] = program;
@@ -204,15 +210,6 @@ public class ScreenFragment extends Fragment implements View.OnClickListener {
         }
     }
 
-    private void initActionButton(View view) {
-        mFabAdd = (FloatingActionButton) view.findViewById(fab_screen_add);
-        mFabAdd.setOnClickListener(this);
-        subMenuFab = (LinearLayout) view.findViewById(R.id.ll_screen_add_submenu);
-        mLlAddText = (LinearLayout) view.findViewById(R.id.ll_screen_add_text);
-        mLlAddPic = (LinearLayout) view.findViewById(R.id.ll_screen_add_pic);
-        mLlAddText.setOnClickListener(this);
-        mLlAddPic.setOnClickListener(this);
-    }
 
     private void updateScreenView() {
         SharedPreferences sharedPre = getContext().getSharedPreferences(Global.SP_SCREEN_CONFIG, MODE_PRIVATE);
@@ -228,15 +225,7 @@ public class ScreenFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.fab_screen_add:
-
-                if (subMenuFab.getVisibility() == View.VISIBLE) {
-                    subMenuFab.setVisibility(View.GONE);
-                } else {
-                    subMenuFab.setVisibility(View.VISIBLE);
-                }
-                break;
-            case R.id.ll_screen_add_text:
+            case R.id.fab_screen_add_text:
                 int size = mProgramList.size();
                 size++;
                 Program program = new Program();
@@ -244,7 +233,7 @@ public class ScreenFragment extends Fragment implements View.OnClickListener {
                 program.setProgramName("new Text" + size);
                 program.setSortNumber(mProgramList.size());
                 program.setProgramType(ProgramType.Text);
-                ((App) getActivity().getApplication()).getDaoSession().getProgramDao().insert(program);
+                mProgramDao.insert(program);
                 mProgramList.add(program);
                 mAdapter.notifyItemInserted(mProgramList.size());
                 break;
@@ -255,7 +244,7 @@ public class ScreenFragment extends Fragment implements View.OnClickListener {
             case R.id.iv_screenCatag_refresh:
                 readData();
                 break;
-            case R.id.ll_screen_add_pic:
+            case R.id.fab_screen_add_pic:
                 int proSize = mProgramList.size();
                 proSize++;
                 Program picProgram = new Program();
@@ -263,7 +252,7 @@ public class ScreenFragment extends Fragment implements View.OnClickListener {
                 picProgram.setProgramName("new pic" + proSize);
                 picProgram.setSortNumber(mProgramList.size());
                 picProgram.setProgramType(ProgramType.Pic);
-                ((App) getActivity().getApplication()).getDaoSession().getProgramDao().insert(picProgram);
+                mProgramDao.insert(picProgram);
                 mProgramList.add(picProgram);
                 mAdapter.notifyItemInserted(mProgramList.size());
                 break;
@@ -283,8 +272,11 @@ public class ScreenFragment extends Fragment implements View.OnClickListener {
         if (resultCode == RESULT_OK && requestCode == EASY_TEXT_REQUEST_CODE) {
             String newProgramName = data.getStringExtra("newProgramName");
             mProgramList.get(mProgramPosition).setProgramName(newProgramName);
-            mAdapter.notifyDataSetChanged();
-        } else if (resultCode == RESULT_OK && requestCode == ITEM_MANAGE_REQUEST_CODE) {
+            mAdapter.notifyItemChanged(mProgramPosition);
+        }if (resultCode == TEXT_CONTENT_CHANGE_CODE && requestCode == EASY_TEXT_REQUEST_CODE) {
+            mAdapter.notifyItemChanged(mProgramPosition);
+        }
+        else if (resultCode == RESULT_OK && requestCode == ITEM_MANAGE_REQUEST_CODE) {
 
             List<Program> list = ((App) getActivity().getApplication()).getDaoSession().getProgramDao().queryBuilder().list();
 

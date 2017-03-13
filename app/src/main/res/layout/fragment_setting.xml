@@ -5,83 +5,64 @@
               android:layout_height="match_parent">
 
     <LinearLayout
-        android:background="@drawable/recycler_bg"
-        android:layout_margin="15dp"
-        android:padding="10dp"
-        android:id="@+id/ll_setting_enterWifi"
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        style="@style/MainFragGuideGroup"
+        android:id="@+id/ll_setting_enterWifi">
         <ImageView
             android:src="@drawable/ic_wifi_green_a700_36dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
         <TextView
-            android:layout_marginLeft="20dp"
-            android:text="连接屏幕"
-            android:layout_gravity="center"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            style="@style/MainFragGuideText"
+            android:text="连接屏幕"/>
     </LinearLayout>
 
 
     <LinearLayout
-        android:background="@drawable/recycler_bg"
-        android:layout_margin="15dp"
-        android:padding="10dp"
-        android:id="@+id/ll_setting_socket"
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        style="@style/MainFragGuideGroup"
+        android:id="@+id/ll_setting_socket">
         <ImageView
             android:src="@drawable/ic_developer_board_primary_dark_36dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
         <TextView
-            android:layout_marginLeft="20dp"
-            android:text="测试通信"
-            android:layout_gravity="center"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            style="@style/MainFragGuideText"
+            android:text="测试通信"/>
     </LinearLayout>
     <LinearLayout
-        android:background="@drawable/recycler_bg"
-        android:layout_margin="15dp"
-        android:padding="10dp"
         android:id="@+id/ll_setting_screenConfig"
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        style="@style/MainFragGuideGroup">
         <ImageView
             android:src="@drawable/ic_phonelink_setup_primary_dark_36dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
         <TextView
-            android:layout_marginLeft="20dp"
-            android:text="屏幕设置"
-            android:layout_gravity="center"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            style="@style/MainFragGuideText"
+            android:text="屏幕设置"/>
     </LinearLayout>
 
     <LinearLayout
-        android:background="@drawable/recycler_bg"
-        android:layout_margin="15dp"
-        android:padding="10dp"
+        style="@style/MainFragGuideGroup"
+        android:id="@+id/ll_setting_remoteSwitch">
+        <ImageView
+            android:src="@drawable/ic_settings_remote_green_a700_36dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <TextView
+            style="@style/MainFragGuideText"
+            android:text="远程切换"/>
+    </LinearLayout>
+
+    <LinearLayout
+        style="@style/MainFragGuideGroup"
         android:id="@+id/ll_setting_language"
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:orientation="horizontal">
         <ImageView
             android:src="@drawable/ic_language_primary_dark_36dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
         <TextView
-            android:layout_marginLeft="20dp"
-            android:text="语言"
-            android:layout_gravity="center"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            style="@style/MainFragGuideText"
+            android:text="语言设置"/>
     </LinearLayout>
 
 </LinearLayout>

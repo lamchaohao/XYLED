@@ -20,9 +20,10 @@ import butterknife.OnClick;
 import cn.com.hotled.xyled.R;
 import cn.com.hotled.xyled.util.communicate.RemoteSwitchUtil;
 
-import static cn.com.hotled.xyled.fragment.ScreenFragment.READ_FAILE;
-import static cn.com.hotled.xyled.fragment.ScreenFragment.READ_SUCCESS;
-import static cn.com.hotled.xyled.fragment.ScreenFragment.WIFI_ERRO;
+import static cn.com.hotled.xyled.global.Global.READ_FAILE;
+import static cn.com.hotled.xyled.global.Global.READ_SUCCESS;
+import static cn.com.hotled.xyled.global.Global.WIFI_ERRO;
+
 
 public class RemoteActivity extends BaseActivity {
 

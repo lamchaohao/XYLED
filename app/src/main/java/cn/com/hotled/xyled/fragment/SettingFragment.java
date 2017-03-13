@@ -50,13 +50,18 @@ public class SettingFragment extends Fragment {
             }
         });
 
-        view.findViewById(R.id.ll_setting_language).setOnClickListener(new View.OnClickListener(){
+        view.findViewById(R.id.ll_setting_remoteSwitch).setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(getContext(), RemoteActivity.class));
             }
         });
+        view.findViewById(R.id.ll_setting_language).setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
 
+            }
+        });
     }
 
 }

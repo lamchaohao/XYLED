@@ -5,7 +5,7 @@
              android:background="#000000"
              tools:context="cn.com.hotled.xyled.activity.BrowsePhotoActivity">
 
-    <cn.com.hotled.xyled.view.PhotoView
+    <cn.com.hotled.xyled.view.photoview.PhotoView
         android:id="@+id/pv_browsephoto"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

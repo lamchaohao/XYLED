@@ -5,7 +5,7 @@
               android:layout_height="match_parent"
               android:id="@+id/ll_fgText">
 
-    <cn.com.hotled.xyled.view.PhotoView
+    <cn.com.hotled.xyled.view.photoview.PhotoView
         android:id="@+id/pv_fgText_photo"
         android:layout_width="match_parent"
         android:layout_height="180dp"
