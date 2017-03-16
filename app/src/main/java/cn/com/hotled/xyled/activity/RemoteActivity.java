@@ -42,13 +42,13 @@ public class RemoteActivity extends BaseActivity {
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case WIFI_ERRO:
-                    Snackbar.make(mGvProgramButton,"未连接屏幕，请查屏",Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(mGvProgramButton, R.string.tos_screen_noresponse, Snackbar.LENGTH_SHORT).show();
                     break;
                 case READ_SUCCESS:
-                    Snackbar.make(mGvProgramButton,"切换成功",Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(mGvProgramButton, R.string.tos_switch_sucess, Snackbar.LENGTH_SHORT).show();
                     break;
                 case READ_FAILE:
-                    Snackbar.make(mGvProgramButton,"屏幕无响应，请重试",Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(mGvProgramButton, R.string.tos_screen_noresponse, Snackbar.LENGTH_SHORT).show();
                     break;
             }
         }

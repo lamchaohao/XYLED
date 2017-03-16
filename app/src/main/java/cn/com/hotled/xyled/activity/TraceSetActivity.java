@@ -9,7 +9,6 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.Spinner;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,6 +21,7 @@ import cn.com.hotled.xyled.adapter.TraceSelectAdapter;
 import cn.com.hotled.xyled.bean.Trace;
 import cn.com.hotled.xyled.bean.TraceFile;
 import cn.com.hotled.xyled.dao.TraceFileDao;
+import cn.com.hotled.xyled.global.Common;
 import cn.com.hotled.xyled.global.Global;
 
 public class TraceSetActivity extends BaseActivity implements AdapterView.OnItemSelectedListener{
@@ -41,7 +41,6 @@ public class TraceSetActivity extends BaseActivity implements AdapterView.OnItem
     @BindView(R.id.bt_traceset_showAll)
     Button mBtTracesetShowAll;
 
-    private File fileName;
     private int pixel;
     private int scan;
     private int size;
@@ -50,6 +49,8 @@ public class TraceSetActivity extends BaseActivity implements AdapterView.OnItem
     private List<Trace> mTraceList;
     private TraceSelectAdapter mTraceAdapter;
     private TraceFile mTraceFile;
+    private boolean isInitView = true;
+    private int initListenerCount;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,11 +62,15 @@ public class TraceSetActivity extends BaseActivity implements AdapterView.OnItem
     }
 
     private void loadData() {
+        long longExtra = getIntent().getLongExtra(Common.EX_id, -1);
         mTraceFileDao = ((App) getApplication()).getDaoSession().getTraceFileDao();
         List<TraceFile> list = mTraceFileDao.queryBuilder().list();
         mTraceList = new ArrayList<>();
         for (TraceFile traceFile : list) {
             Trace trace =new Trace(false,traceFile);
+            if (longExtra==traceFile.getId()){
+                trace.setSelected(true);
+            }
             mTraceList.add(trace);
         }
 
@@ -74,7 +79,8 @@ public class TraceSetActivity extends BaseActivity implements AdapterView.OnItem
     private void initView() {
         mTraceFile = new TraceFile();
         mRvSelectFile.setLayoutManager(new LinearLayoutManager(this));
-        mTraceAdapter = new TraceSelectAdapter(mTraceList, this);
+        int langInt = getSharedPreferences(Global.SP_SYSTEM_CONFIG, MODE_PRIVATE).getInt(Global.KEY_LANGUAGE, 0);
+        mTraceAdapter = new TraceSelectAdapter(mTraceList, this,langInt==1);
         mRvSelectFile.setAdapter(mTraceAdapter);
         mTraceAdapter.setOnItemClickListener(new TraceSelectAdapter.OnItemOnClickListener() {
             @Override
@@ -95,13 +101,16 @@ public class TraceSetActivity extends BaseActivity implements AdapterView.OnItem
             case R.id.bt_traceset_commit:
                 if (mTraceFile.getId()!=0) {
                     Intent intent=new Intent();
-                    intent.putExtra(Global.EXTRA_SELECT_TRACE,mTraceFile.getId());
+                    intent.putExtra(Common.EX_selectTrace,mTraceFile.getId());
                     setResult(RESULT_OK,intent);
                     TraceSetActivity.this.finish();
                 }
                 break;
             case R.id.bt_traceset_showAll:
-                updateData(true);
+                mSpnTracePixel.setSelection(0);
+                mSpnTraceScan.setSelection(0);
+                mSpnTraceSize.setSelection(0);
+                mSpnTraceHub.setSelection(0);
                 break;
         }
     }
@@ -122,20 +131,22 @@ public class TraceSetActivity extends BaseActivity implements AdapterView.OnItem
                 hub = position;
                 break;
         }
-        updateData(false);
+        if (!isInitView) {
+            updateData();
+        }else {
+            initListenerCount++;
+            if (initListenerCount==4)
+                isInitView=false;
+        }
     }
 
-    private void updateData(boolean isShowAll) {
-        List<TraceFile> list = null;
-        if (isShowAll){
-            list = mTraceFileDao.queryBuilder().list();
-        }else {
-            list = mTraceFileDao.queryBuilder().where(pixel==0?TraceFileDao.Properties.Pixel.isNotNull():TraceFileDao.Properties.Pixel.eq(pixel),
-                    scan==0?TraceFileDao.Properties.Scan.isNotNull():TraceFileDao.Properties.Scan.eq(scan),
-                    size==0?TraceFileDao.Properties.Size.isNotNull():TraceFileDao.Properties.Size.eq(size),
-                    hub==0?TraceFileDao.Properties.Hub.isNotNull():TraceFileDao.Properties.Hub.eq(hub))
-                    .list();
-        }
+    private void updateData() {
+
+        List<TraceFile> list = mTraceFileDao.queryBuilder().where(pixel==0?TraceFileDao.Properties.Pixel.isNotNull():TraceFileDao.Properties.Pixel.eq(pixel),
+                scan==0?TraceFileDao.Properties.Scan.isNotNull():TraceFileDao.Properties.Scan.eq(scan),
+                size==0?TraceFileDao.Properties.Size.isNotNull():TraceFileDao.Properties.Size.eq(size),
+                hub==0?TraceFileDao.Properties.Hub.isNotNull():TraceFileDao.Properties.Hub.eq(hub))
+                .list();
         mTraceList.clear();
         for (TraceFile traceFile : list) {
             Trace trace =new Trace(false,traceFile);

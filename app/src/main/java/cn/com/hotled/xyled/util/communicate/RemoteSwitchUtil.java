@@ -13,6 +13,7 @@ import java.net.Socket;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import cn.com.hotled.xyled.global.Common;
 import cn.com.hotled.xyled.global.Global;
 import cn.com.hotled.xyled.util.android.WifiAdmin;
 
@@ -64,7 +65,9 @@ public class RemoteSwitchUtil {
         WifiInfo wifiInfo = wifiAdmin.getWifiInfo();
         String ssid = wifiInfo.getSSID();
         String macStr = "";
-        if (ssid.contains("HC-LED")){
+        boolean startFlag = ssid.contains(Global.SSID_START);
+        boolean endFlag = ssid.contains(Global.SSID_END);
+        if (startFlag&&endFlag){
             macStr = ssid.substring(ssid.indexOf("[")+1, ssid.indexOf("]"));
         }else {
             Message message = mHandler.obtainMessage();
@@ -118,17 +121,7 @@ public class RemoteSwitchUtil {
             pauseCMD[2]= (byte) macInt3;
             pauseCMD[3]= (byte) macInt4;
             pauseCMD[4]= 16;
-            pauseCMD[5]= 0;//Data Length
-            pauseCMD[6]= 0;//Data Length
-            pauseCMD[7]= 0;//Data Length
-            pauseCMD[8]= 0;//包序Serial Number
-            pauseCMD[9]= 0;//包序Serial Number
-            pauseCMD[10]= 0;//包序Serial Number
             pauseCMD[11]= 8; //cmd
-            pauseCMD[12]= 0;
-            pauseCMD[13]= 0;
-            pauseCMD[14]= 0;
-            pauseCMD[15]= 0;
 
             byte[] resetCMD=new byte[16];
             resetCMD[0]= (byte) macInt1;
@@ -136,17 +129,7 @@ public class RemoteSwitchUtil {
             resetCMD[2]= (byte) macInt3;
             resetCMD[3]= (byte) macInt4;
             resetCMD[4]= 16;
-            resetCMD[5]= 0;//Data Length
-            resetCMD[6]= 0;//Data Length
-            resetCMD[7]= 0;//Data Length
-            resetCMD[8]= 0;//包序Serial Number
-            resetCMD[9]= 0;//包序Serial Number
-            resetCMD[10]= 0;//包序Serial Number
             resetCMD[11]= 4; //cmd
-            resetCMD[12]= 0;
-            resetCMD[13]= 0;
-            resetCMD[14]= 0;
-            resetCMD[15]= 0;
 
             byte[] writeCMD = new byte[16];
             writeCMD[0]= (byte) macInt1;
@@ -154,17 +137,7 @@ public class RemoteSwitchUtil {
             writeCMD[2]= (byte) macInt3;
             writeCMD[3]= (byte) macInt4;
             writeCMD[4]= 16;
-            writeCMD[5]= 0;//Data Length
-            writeCMD[6]= 0;//Data Length
-            writeCMD[7]= 0;//Data Length
-            writeCMD[8]= 0;//包序Serial Number
-            writeCMD[9]= 0;//包序Serial Number
-            writeCMD[10]= 0;//包序Serial Number
             writeCMD[11]= 21; //read cmd 0x00010001  write cmd=0x00010101;
-            writeCMD[12]= 0;//flash address
-            writeCMD[13]= 0;//flash address
-            writeCMD[14]= 0;//flash address
-            writeCMD[15]= 0;//flash address
 
             os = socket.getOutputStream();
             byte[] readMsg = new byte[16];
@@ -175,7 +148,6 @@ public class RemoteSwitchUtil {
             boolean pauseSuccess = true;
             for (int i = 0; i < readMsg.length; i++) {
                 if(pauseCMD[i]!=readMsg[i]){
-                    Log.d("tcpSend","暂停不成功 pauseCMD[i]!=readMsg[i]");
                     mHandler.sendEmptyMessageDelayed(READ_FAILE,1500);
                     pauseSuccess = false;
                 }
@@ -235,7 +207,9 @@ public class RemoteSwitchUtil {
         WifiInfo wifiInfo = wifiAdmin.getWifiInfo();
         String ssid = wifiInfo.getSSID();
         String macStr = "";
-        if (ssid.contains("HC-LED")){
+        boolean startFlag = ssid.contains(Global.SSID_START);
+        boolean endFlag = ssid.contains(Global.SSID_END);
+        if (startFlag&&endFlag){
             macStr = ssid.substring(ssid.indexOf("[")+1, ssid.indexOf("]"));
         }else {
             Message message = mHandler.obtainMessage();
@@ -283,7 +257,7 @@ public class RemoteSwitchUtil {
 
         try {
             socket = new Socket(Global.SERVER_IP, Global.SERVER_PORT);
-            File dataRead=new File(mContext.getFilesDir()+"/screenData.dat");
+            File dataRead=new File(mContext.getFilesDir()+ Common.FL_SCREEN_DATA);
             if (!dataRead.exists()) {
                 dataRead.createNewFile();
             }else {
@@ -297,17 +271,6 @@ public class RemoteSwitchUtil {
             testCMD[2] = (byte) macInt3;
             testCMD[3] = (byte) macInt4;
             testCMD[4] = 16;
-            testCMD[5] = 0;//Data Length
-            testCMD[6] = 0;//Data Length
-            testCMD[7] = 0;//Data Length
-            testCMD[8] = 0;//包序Serial Number
-            testCMD[9] = 0;//包序Serial Number
-            testCMD[10] = 0;//包序Serial Number
-            testCMD[11] = 0; //cmd
-            testCMD[12] = 0;
-            testCMD[13] = 0;
-            testCMD[14] = 0;
-            testCMD[15] = 0;
 
             byte[] pauseCMD = new byte[16];
             pauseCMD[0]= (byte) macInt1;
@@ -315,17 +278,7 @@ public class RemoteSwitchUtil {
             pauseCMD[2]= (byte) macInt3;
             pauseCMD[3]= (byte) macInt4;
             pauseCMD[4]= 16;
-            pauseCMD[5]= 0;//Data Length
-            pauseCMD[6]= 0;//Data Length
-            pauseCMD[7]= 0;//Data Length
-            pauseCMD[8]= 0;//包序Serial Number
-            pauseCMD[9]= 0;//包序Serial Number
-            pauseCMD[10]= 0;//包序Serial Number
             pauseCMD[11]= 8; //cmd
-            pauseCMD[12]= 0;
-            pauseCMD[13]= 0;
-            pauseCMD[14]= 0;
-            pauseCMD[15]= 0;
 
             byte[] resumeCMD=new byte[16];
             resumeCMD[0]= (byte) macInt1;
@@ -333,17 +286,7 @@ public class RemoteSwitchUtil {
             resumeCMD[2]= (byte) macInt3;
             resumeCMD[3]= (byte) macInt4;
             resumeCMD[4]= 16;
-            resumeCMD[5]= 0;//Data Length
-            resumeCMD[6]= 0;//Data Length
-            resumeCMD[7]= 0;//Data Length
-            resumeCMD[8]= 0;//包序Serial Number
-            resumeCMD[9]= 0;//包序Serial Number
-            resumeCMD[10]= 0;//包序Serial Number
             resumeCMD[11]= 12; //cmd 0x00000100
-            resumeCMD[12]= 0;
-            resumeCMD[13]= 0;
-            resumeCMD[14]= 0;
-            resumeCMD[15]= 0;
 
             byte[] readCMD = new byte[16];
             readCMD[0]= (byte) macInt1;
@@ -351,17 +294,7 @@ public class RemoteSwitchUtil {
             readCMD[2]= (byte) macInt3;
             readCMD[3]= (byte) macInt4;
             readCMD[4]= 16;
-            readCMD[5]= 0;//Data Length
-            readCMD[6]= 0;//Data Length
-            readCMD[7]= 0;//Data Length
-            readCMD[8]= 0;//包序Serial Number
-            readCMD[9]= 0;//包序Serial Number
-            readCMD[10]= 0;//包序Serial Number
             readCMD[11]= 17; //read cmd 0x00010001  write cmd=0x00010101;
-            readCMD[12]= 0;//flash address
-            readCMD[13]= 0;//flash address
-            readCMD[14]= 0;//flash address
-            readCMD[15]= 0;//flash address
 
 
             //执行测试指令
@@ -373,9 +306,8 @@ public class RemoteSwitchUtil {
             for (int i = 0; i < readMsg.length; i++) {
                 if(testCMD[i]!=readMsg[i]){
                     for (int i1 = 0; i1 < readMsg.length; i1++) {
-                        Log.w("tcpSend","i1"+i1+"msg="+readMsg[i1]);
                     }
-                    mHandler.sendEmptyMessageDelayed(READ_FAILE,1500);
+                    mHandler.sendEmptyMessage(READ_FAILE);
                 }else {
 
                 }
@@ -387,7 +319,7 @@ public class RemoteSwitchUtil {
             boolean pauseSuccess = true;
             for (int i = 0; i < readMsg.length; i++) {
                 if(pauseCMD[i]!=readMsg[i]){
-                    mHandler.sendEmptyMessageDelayed(READ_FAILE,1500);
+                    mHandler.sendEmptyMessage(READ_FAILE);
                     pauseSuccess = false;
                 }
             }
@@ -395,26 +327,25 @@ public class RemoteSwitchUtil {
                 //暂停成功，开始回读
                 byte[] feedbackcmd=new byte[16];
                 byte[] readbackmsg=new byte[512];
-
-                int ra=122880;
+                int programCount=0;//总共有多少个节目
+                int readAddress = 122880;
                 for (int k = 0; k < 1; k++) {
-                    byte[] bytes = intToByteArray(ra, 4);
+                    byte[] bytes = intToByteArray(readAddress, 4);
                     setInbyteArray(12,bytes,readCMD);
                     os.write(readCMD);
                     socket.getInputStream().read(feedbackcmd);
                     socket.getInputStream().read(readbackmsg);
-                    ra+=512;
+                    readAddress+=512;
                     for (int i = 0; i < readbackmsg.length; i++) {
                         if (k==0){
                             //第一扇区的数据
                             if (i==0){
-                                int msgInt = readbackmsg[0] & 0xff;
-                                Log.w("readAct","----------msgInt= "+msgInt);
+                                programCount = readbackmsg[0] & 0xff;//节目个数
                             }
                         }
                     }
                 }
-                mHandler.sendEmptyMessageDelayed(READ_SUCCESS,1500);
+                mHandler.sendEmptyMessage(READ_SUCCESS);
                 os.write(resumeCMD);
                 socket.getInputStream().read(feedbackcmd);
 

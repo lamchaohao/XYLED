@@ -63,6 +63,15 @@ public class DrawBitmapUtil3 {
         Paint paint = new Paint();
         Canvas canvas = new Canvas();
         String text = mTextContent.getText();
+        if (mTextContent.getIsTextReverse()) {
+            //倒叙的文字
+            StringBuilder reverseText = new StringBuilder();
+            for (int i = mTextContent.getText().length()-1; i >=0 ; i--) {
+                String substring = mTextContent.getText().substring(i, i + 1);
+                reverseText.append(substring);
+            }
+            text = reverseText.toString();
+        }
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
         canvas.drawPaint(paint);
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
@@ -141,23 +150,13 @@ public class DrawBitmapUtil3 {
                     canvas.drawText(text, mBaseX+mWidth, mBaseY, paint);
                     break;
                 case Global.TEXT_EFFECT_MOVE_RIGHT:
-                    StringBuilder sb = new StringBuilder();
-                    for (int i = text.length()-1; i >=0 ; i--) {
-                        String substring = text.substring(i, i + 1);
-                        sb.append(substring);
-                    }
-                    canvas.drawText(sb.toString(), mBaseX+mWidth, mBaseY, paint);
+                    canvas.drawText(text, mBaseX+mWidth, mBaseY, paint);
                     break;
                 case Global.TEXT_EFFECT_APPEAR_MOVE_LEFT:
                     canvas.drawText(text, mBaseX, mBaseY, paint);
                     break;
                 case Global.TEXT_EFFECT_APPEAR_MOVE_RIGHT:
-                    StringBuilder sbRight = new StringBuilder();
-                    for (int i = text.length()-1; i >=0 ; i--) {
-                        String substring = text.substring(i, i+1);
-                        sbRight.append(substring);
-                    }
-                    canvas.drawText(sbRight.toString(), mBaseX+mWidth, mBaseY, paint);
+                    canvas.drawText(text, mBaseX+mWidth, mBaseY, paint);
                     break;
                 case Global.TEXT_EFFECT_STATIC://这里应该居中显示
                     paint.setTextAlign(Paint.Align.CENTER);
@@ -171,19 +170,7 @@ public class DrawBitmapUtil3 {
                 TextPaint textPaint =new TextPaint();
                 textPaint.set(paint);
                 StaticLayout currentLayout = null;
-                switch (mTextEffect){
-                    case Global.TEXT_EFFECT_MOVE_UP:
-                        currentLayout = new StaticLayout(text, textPaint, mWidth, Layout.Alignment.ALIGN_CENTER, 1.0f, 0f, false);
-                        break;
-                    case Global.TEXT_EFFECT_MOVE_DOWN:
-                        StringBuilder sb = new StringBuilder();
-                        for (int i = text.length()-1; i >=0 ; i--) {
-                            String substring = text.substring(i, i + 1);
-                            sb.append(substring);
-                        }
-                        currentLayout = new StaticLayout(sb.toString(), textPaint, mWidth, Layout.Alignment.ALIGN_CENTER, 1.0f, 0f, false);
-                        break;
-                }
+                currentLayout = new StaticLayout(text, textPaint, mWidth, Layout.Alignment.ALIGN_CENTER, 1.0f, 0f, false);
                 int height = currentLayout.getHeight();
                 if (height<=mHeight){
                     height=mHeight;

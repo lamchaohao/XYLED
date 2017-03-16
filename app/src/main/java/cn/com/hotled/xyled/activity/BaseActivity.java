@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.support.annotation.LayoutRes;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
@@ -18,7 +17,7 @@ import cn.com.hotled.xyled.util.android.ToolBarHelper;
  * Created by Lam on 2016/11/23.
  */
 
-public abstract class BaseActivity extends AppCompatActivity {
+public abstract class BaseActivity extends BaseAppCompatAtivity {
     private ToolBarHelper mToolBarHelper ;
     public Toolbar toolbar ;
 

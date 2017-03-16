@@ -31,7 +31,7 @@
             android:layout_height="wrap_content"/>
         <TextView
             android:id="@+id/tv_send_progress"
-            android:text="Ready"
+            android:text="@string/ready"
             android:textSize="38sp"
             android:gravity="center"
             android:layout_centerInParent="true"
@@ -45,24 +45,26 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="30dp"
         android:textColor="#FFFFFF"
-        android:padding="5dp"
+        android:padding="10dp"
         android:textSize="18sp"
         android:background="@drawable/black_rectangle"
-        android:text="请耐心等候，正在转换数据"
+        android:gravity="center"
+        android:text="@string/tos_wait"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
     <TextView
-        android:text="如转换完成后未开始发送,请按发送键"
+        android:text="@string/tos_press_send"
         android:layout_marginBottom="60dp"
         android:layout_centerHorizontal="true"
         android:layout_alignParentBottom="true"
+        android:gravity="center"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
     <Button
         android:id="@+id/bt_send_send"
         android:layout_centerHorizontal="true"
         android:layout_alignParentBottom="true"
-        android:text="发送"
+        android:text="@string/msg_send"
         android:layout_marginBottom="5dp"
         android:background="@drawable/button_bg"
         android:layout_width="wrap_content"

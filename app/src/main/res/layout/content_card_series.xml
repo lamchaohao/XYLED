@@ -8,7 +8,7 @@
     <ImageView
         android:id="@+id/iv_card_pic"
         android:padding="10dp"
-        android:src="@drawable/ic_text_fields_black_36dp"
+        android:src="@drawable/ic_developer_board_primary_dark_36dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
     <TextView

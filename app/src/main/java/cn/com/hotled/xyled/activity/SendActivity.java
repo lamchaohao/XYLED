@@ -38,6 +38,7 @@ import cn.com.hotled.xyled.bean.Program;
 import cn.com.hotled.xyled.bean.ProgramType;
 import cn.com.hotled.xyled.bean.TextContent;
 import cn.com.hotled.xyled.dao.TextContentDao;
+import cn.com.hotled.xyled.global.Common;
 import cn.com.hotled.xyled.global.Global;
 import cn.com.hotled.xyled.util.android.WifiAdmin;
 import cn.com.hotled.xyled.util.genFile.GenFileUtil2;
@@ -58,7 +59,7 @@ public class SendActivity extends BaseActivity {
             switch (msg.what){
                 case UPDATE_PROGRESS:
                     int arg1 = msg.arg1;
-                    mTvStatus.setText("正在传输数据 "+arg1+"%");
+                    mTvStatus.setText(getString(R.string.sending_data)+arg1+"%");
                     mSendProgress.setText(arg1+"%");
                     if (arg1==1){
                         mSendRound.setImageResource(R.drawable.send_data_uncomplete_low);
@@ -68,31 +69,31 @@ public class SendActivity extends BaseActivity {
                         mSendRound.setImageResource(R.drawable.send_data_uncomplete_high);
                     }
                     if (arg1==100){
-                        Toast.makeText(SendActivity.this,"已发送",Toast.LENGTH_LONG).show();
-                        mTvStatus.setText("发送完成");
+                        Toast.makeText(SendActivity.this,R.string.tos_sendProgram_done,Toast.LENGTH_LONG).show();
+                        mTvStatus.setText(R.string.tos_sendProgram_done);
                         mSendAnim.cancel();
                         mSendOutsideAnim.cancel();
                         isSending=false;
                     }
                     break;
                 case WIFI_ERRO:
-                    Toast.makeText(SendActivity.this,"所连接WiFi非本公司产品，请切换WiFi",Toast.LENGTH_LONG).show();
-                    mTvStatus.setText("所连接WiFi非本公司产品，请切换WiFi");
+                    Toast.makeText(SendActivity.this,R.string.tos_wifi_switch,Toast.LENGTH_LONG).show();
+                    mTvStatus.setText(R.string.tos_wifi_switch);
                     mSendAnim.cancel();
                     mSendOutsideAnim.cancel();
                     startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
                     isSending=false;
                     break;
                 case CONNECT_NORESPONE:
-                    Toast.makeText(SendActivity.this,"连接错误，请重新连接屏幕",Toast.LENGTH_LONG).show();
-                    mTvStatus.setText("无法发送，请重新连接屏幕");
+                    Toast.makeText(SendActivity.this,R.string.tos_screen_noresponse,Toast.LENGTH_LONG).show();
+                    mTvStatus.setText(R.string.tos_screen_noresponse);
                     mSendAnim.cancel();
                     mSendOutsideAnim.cancel();
                     isSending=false;
                     break;
                 case CONNECT_TIMEOUT:
-                    Toast.makeText(SendActivity.this,"连接超时，请重试",Toast.LENGTH_LONG).show();
-                    mTvStatus.setText("连接超时，请重试");
+                    Toast.makeText(SendActivity.this,R.string.tos_wifi_timeout,Toast.LENGTH_LONG).show();
+                    mTvStatus.setText(R.string.tos_wifi_timeout);
                     mSendAnim.cancel();
                     mSendOutsideAnim.cancel();
                     isSending=false;
@@ -102,7 +103,7 @@ public class SendActivity extends BaseActivity {
                     isGeningFile = false;
                     mPbSend.setVisibility(View.GONE);
                     mBtSend.setEnabled(true);
-                    Toast.makeText(SendActivity.this,"文件已生成，开始传送",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(SendActivity.this,R.string.tos_genAndSend,Toast.LENGTH_SHORT).show();
                     if (!isSending&&fileReady) {
                         send();
                     }
@@ -174,7 +175,7 @@ public class SendActivity extends BaseActivity {
                 if (!isSending) {
                     send();
                 }else {
-                    Snackbar.make(mTvStatus,"已经在传送",Snackbar.LENGTH_LONG).show();
+                    Snackbar.make(mTvStatus,R.string.tos_isSending,Snackbar.LENGTH_LONG).show();
                 }
             }
         });
@@ -203,8 +204,9 @@ public class SendActivity extends BaseActivity {
         WifiInfo wifiInfo = wifiAdmin.getWifiInfo();
         String ssid = wifiInfo.getSSID();
         String macStr = "";
-        if (ssid.contains("HC-LED")){
-            Log.w("tcpSend","ssid = "+ssid);
+        boolean startFlag = ssid.contains(Global.SSID_START);
+        boolean endFlag = ssid.contains(Global.SSID_END);
+        if (startFlag&&endFlag){
             macStr = ssid.substring(ssid.indexOf("[")+1, ssid.indexOf("]"));
         }else {
             Message message = mHandler.obtainMessage();
@@ -252,7 +254,7 @@ public class SendActivity extends BaseActivity {
         try {
             socket = new Socket(Global.SERVER_IP,Global.SERVER_PORT);
             socket.setSoTimeout(10000);
-            File file =new File(getFilesDir()+"/color.prg");
+            File file =new File(getFilesDir()+ Common.FL_COLOR_PRG);
             fis = new FileInputStream(file);
             os = socket.getOutputStream();
             byte[] buf = new byte[512];
@@ -285,7 +287,6 @@ public class SendActivity extends BaseActivity {
 
             //执行测试指令
             os.write(testCMD);
-            Log.w("tcpSend","发送测试指令");
             byte[] readMsg = new byte[16];
             socket.getInputStream().read(readMsg);//读取返回
 
@@ -308,13 +309,10 @@ public class SendActivity extends BaseActivity {
             }
             if (pauseSuccess) {
                 //暂停了,开始写数据
-                Log.d("tcpSend","开始写数据");
-                Log.d("tcpSend","mFile size--"+file.length()+" byte");
                 int serialNum = (int) (file.length()/512); //包序是从0开始，基数与个数
                 if (file.length()%512==0){
                     serialNum--;
                 }
-                Log.w("tcpSend","总包长度 == "+serialNum+" ");
                 boolean isFirstPack = true;
                 byte[] firstPackage = null;
                 byte[] feedBackData = new byte[16];
@@ -327,17 +325,7 @@ public class SendActivity extends BaseActivity {
                 writeCMD[2]= (byte) macInt3;
                 writeCMD[3]= (byte) macInt4;
                 writeCMD[4]= 16;
-                writeCMD[5]= 0;//Data Length
-                writeCMD[6]= 0;//Data Length
-                writeCMD[7]= 0;//Data Length
-                writeCMD[8]= 0;//包序Serial Number
-                writeCMD[9]= 0;//包序Serial Number
-                writeCMD[10]= 0;//包序Serial Number
                 writeCMD[11]= 22; //cmd
-                writeCMD[12]= 0;
-                writeCMD[13]= 0;
-                writeCMD[14]= 0;
-                writeCMD[15]= 0;
 
 
                 while((len=fis.read(buf))!=-1&&writeSuccess){
@@ -442,7 +430,6 @@ public class SendActivity extends BaseActivity {
                     e.printStackTrace();
                 }
             }
-            Log.w("tcpSend","关闭TCP");
         }
 
     }
@@ -480,25 +467,25 @@ public class SendActivity extends BaseActivity {
     public void onBackPressed() {
         if (isSending){
             new AlertDialog.Builder(this)
-                    .setMessage("正在传送，确定退出吗？")
-                    .setPositiveButton("退出", new DialogInterface.OnClickListener() {
+                    .setMessage(R.string.msg_sendingAndAsk)
+                    .setPositiveButton(R.string.msg_quit, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             SendActivity.super.onBackPressed();
                         }
                     })
-                    .setNegativeButton("不退出",null)
+                    .setNegativeButton(R.string.msg_cancle,null)
                     .show();
         }else if(isGeningFile){
             new AlertDialog.Builder(this)
-                    .setMessage("正在转换数据，确定退出吗？")
-                    .setPositiveButton("退出", new DialogInterface.OnClickListener() {
+                    .setMessage(R.string.msg_convertingAndAsk)
+                    .setPositiveButton(R.string.msg_quit, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             SendActivity.super.onBackPressed();
                         }
                     })
-                    .setNegativeButton("不退出",null)
+                    .setNegativeButton(R.string.msg_cancle,null)
                     .show();
         }else {
             super.onBackPressed();
@@ -508,6 +495,7 @@ public class SendActivity extends BaseActivity {
 
     @Override
     public void onCreateCustomToolBar(Toolbar toolbar) {
-        toolbar.setTitle("发送数据");
+        toolbar.setTitle(R.string.send_data);
     }
+
 }

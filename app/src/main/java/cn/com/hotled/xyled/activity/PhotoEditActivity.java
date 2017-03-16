@@ -24,6 +24,7 @@ import cn.com.hotled.xyled.App;
 import cn.com.hotled.xyled.R;
 import cn.com.hotled.xyled.bean.Program;
 import cn.com.hotled.xyled.dao.ProgramDao;
+import cn.com.hotled.xyled.global.Common;
 import cn.com.hotled.xyled.global.Global;
 import cn.com.hotled.xyled.view.photoview.PhotoView;
 
@@ -50,7 +51,7 @@ public class PhotoEditActivity extends BaseActivity implements SeekBar.OnSeekBar
 
     private void loadData() {
 
-        long programId = getIntent().getLongExtra("programId",-1);
+        long programId = getIntent().getLongExtra(Common.EX_programId,-1);
         List<Program> list = ((App) getApplication()).getDaoSession().getProgramDao().queryBuilder().where(ProgramDao.Properties.Id.eq(programId)).list();
         if (list==null) {
             mProgram=new Program();
@@ -93,7 +94,7 @@ public class PhotoEditActivity extends BaseActivity implements SeekBar.OnSeekBar
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
-        startActivityForResult(Intent.createChooser(intent, "选择图片"), REQUEST_CHOOSE_PIC);
+        startActivityForResult(Intent.createChooser(intent, getString(R.string.msg_choose_pic)), REQUEST_CHOOSE_PIC);
     }
     public void setBitmapToView(Bitmap bm){
         mBitmap = bm;
@@ -180,7 +181,7 @@ public class PhotoEditActivity extends BaseActivity implements SeekBar.OnSeekBar
     @Override
     public void onCreateCustomToolBar(Toolbar toolbar) {
         super.onCreateCustomToolBar(toolbar);
-        toolbar.setTitle(getIntent().getStringExtra("programName"));
+        toolbar.setTitle(getIntent().getStringExtra(Common.EX_programName));
     }
 
     @Override
@@ -188,7 +189,7 @@ public class PhotoEditActivity extends BaseActivity implements SeekBar.OnSeekBar
         switch (seekBar.getId()) {
             case R.id.sb_photo_stayTime:
                 int second = progress/2;
-                mTvShowStaytime.setText(second+" s");
+                mTvShowStaytime.setText(second+getString(R.string.screen_scan_symbol));
                 mProgram.setStayTime(second);
                 break;
         }

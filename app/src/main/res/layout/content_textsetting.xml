@@ -9,7 +9,7 @@
         android:layout_height="wrap_content">
         <TextView
             android:textSize="18sp"
-            android:text="字体大小："
+            android:text="@string/edit_font"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
         <LinearLayout
@@ -21,13 +21,13 @@
                 style="@style/TextEditIcon"
                 android:id="@+id/bt_fgText_textSize"
                 android:layout_weight="1"
-                android:text="TextSize"
+                android:text="@string/edit_size"
                 android:layout_width="0dp"
                 android:layout_height="match_parent" />
             <Button
                 android:id="@+id/bt_fgText_font"
                 android:layout_weight="1"
-                android:text="字体"
+                android:text="@string/edit_font"
                 android:fontFamily="sans-serif"
                 style="@style/TextEditIcon"
                 android:layout_width="0dp"
@@ -35,7 +35,7 @@
         </LinearLayout>
         <TextView
             android:textSize="18sp"
-            android:text="字体效果："
+            android:text="@string/edit_font_effect"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
         <LinearLayout
@@ -63,15 +63,13 @@
                 style="@style/TextEditIcon"
                 android:id="@+id/ib_fgText_setUnderLine"
                 android:layout_weight="1"
-                android:text="Font"
-                android:fontFamily="sans-serif"
                 android:src="@drawable/ic_format_underlined_black_48dp"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content" />
         </LinearLayout>
         <TextView
             android:textSize="18sp"
-            android:text="字体颜色："
+            android:text="@string/edit_font_color"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
         <LinearLayout
@@ -112,7 +110,7 @@
         </LinearLayout>
         <TextView
             android:textSize="18sp"
-            android:text="字体背景颜色："
+            android:text="@string/edit_backgroud_color"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
         <LinearLayout
@@ -151,7 +149,7 @@
         </LinearLayout>
         <TextView
             android:textSize="18sp"
-            android:text="偏移量:"
+            android:text="@string/edit_translate"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
@@ -182,11 +180,23 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"/>
         </LinearLayout>
-        <TextView
-            android:textSize="18sp"
-            android:text="文字特效:"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+            <TextView
+                android:textSize="18sp"
+                android:text="@string/edit_font_style"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+            <Switch
+                android:id="@+id/sw_reverse"
+                android:text="@string/edit_text_reverse"
+                android:layout_marginLeft="20dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+        </LinearLayout>
+
         <Spinner
             android:id="@+id/spn_fgText_textEffect"
             android:entries="@array/textEffect"
@@ -203,7 +213,7 @@
             android:layout_height="wrap_content">
             <TextView
                 android:textSize="18sp"
-                android:text="边框:"
+                android:text="@string/edit_bound"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
             <Switch
@@ -246,7 +256,6 @@
                 android:id="@+id/spn_fgText_flowShowSpeed"
                 android:layout_weight="1"
                 android:padding="15dp"
-                android:text="移动速度"
                 android:entries="@array/flowSpeed"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"/>
@@ -257,7 +266,7 @@
            android:layout_height="wrap_content">
            <TextView
                android:textSize="18sp"
-               android:text="移动速度:"
+               android:text="@string/edit_speed"
                android:layout_width="wrap_content"
                android:layout_height="wrap_content" />
            <TextView
@@ -281,7 +290,7 @@
             android:layout_height="wrap_content">
             <TextView
                 android:textSize="18sp"
-                android:text="停留时间:"
+                android:text="@string/edit_stay"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
             <TextView

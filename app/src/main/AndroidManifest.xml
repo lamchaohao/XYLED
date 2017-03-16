@@ -43,20 +43,9 @@
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden">
         </activity>
-        <activity android:name=".activity.MutilConnectActivity">
-        </activity>
         <activity android:name=".activity.SelectFlowActivity">
         </activity>
-
-        <service
-            android:name=".service.SendDataService"
-            android:enabled="true"
-            android:exported="true">
-        </service>
-
         <activity android:name=".activity.PhotoEditActivity">
-        </activity>
-        <activity android:name=".activity.ReadActivity">
         </activity>
         <activity android:name=".activity.SendActivity">
         </activity>
@@ -88,6 +77,10 @@
         <activity android:name=".activity.RemoteActivity">
         </activity>
         <activity android:name=".activity.AdvanceSetActivity">
+        </activity>
+        <activity android:name=".activity.SelectLanguageActivity">
+        </activity>
+        <activity android:name=".activity.UpdateActivity">
         </activity>
     </application>
 

@@ -19,7 +19,7 @@
             android:layout_height="wrap_content"/>
         <TextView
             android:id="@+id/tv_main_screen"
-            android:text="显示屏"
+            android:text="@string/program"
             android:textSize="12sp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
@@ -38,7 +38,7 @@
             android:layout_height="wrap_content"/>
         <TextView
             android:id="@+id/tv_main_connect"
-            android:text="连接"
+            android:text="@string/connect"
             android:textSize="12sp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
@@ -57,7 +57,7 @@
             android:layout_height="wrap_content"/>
         <TextView
             android:id="@+id/tv_main_setting"
-            android:text="设置"
+            android:text="@string/setting"
             android:textSize="12sp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
@@ -76,7 +76,7 @@
             android:layout_height="wrap_content"/>
         <TextView
             android:id="@+id/tv_main_more"
-            android:text="更多"
+            android:text="@string/more"
             android:textSize="12sp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>

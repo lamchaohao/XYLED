@@ -9,7 +9,7 @@
     <LinearLayout
         android:layout_margin="5dp"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical">
         <RelativeLayout
             android:id="@+id/rl_set_cardSeries"
@@ -20,7 +20,7 @@
             android:layout_height="wrap_content">
             <TextView
                 android:drawableLeft="@drawable/ic_developer_board_primary_dark_36dp"
-                android:text="控制卡类型"
+                android:text="@string/card_series"
                 android:textSize="18sp"
                 android:gravity="center"
                 android:layout_width="wrap_content"
@@ -29,7 +29,7 @@
                 android:id="@+id/tv_set_cardSeries"
                 android:textSize="18sp"
                 android:gravity="center"
-                android:text="HC-1"
+                android:text="@string/default_card"
                 android:layout_centerVertical="true"
                 android:layout_alignParentRight="true"
                 android:layout_width="wrap_content"
@@ -44,7 +44,7 @@
             android:layout_height="wrap_content">
             <TextView
                 android:drawableLeft="@drawable/ic_stay_current_landscape_primary_dark_36dp"
-                android:text="屏幕宽度"
+                android:text="@string/screen_width"
                 android:textSize="18sp"
                 android:gravity="center"
                 android:layout_width="wrap_content"
@@ -53,7 +53,6 @@
                 android:id="@+id/tv_set_screenWidth"
                 android:textSize="18sp"
                 android:gravity="center"
-                android:text="32"
                 android:layout_centerVertical="true"
                 android:layout_alignParentRight="true"
                 android:layout_width="wrap_content"
@@ -69,7 +68,7 @@
             android:layout_height="wrap_content">
             <TextView
                 android:drawableLeft="@drawable/ic_stay_current_portrait_primary_dark_36dp"
-                android:text="屏幕高度"
+                android:text="@string/screen_height"
                 android:textSize="18sp"
                 android:gravity="center"
                 android:layout_width="wrap_content"
@@ -78,7 +77,6 @@
                 android:id="@+id/tv_set_screenHeight"
                 android:textSize="18sp"
                 android:gravity="center"
-                android:text="64"
                 android:layout_centerVertical="true"
                 android:layout_alignParentRight="true"
                 android:layout_width="wrap_content"
@@ -94,7 +92,7 @@
             android:layout_height="wrap_content">
             <TextView
                 android:drawableLeft="@drawable/ic_timeline_primary_dark_36dp"
-                android:text="走线设置"
+                android:text="@string/trace_setting"
                 android:textSize="18sp"
                 android:gravity="center"
                 android:layout_width="wrap_content"
@@ -104,7 +102,6 @@
                 android:textSize="18sp"
                 android:gravity="right"
                 android:ellipsize="marquee"
-                android:text="P4_32*16_16S"
                 android:maxLines="1"
                 android:layout_centerVertical="true"
                 android:layout_alignParentRight="true"
@@ -121,7 +118,7 @@
             android:layout_height="wrap_content">
             <TextView
                 android:drawableLeft="@drawable/ic_more_horiz_primary_dark_36dp"
-                android:text="高级设置"
+                android:text="@string/advance_setting"
                 android:textSize="18sp"
                 android:gravity="center"
                 android:layout_width="wrap_content"
@@ -137,7 +134,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
             <TextView
-                android:text="RGB次序"
+                android:text="@string/rgb_order"
                 android:textSize="18sp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
@@ -156,7 +153,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
             <TextView
-                android:text="DATA"
+                android:text="@string/data"
                 android:textSize="18sp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
@@ -175,7 +172,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
             <TextView
-                android:text="OE"
+                android:text="@string/oe"
                 android:textSize="18sp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
@@ -195,7 +192,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
             <TextView
-                android:text="138行译码"
+                android:text="@string/OTEcode"
                 android:textSize="18sp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
@@ -206,7 +203,25 @@
                 android:padding="10dp"
                 android:layout_height="wrap_content"/>
         </LinearLayout>
+        <Button
+            android:id="@+id/bt_send_config"
+            android:text="@string/send_config"
+            android:layout_margin="5dp"
+            android:background="@drawable/sendbutton_bg"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+        <Button
+            android:id="@+id/bt_read_config"
+            android:text="@string/read_config"
+            android:layout_margin="5dp"
+            android:background="@drawable/sendbutton_bg"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="20dp"/>
 
     </LinearLayout>
+
 </ScrollView>
 

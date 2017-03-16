@@ -1,5 +1,6 @@
 package cn.com.hotled.xyled.util.communicate;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.wifi.WifiInfo;
@@ -8,13 +9,20 @@ import android.os.Message;
 import android.util.Log;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import cn.com.hotled.xyled.App;
+import cn.com.hotled.xyled.bean.TraceFile;
+import cn.com.hotled.xyled.dao.TraceFileDao;
+import cn.com.hotled.xyled.global.Common;
 import cn.com.hotled.xyled.global.Global;
 import cn.com.hotled.xyled.util.android.WifiAdmin;
 
@@ -28,9 +36,9 @@ import static cn.com.hotled.xyled.global.Global.WIFI_ERRO;
 
 public class ReadScreenDataUtil {
 
-    private Context mContext;
+    private Activity mContext;
     private Handler mHandler;
-    public ReadScreenDataUtil(Context context, Handler handler) {
+    public ReadScreenDataUtil(Activity context, Handler handler) {
         mContext = context;
         mHandler = handler;
     }
@@ -52,7 +60,9 @@ public class ReadScreenDataUtil {
         WifiInfo wifiInfo = wifiAdmin.getWifiInfo();
         String ssid = wifiInfo.getSSID();
         String macStr = "";
-        if (ssid.contains("HC-LED")){
+        boolean startFlag = ssid.contains(Global.SSID_START);
+        boolean endFlag = ssid.contains(Global.SSID_END);
+        if (startFlag&&endFlag){
             Log.w("tcpSend","ssid = "+ssid);
             macStr = ssid.substring(ssid.indexOf("[")+1, ssid.indexOf("]"));
         }else {
@@ -102,7 +112,7 @@ public class ReadScreenDataUtil {
         Log.w("tcpSend","mac = "+macInt1+":"+macInt2+":"+macInt3+":"+macInt4);
         try {
             socket = new Socket(Global.SERVER_IP, Global.SERVER_PORT);
-            File dataRead=new File(mContext.getFilesDir()+"/screenData.dat");
+            File dataRead=new File(mContext.getFilesDir()+ Common.FL_SCREEN_DATA);
             if (!dataRead.exists()) {
                 dataRead.createNewFile();
             }else {
@@ -117,17 +127,6 @@ public class ReadScreenDataUtil {
             testCMD[2] = (byte) macInt3;
             testCMD[3] = (byte) macInt4;
             testCMD[4] = 16;
-            testCMD[5] = 0;//Data Length
-            testCMD[6] = 0;//Data Length
-            testCMD[7] = 0;//Data Length
-            testCMD[8] = 0;//包序Serial Number
-            testCMD[9] = 0;//包序Serial Number
-            testCMD[10] = 0;//包序Serial Number
-            testCMD[11] = 0; //cmd
-            testCMD[12] = 0;
-            testCMD[13] = 0;
-            testCMD[14] = 0;
-            testCMD[15] = 0;
 
             byte[] pauseCMD = new byte[16];
             pauseCMD[0]= (byte) macInt1;
@@ -135,17 +134,7 @@ public class ReadScreenDataUtil {
             pauseCMD[2]= (byte) macInt3;
             pauseCMD[3]= (byte) macInt4;
             pauseCMD[4]= 16;
-            pauseCMD[5]= 0;//Data Length
-            pauseCMD[6]= 0;//Data Length
-            pauseCMD[7]= 0;//Data Length
-            pauseCMD[8]= 0;//包序Serial Number
-            pauseCMD[9]= 0;//包序Serial Number
-            pauseCMD[10]= 0;//包序Serial Number
             pauseCMD[11]= 8; //cmd
-            pauseCMD[12]= 0;
-            pauseCMD[13]= 0;
-            pauseCMD[14]= 0;
-            pauseCMD[15]= 0;
 
             byte[] resumeCMD=new byte[16];
             resumeCMD[0]= (byte) macInt1;
@@ -153,17 +142,7 @@ public class ReadScreenDataUtil {
             resumeCMD[2]= (byte) macInt3;
             resumeCMD[3]= (byte) macInt4;
             resumeCMD[4]= 16;
-            resumeCMD[5]= 0;//Data Length
-            resumeCMD[6]= 0;//Data Length
-            resumeCMD[7]= 0;//Data Length
-            resumeCMD[8]= 0;//包序Serial Number
-            resumeCMD[9]= 0;//包序Serial Number
-            resumeCMD[10]= 0;//包序Serial Number
             resumeCMD[11]= 12; //cmd 0x00000100
-            resumeCMD[12]= 0;
-            resumeCMD[13]= 0;
-            resumeCMD[14]= 0;
-            resumeCMD[15]= 0;
 
             byte[] readCMD = new byte[16];
             readCMD[0]= (byte) macInt1;
@@ -171,17 +150,7 @@ public class ReadScreenDataUtil {
             readCMD[2]= (byte) macInt3;
             readCMD[3]= (byte) macInt4;
             readCMD[4]= 16;
-            readCMD[5]= 0;//Data Length
-            readCMD[6]= 0;//Data Length
-            readCMD[7]= 0;//Data Length
-            readCMD[8]= 0;//包序Serial Number
-            readCMD[9]= 0;//包序Serial Number
-            readCMD[10]= 0;//包序Serial Number
             readCMD[11]= 17; //cmd 0x00010001
-            readCMD[12]= 0;//flash address
-            readCMD[13]= 0;//flash address
-            readCMD[14]= 0;//flash address
-            readCMD[15]= 0;//flash address
 
 
             //执行测试指令
@@ -192,7 +161,7 @@ public class ReadScreenDataUtil {
 
             for (int i = 0; i < readMsg.length; i++) {
                 if(testCMD[i]!=readMsg[i]){
-                    mHandler.sendEmptyMessageDelayed(READ_FAILE,1500);
+                    mHandler.sendEmptyMessageDelayed(READ_FAILE,1000);
                 }else {
 
                 }
@@ -204,7 +173,7 @@ public class ReadScreenDataUtil {
             boolean pauseSuccess = true;
             for (int i = 0; i < readMsg.length; i++) {
                 if(pauseCMD[i]!=readMsg[i]){
-                    mHandler.sendEmptyMessageDelayed(READ_FAILE,1500);
+                    mHandler.sendEmptyMessageDelayed(READ_FAILE,1000);
                     pauseSuccess = false;
                 }
             }
@@ -213,44 +182,26 @@ public class ReadScreenDataUtil {
                 byte[] feedbackcmd=new byte[16];
                 byte[] readbackmsg=new byte[512];
 
-                int ra=129024;
-                int ea=131071;
+                int readAddress=129024;
                 for (int k = 0; k < 4; k++) {
-                    byte[] bytes = intToByteArray(ra, 4);
+                    byte[] bytes = intToByteArray(readAddress, 4);
                     setInbyteArray(12,bytes,readCMD);
                     os.write(readCMD);
-                    socket.getInputStream().read(feedbackcmd);
-                    socket.getInputStream().read(readbackmsg);
-                    ra+=512;
+                    socket.getInputStream().read(feedbackcmd);//返回的指令
+                    socket.getInputStream().read(readbackmsg);//接着返回读取到的数据512byte
+                    readAddress+=512;//读完后地址加512
                     fos.write(readbackmsg);
-                    Log.d("tcpSend","readbackmsg-----start-------");
-                    for (int i = 0; i < readbackmsg.length; i++) {
-                        if (k==0){
-                            //第一扇区的数据
-                            if (i==511){
-                                //屏宽
-                                //转换过程中可能会出现负数，故而与0xFF进行与运算
-                                int screenWid=readbackmsg[35]&0xff;
-                                int screenHei=readbackmsg[37]&0xff;
-                                int screenScan=readbackmsg[38]&0xff;
-                                int RGBorder=readbackmsg[498]&0xff;
-                                screenWid=screenWid<<8;
-                                screenWid+=readbackmsg[36]&0xff;
-
-                                SharedPreferences.Editor edit = mContext.getSharedPreferences(Global.SP_SCREEN_CONFIG, Context.MODE_PRIVATE).edit();
-                                edit.putInt(Global.KEY_RGB_ORDER,RGBorder);
-                                edit.putInt(Global.KEY_SCREEN_W,screenWid);
-                                edit.putInt(Global.KEY_SCREEN_H,screenHei);
-                                edit.putInt(Global.KEY_SCREEN_SCAN,screenScan);
-                                edit.apply();
-                            }
-                        }
-                        Log.d("readAct","readbackmsg[i]= "+readbackmsg[i]+", i = "+i);
+                    if (k==0){
+                        //第一扇区的数据
+                        saveConfigToSharedPref(readbackmsg);
+                    }else if (k==1){
+                        //第二扇区 走线表
+                        findTraceFile(readbackmsg);
                     }
-                    Log.d("tcpSend","readbackmsg-----end--------");
                 }
-                mHandler.sendEmptyMessageDelayed(READ_SUCCESS,1500);
                 os.write(resumeCMD);
+                socket.getInputStream().read(feedbackcmd);
+                mHandler.sendEmptyMessageDelayed(READ_SUCCESS,1000);
 
             }
 
@@ -275,6 +226,91 @@ public class ReadScreenDataUtil {
                 }
             }
         }
+    }
+
+    private void findTraceFile(byte[] readbackmsg) {
+        SharedPreferences sp = mContext.getSharedPreferences(Global.SP_SCREEN_CONFIG, Context.MODE_PRIVATE);
+        int scanCount = sp.getInt(Global.KEY_SCREEN_SCAN, -1);
+        int batH = sp.getInt(Global.KEY_BATH, -1);
+        int batW = sp.getInt(Global.KEY_BATW, -1);
+        int foldCount = batH/scanCount;
+        TraceFileDao traceFileDao = ((App) mContext.getApplication()).getDaoSession().getTraceFileDao();
+        if (scanCount!=-1){
+            //取出扫描份数一致的走线文件
+            List<TraceFile> list = traceFileDao.queryBuilder().where(TraceFileDao.Properties.ScanCount.eq(scanCount)).list();
+            FileInputStream fis = null;
+            for (TraceFile traceFile : list) {
+                //比较折数与模组宽度是否一致
+                if (traceFile.getFoldCount()==foldCount&&traceFile.getModuleWidth()==batW) {
+                    File file = new File(mContext.getFilesDir()+"/trace",traceFile.getFilePath().getAbsolutePath());
+                    byte[] fileData =new byte[512];
+                    try {
+                        fis =new FileInputStream(file);
+                        fis.read(fileData);
+                        boolean isMatch = true;
+                        //比较内容是否一致
+                        for (int i = 0; i < fileData.length; i++) {
+                            if (readbackmsg[i]!=fileData[i]) {
+                                isMatch = false;
+                                break;
+                            }
+                        }
+                        if (isMatch) {
+                            //匹配后保存到sp
+                            long id = traceFile.getId();
+                            sp.edit().putLong(Global.KEY_TRACE_SELECT,id).apply();
+                        }
+                    } catch (FileNotFoundException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }finally {
+                        if (fis!=null) {
+                            try {
+                                fis.close();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private void saveConfigToSharedPref(byte[] readbackmsg) {
+        //转换过程中可能会出现负数，故而与0xFF进行与运算
+        int screenWid=readbackmsg[35]&0xff; //宽度
+        int screenHei=readbackmsg[37]&0xff; // 高度
+        int data=readbackmsg[42]&0xff; //data
+        int oe=readbackmsg[43]&0xff; // oe
+        int code = 0;//138code
+        int screenScan=readbackmsg[38]&0xff;
+        if (screenScan>=128){
+            code=1;
+            screenScan-=128;
+        }
+        int batH = readbackmsg[66] & 0xff;
+        int batW = readbackmsg[67] & 0xff;
+        int special = readbackmsg[496]&0xff; //增高加长
+        int dataOrientation = readbackmsg[497]&0xff; //数据方向
+        int RGBorder=readbackmsg[498]&0xff; //rgb次序
+        screenWid=screenWid<<8;
+        screenWid+=readbackmsg[36]&0xff;
+
+        SharedPreferences.Editor edit = mContext.getSharedPreferences(Global.SP_SCREEN_CONFIG, Context.MODE_PRIVATE).edit();
+        edit.putInt(Global.KEY_RGB_ORDER,RGBorder);
+        edit.putInt(Global.KEY_SCREEN_W,screenWid);
+        edit.putInt(Global.KEY_SCREEN_H,screenHei);
+        edit.putInt(Global.KEY_SCREEN_SCAN,screenScan);
+        edit.putInt(Global.KEY_DATA,data);
+        edit.putInt(Global.KEY_OE,oe);
+        edit.putInt(Global.KEY_138CODE,code);
+        edit.putInt(Global.KEY_BATH,batH);
+        edit.putInt(Global.KEY_BATW,batW);
+        edit.putInt(Global.KEY_SPECIAL,special);
+        edit.putInt(Global.KEY_DATA_ORIENTATION,dataOrientation);
+        edit.apply();
     }
 
     /**

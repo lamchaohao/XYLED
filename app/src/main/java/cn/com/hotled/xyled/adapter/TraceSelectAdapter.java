@@ -24,14 +24,16 @@ public class TraceSelectAdapter extends RecyclerView.Adapter {
     List<Trace> mTraceList;
     private OnItemOnClickListener onItemOnClickListener;
     private int oldPosition=-1;
+    boolean isChinese;
 
     public interface OnItemOnClickListener{
         void onItemClick(View view, int position);
     }
 
-    public TraceSelectAdapter(List<Trace> cardNameList, Context context) {
+    public TraceSelectAdapter(List<Trace> cardNameList, Context context,boolean isChinese) {
         this.mContext = context;
         this.mTraceList = cardNameList;
+        this.isChinese = isChinese;
     }
 
     @Override
@@ -45,7 +47,11 @@ public class TraceSelectAdapter extends RecyclerView.Adapter {
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         final CardViewHolder viewHolder= (CardViewHolder) holder;
-        viewHolder.textView.setText(mTraceList.get(position).getTraceFile().getTraceLineFile_zh());
+        if (isChinese) {
+            viewHolder.textView.setText(mTraceList.get(position).getTraceFile().getTraceLineFile_zh());
+        }else {
+            viewHolder.textView.setText(mTraceList.get(position).getTraceFile().getTraceLineFile_en());
+        }
 
         if (mTraceList.get(position).isSelected()){
             viewHolder.ivCheck.setVisibility(View.VISIBLE);
@@ -70,6 +76,15 @@ public class TraceSelectAdapter extends RecyclerView.Adapter {
                             notifyItemChanged(oldPosition);
                     }else {
                         //第一次点击
+                        int i= 0;
+                        for (Trace trace : mTraceList) {
+                            if (trace.isSelected()) {
+                                //如果之前是选中的
+                                trace.setSelected(false);
+                                notifyItemChanged(i);
+                            }
+                            i++;
+                        }
                         oldPosition =layoutPosition;
                         boolean selected = mTraceList.get(layoutPosition).isSelected();
                         mTraceList.get(layoutPosition).setSelected(!selected);//取反操作

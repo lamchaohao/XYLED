@@ -24,15 +24,16 @@ public class TextContent {
     private boolean isIlatic;
     private boolean isUnderline;
     private boolean isSelected;
+    private boolean isTextReverse;
     private int sortNumber;
     private long programId;
     private int textEffect;
     private int textSpeed;
-    @Generated(hash = 127409998)
+    @Generated(hash = 1621581270)
     public TextContent(long id, String text, File typeface, int textSize,
             int textColor, int textBackgroudColor, boolean isbold, boolean isIlatic,
-            boolean isUnderline, boolean isSelected, int sortNumber, long programId,
-            int textEffect, int textSpeed) {
+            boolean isUnderline, boolean isSelected, boolean isTextReverse,
+            int sortNumber, long programId, int textEffect, int textSpeed) {
         this.id = id;
         this.text = text;
         this.typeface = typeface;
@@ -43,6 +44,7 @@ public class TextContent {
         this.isIlatic = isIlatic;
         this.isUnderline = isUnderline;
         this.isSelected = isSelected;
+        this.isTextReverse = isTextReverse;
         this.sortNumber = sortNumber;
         this.programId = programId;
         this.textEffect = textEffect;
@@ -111,6 +113,12 @@ public class TextContent {
     public void setIsSelected(boolean isSelected) {
         this.isSelected = isSelected;
     }
+    public boolean getIsTextReverse() {
+        return this.isTextReverse;
+    }
+    public void setIsTextReverse(boolean isTextReverse) {
+        this.isTextReverse = isTextReverse;
+    }
     public int getSortNumber() {
         return this.sortNumber;
     }
@@ -135,24 +143,5 @@ public class TextContent {
     public void setTextSpeed(int textSpeed) {
         this.textSpeed = textSpeed;
     }
-
-    @Override
-    public String toString() {
-        return "TextContent{" +
-                "id=" + id +
-                ", text='" + text + '\'' +
-                ", typeface=" + typeface +
-                ", textSize=" + textSize +
-                ", textColor=" + textColor +
-                ", textBackgroudColor=" + textBackgroudColor +
-                ", isbold=" + isbold +
-                ", isIlatic=" + isIlatic +
-                ", isUnderline=" + isUnderline +
-                ", isSelected=" + isSelected +
-                ", sortNumber=" + sortNumber +
-                ", programId=" + programId +
-                ", textEffect=" + textEffect +
-                ", textSpeed=" + textSpeed +
-                '}';
-    }
+   
 }

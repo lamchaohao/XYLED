@@ -7,7 +7,6 @@
 
         <TextView
             android:id="@+id/tv_message_fromserver"
-            android:text="来自谁"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
         <TextView
@@ -24,7 +23,6 @@
         <TextView
             android:layout_alignParentRight="true"
             android:id="@+id/tv_message_fromme"
-            android:text="来自谁"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
         <TextView

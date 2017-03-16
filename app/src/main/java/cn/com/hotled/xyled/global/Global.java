@@ -10,12 +10,15 @@ public class Global {
     public static final int TEXT_CONTENT_CHANGE_CODE =2;
     public static final String SERVER_IP="192.168.3.1";
     public static final int SERVER_PORT=16389;
+    public static final String SSID_START = "HC-LED[";
+    public static final String SSID_END="]";
     public static final String CARD_PASSWORD="88888888";
     public static final String FILE_NAME="COLOR_01.PRG";
 
     //---------------sharedPreferences---------------------
     public static final String SP_SCREEN_CONFIG="ScreenConfig";
     public static final String SP_SYSTEM_CONFIG="SystemConfig";
+    public static final String KEY_LANGUAGE="language";
     public static final String KEY_IS_FIRSTIN="isFirstIn";
     public static final String KEY_SCREEN_W="screenWidth";
     public static final String KEY_SCREEN_H="screenHeight";
@@ -28,12 +31,11 @@ public class Global {
     public static final String KEY_DATA="data";
     public static final String KEY_OE="OE";
     public static final String KEY_138CODE="138code";
+    public static final String KEY_BATH="batH";
+    public static final String KEY_BATW="batW";
 
     //----------extra for activityResult------------
-    public static final String EXTRA_SELECT_FONT= "fontFileName";
-    public static final String EXTRA_SELECT_FLOW = "flowFileName";
-    public static final String EXTRA_SELECT_TRACE = "traceFileName";
-    public static final String EXTRA_TEXT_CONTENT="textContent";
+
 
     public static final int TEXT_EFFECT_MOVE_LEFT=0;
     public static final int TEXT_EFFECT_MOVE_RIGHT=1;

@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <TextView
-            android:text="点距:"
+            android:text="@string/pixels"
             android:textSize="18sp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
@@ -24,7 +24,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"/>
         <TextView
-            android:text="扫描:"
+            android:text="@string/scans"
             android:textSize="18sp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
@@ -44,7 +44,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <TextView
-            android:text="尺寸:"
+            android:text="@string/size"
             android:textSize="18sp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
@@ -56,7 +56,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"/>
         <TextView
-            android:text="接口:"
+            android:text="@string/hub"
             android:textSize="18sp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
@@ -76,7 +76,7 @@
             android:layout_margin="5dp"
             android:layout_weight="1"
             android:id="@+id/bt_traceset_commit"
-            android:text="确定"
+            android:text="@string/msg_confirm"
             android:background="@drawable/sendbutton_bg"
             android:layout_width="0dp"
             android:layout_height="wrap_content"/>
@@ -84,7 +84,7 @@
             android:layout_margin="5dp"
             android:layout_weight="1"
             android:id="@+id/bt_traceset_showAll"
-            android:text="全部"
+            android:text="@string/showAll"
             android:background="@drawable/sendbutton_bg"
             android:layout_width="0dp"
             android:layout_height="wrap_content"/>

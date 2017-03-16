@@ -35,14 +35,12 @@
                     android:id="@+id/tv_cwl_wifiName"
                     android:textSize="@dimen/wifi_name_textsize"
                     android:textColor="@color/textPrimary"
-                    android:text="newWing"
                     android:ellipsize="marquee"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
                 <TextView
                     android:id="@+id/tv_cwl_wifiState"
                     android:layout_marginTop="3dp"
-                    android:text="正在连接..."
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
             </LinearLayout>

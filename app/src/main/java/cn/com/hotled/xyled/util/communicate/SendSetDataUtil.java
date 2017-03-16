@@ -3,10 +3,8 @@ package cn.com.hotled.xyled.util.communicate;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.wifi.WifiInfo;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -30,6 +28,7 @@ import static cn.com.hotled.xyled.util.genFile.ByteUtil.intToByteArray;
 import static cn.com.hotled.xyled.util.genFile.ByteUtil.setInbyteArray;
 
 /**
+ * 发送设屏参设置
  * Created by Lam on 2017/3/13.
  */
 
@@ -62,7 +61,9 @@ public class SendSetDataUtil {
         WifiInfo wifiInfo = wifiAdmin.getWifiInfo();
         String ssid = wifiInfo.getSSID();
         String macStr = "";
-        if (ssid.contains("HC-LED")){
+        boolean startFlag = ssid.contains(Global.SSID_START);
+        boolean endFlag = ssid.contains(Global.SSID_END);
+        if (startFlag&&endFlag){
             macStr = ssid.substring(ssid.indexOf("[")+1, ssid.indexOf("]"));
         }else {
             Message message = mHandler.obtainMessage();
@@ -155,8 +156,9 @@ public class SendSetDataUtil {
                 File filePath = mTraceFile.getFilePath();
                 File traceFile=new File(mContext.getFilesDir()+"/trace",filePath.getAbsolutePath());
                 fis= new FileInputStream(traceFile);
+
                 byte[] traceFileBytes=new byte[512];
-                fis.read(traceFileBytes);
+                int read = fis.read(traceFileBytes);
 
                 for (int i = 0; i < 4; i++) {
                     serialNum--;
@@ -178,13 +180,11 @@ public class SendSetDataUtil {
                     setInbyteArray(0,writeCMD,sendPack);
                     setInbyteArray(16,dataBytes,sendPack);
                     os.write(sendPack);
-                    Log.i("sensetdata","第"+i+"次写入");
                     socket.getInputStream().read(feedbackcmd);
                     flashAddress += length;
 
                 }
                 os.write(resetCMD);
-                Log.i("sensetdata","写入reset");
                 socket.getInputStream().read(feedbackcmd);
                 mHandler.sendEmptyMessage(SEND_DONE);
             }
@@ -223,12 +223,7 @@ public class SendSetDataUtil {
     public void testPrintData(){
         FileInputStream fis = null;
         FileOutputStream fos =null;
-        File filePath = mTraceFile.getFilePath();
-        File traceFile=new File(mContext.getFilesDir()+"/trace",filePath.getAbsolutePath());
-        File save = new File(Environment.getDataDirectory()+"/setting.prg");
-        if (save.exists()) {
-            save.delete();
-        }
+        File traceFile=new File(mContext.getFilesDir()+"/trace",mTraceFile.getFilePath().getAbsolutePath());
         try {
             fis= new FileInputStream(traceFile);
             fos =new FileOutputStream(mContext.getFilesDir()+"/setting.prg",true);
@@ -239,26 +234,13 @@ public class SendSetDataUtil {
                 if (i==0){
                     dataBytes=genData();//写入第一区设置内容
                     fos.write(dataBytes);
-                    for (int j = 0; j < dataBytes.length; j++) {
-                        System.out.print(dataBytes[j]+",");
-                        if (j%10==0){
-                            System.out.println();
-                        }
-                    }
                 }else if (i==1){
                     dataBytes=traceFileBytes;//写入走线记录表
                     fos.write(dataBytes);
-                    for (int j = 0; j < dataBytes.length; j++) {
-                        System.out.print(dataBytes[j]+",");
-                        if (j%10==0&&j!=0){
-                            System.out.println();
-                        }
-                    }
                 }else {
                     dataBytes = new byte[512];
                     fos.write(dataBytes);
                 }
-                Log.i("sensetdata","第"+i+"次写入");
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -289,7 +271,7 @@ public class SendSetDataUtil {
 
     private byte[] genData(){
         //取出设置
-        SharedPreferences sharedPreferences = mContext.getSharedPreferences(Global.SP_SCREEN_CONFIG, mContext.MODE_PRIVATE);
+        SharedPreferences sharedPreferences = mContext.getSharedPreferences(Global.SP_SCREEN_CONFIG, Context.MODE_PRIVATE);
         int width = sharedPreferences.getInt(Global.KEY_SCREEN_W, 64);
         int height = sharedPreferences.getInt(Global.KEY_SCREEN_H, 64);
         int rgbOrder = sharedPreferences.getInt(Global.KEY_RGB_ORDER, 0);
@@ -304,14 +286,14 @@ public class SendSetDataUtil {
         int picture =width*height;
         int foldCount = mTraceFile.getFoldCount();
         int scanCount = mTraceFile.getScanCount();
-        int line = picture/foldCount;
+        int line = width*foldCount;
         int output = height/(scanCount*foldCount);
         byte[] scanOrderArray=new byte[16];
         for (int i = 0; i < scanOrderArray.length; i++) {
             scanOrderArray[i]= (byte) i;
         }
         int route = mTraceFile.getDotCount();
-        int batH = height/mTraceFile.getRGBCount();
+        int batH = scanCount*foldCount;
         int batW = mTraceFile.getModuleWidth();
 
         String fileName = Global.FILE_NAME;
@@ -335,8 +317,8 @@ public class SendSetDataUtil {
         dataBytes[42] = (byte) data; //data相位
         dataBytes[43] = (byte) oe;  //oe
         setInbyteArray(48,scanOrderArray,dataBytes); //48-63扫行次序
-        byte[] routeArray = intToByteArray(route, 2);
-        setInbyteArray(64,routeArray,dataBytes); //64-65 走线表点数
+        byte[] routeArray = intToByteArray(route, 2); //64-65 走线表点数
+        setInbyteArray(64,routeArray,dataBytes);
         dataBytes[66] = (byte) batH; // 66 1个端口带高度
         dataBytes[67] = (byte) batW; // 67 一个模组宽度
 

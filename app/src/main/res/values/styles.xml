@@ -73,9 +73,13 @@
 
     <style name="MainFragGuideText">
         <item name="android:layout_gravity">center</item>
-        <item name="android:layout_marginLeft">20dp</item>
+        <item name="android:layout_marginTop">20dp</item>
+        <item name="android:padding">10dp</item>
+        <item name="android:background">@drawable/recycler_bg</item>
         <item name="android:textSize">18sp</item>
-        <item name="android:layout_width">wrap_content</item>
+        <item name="android:gravity">left|center</item>
+        <item name="android:drawablePadding">20dp</item>
+        <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
     </style>
     <style name="MainFragGuideGroup">

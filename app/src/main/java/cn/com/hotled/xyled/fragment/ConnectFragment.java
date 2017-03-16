@@ -46,7 +46,6 @@ public class ConnectFragment extends Fragment {
     private static final int STOP_ANIM_FAIL = 101;
     private static final int STOP_ANIM_SUCCESS = 201;
     private static final int REQUST_LOCATION_PERMISSION_CODE = 301;
-    private RecyclerView mRecyclerView;
     private WifiAdmin mWifiAdmin;
     private List<ScanResult> mWifiList;
     private ConnectAdapter mConnectAdapter;
@@ -59,13 +58,13 @@ public class ConnectFragment extends Fragment {
             switch (msg.what){
                 case STOP_ANIM_SUCCESS:
                     mInsideAnim.cancel();
-                    mTvTip.setText("已连接");
+                    mTvTip.setText(R.string.connected);
                     mIvWifiLogo.setImageResource(R.drawable.ic_wifi_green_a700_svg);
                     mIvRoundInside.setImageResource(R.drawable.connect_view_completed);
                     break;
                 case STOP_ANIM_FAIL:
                     mInsideAnim.cancel();
-                    mTvTip.setText("点击查屏");
+                    mTvTip.setText(R.string.click_check);
                     mIvWifiLogo.setImageResource(R.drawable.ic_wifi_green_a700_svg_uncomplete);
                     mIvRoundInside.setImageResource(R.drawable.connect_view_uncomplete);
                     break;
@@ -98,10 +97,10 @@ public class ConnectFragment extends Fragment {
         mTvCheckResult = (TextView) view.findViewById(R.id.tv_connect_checkResult);
         mIvHelp= (ImageView) view.findViewById(R.id.iv_connect_help);
         mInsideAnim = AnimationUtils.loadAnimation(getContext(), R.anim.search_round);
-        mRecyclerView = (RecyclerView) view.findViewById(R.id.rv_connect_wifi);
-        mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.rv_connect_wifi);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         mConnectAdapter = new ConnectAdapter(getContext(), mWifiList, mWifiAdmin);
-        mRecyclerView.setAdapter(mConnectAdapter);
+        recyclerView.setAdapter(mConnectAdapter);
         mIvRoundInside.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -110,17 +109,17 @@ public class ConnectFragment extends Fragment {
                         return;
                     }
                     mIvRoundInside.startAnimation(mInsideAnim);
-                    mTvTip.setText("正在连接");
+                    mTvTip.setText(R.string.connecting);
                     connectWifi(0);
                 }else {
                     if (mWifiAdmin.checkWifiState()) {
                         mIvRoundInside.startAnimation(mInsideAnim);
-                        mTvTip.setText("正在查屏");
+                        mTvTip.setText(R.string.searching);
                         refreshWifiList();
                         connHandler.sendEmptyMessageDelayed(STOP_ANIM_FAIL,3000);
                     }else {
                         startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
-                        Toast.makeText(getContext(), "请开启Wi-Fi", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getContext(), R.string.tos_set_wifi_enable, Toast.LENGTH_SHORT).show();
                     }
                 }
 
@@ -135,7 +134,7 @@ public class ConnectFragment extends Fragment {
                     return;
                 }
                 mIvRoundInside.startAnimation(mInsideAnim);
-                mTvTip.setText("正在连接");
+                mTvTip.setText(R.string.connecting);
                 connectWifi(position);
             }
 
@@ -175,8 +174,8 @@ public class ConnectFragment extends Fragment {
         List<ScanResult> scanResults = mWifiAdmin.startScan();
         mWifiList=new ArrayList<>();
         for (ScanResult scanResult : scanResults) {
-            boolean startFlag = scanResult.SSID.startsWith("HC-LED[");
-            boolean endFlag = scanResult.SSID.endsWith("]");
+            boolean startFlag = scanResult.SSID.startsWith(Global.SSID_START);
+            boolean endFlag = scanResult.SSID.endsWith(Global.SSID_END);
             if (startFlag&&endFlag){
                 mWifiList.add(scanResult);
             }
@@ -206,7 +205,7 @@ public class ConnectFragment extends Fragment {
                     case WifiManager.WIFI_STATE_DISABLED://wifi closed
                         updateAnimState();
                         mWifiList.clear();
-                        mTvState.setText("未开启Wi-Fi");
+                        mTvState.setText(R.string.msg_wifi_disable);
                         mConnectAdapter.notifyDataSetChanged();
                         break;
                     case WifiManager.WIFI_STATE_ENABLED://wifi enable
@@ -218,14 +217,14 @@ public class ConnectFragment extends Fragment {
                 NetworkInfo networkInfo = intent.getParcelableExtra(WifiManager.EXTRA_NETWORK_INFO);
                 if (networkInfo!=null){
                     if (networkInfo.getState().equals(NetworkInfo.State.CONNECTED)){
-                        mTvState.setText("已连接到"+mWifiAdmin.getWifiInfo().getSSID());
+                        mTvState.setText(getString(R.string.connected)+mWifiAdmin.getWifiInfo().getSSID());
                         updateAnimState();
                     }else if (networkInfo.getState().equals(NetworkInfo.State.CONNECTING)){
-                        mTvState.setText("正在连接");
+                        mTvState.setText(R.string.connecting);
                     }else if (networkInfo.getState().equals(NetworkInfo.State.DISCONNECTING)){
-                        mTvState.setText("正在断开");
+                        mTvState.setText(R.string.disconnecting);
                     }else if (networkInfo.getState().equals(NetworkInfo.State.DISCONNECTED)){
-                        mTvState.setText("已断开");
+                        mTvState.setText(R.string.disconnect);
                     }
 
                     // 刷新状态显示
@@ -238,9 +237,9 @@ public class ConnectFragment extends Fragment {
 
     private void updateAnimState() {
         String ssid = mWifiAdmin.getWifiInfo().getSSID();
-        boolean startFlag = ssid.contains("HC-LED[");
-        boolean endFlag = ssid.contains("]");
-        String result="检测到"+mWifiList.size()+"个屏幕";
+        boolean startFlag = ssid.contains(Global.SSID_START);
+        boolean endFlag = ssid.contains(Global.SSID_END);
+        String result=getString(R.string.search_result)+mWifiList.size();
         mTvCheckResult.setText(result);
         if (startFlag&&endFlag){
             //动画停止
@@ -254,8 +253,8 @@ public class ConnectFragment extends Fragment {
         List<ScanResult> scanResults = mWifiAdmin.startScan();
         mWifiList.clear();
         for (ScanResult scanResult : scanResults) {
-            boolean startFlag = scanResult.SSID.startsWith("HC-LED[");
-            boolean endFlag = scanResult.SSID.endsWith("]");
+            boolean startFlag = scanResult.SSID.startsWith(Global.SSID_START);
+            boolean endFlag = scanResult.SSID.endsWith(Global.SSID_END);
             if (startFlag&&endFlag){
                 mWifiList.add(scanResult);
             }
@@ -290,7 +289,7 @@ public class ConnectFragment extends Fragment {
         } else {
             // 权限拒绝了
             loadData();
-            Toast.makeText(getContext(), "需要权限才能开启WIFI", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), R.string.tos_request_permission, Toast.LENGTH_SHORT).show();
             startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
         }
     }

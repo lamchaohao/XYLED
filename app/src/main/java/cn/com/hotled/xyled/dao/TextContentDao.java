@@ -37,10 +37,11 @@ public class TextContentDao extends AbstractDao<TextContent, Long> {
         public final static Property IsIlatic = new Property(7, boolean.class, "isIlatic", false, "IS_ILATIC");
         public final static Property IsUnderline = new Property(8, boolean.class, "isUnderline", false, "IS_UNDERLINE");
         public final static Property IsSelected = new Property(9, boolean.class, "isSelected", false, "IS_SELECTED");
-        public final static Property SortNumber = new Property(10, int.class, "sortNumber", false, "SORT_NUMBER");
-        public final static Property ProgramId = new Property(11, long.class, "programId", false, "PROGRAM_ID");
-        public final static Property TextEffect = new Property(12, int.class, "textEffect", false, "TEXT_EFFECT");
-        public final static Property TextSpeed = new Property(13, int.class, "textSpeed", false, "TEXT_SPEED");
+        public final static Property IsTextReverse = new Property(10, boolean.class, "isTextReverse", false, "IS_TEXT_REVERSE");
+        public final static Property SortNumber = new Property(11, int.class, "sortNumber", false, "SORT_NUMBER");
+        public final static Property ProgramId = new Property(12, long.class, "programId", false, "PROGRAM_ID");
+        public final static Property TextEffect = new Property(13, int.class, "textEffect", false, "TEXT_EFFECT");
+        public final static Property TextSpeed = new Property(14, int.class, "textSpeed", false, "TEXT_SPEED");
     }
 
     private final FileConverter typefaceConverter = new FileConverter();
@@ -67,10 +68,11 @@ public class TextContentDao extends AbstractDao<TextContent, Long> {
                 "\"IS_ILATIC\" INTEGER NOT NULL ," + // 7: isIlatic
                 "\"IS_UNDERLINE\" INTEGER NOT NULL ," + // 8: isUnderline
                 "\"IS_SELECTED\" INTEGER NOT NULL ," + // 9: isSelected
-                "\"SORT_NUMBER\" INTEGER NOT NULL ," + // 10: sortNumber
-                "\"PROGRAM_ID\" INTEGER NOT NULL ," + // 11: programId
-                "\"TEXT_EFFECT\" INTEGER NOT NULL ," + // 12: textEffect
-                "\"TEXT_SPEED\" INTEGER NOT NULL );"); // 13: textSpeed
+                "\"IS_TEXT_REVERSE\" INTEGER NOT NULL ," + // 10: isTextReverse
+                "\"SORT_NUMBER\" INTEGER NOT NULL ," + // 11: sortNumber
+                "\"PROGRAM_ID\" INTEGER NOT NULL ," + // 12: programId
+                "\"TEXT_EFFECT\" INTEGER NOT NULL ," + // 13: textEffect
+                "\"TEXT_SPEED\" INTEGER NOT NULL );"); // 14: textSpeed
     }
 
     /** Drops the underlying database table. */
@@ -100,10 +102,11 @@ public class TextContentDao extends AbstractDao<TextContent, Long> {
         stmt.bindLong(8, entity.getIsIlatic() ? 1L: 0L);
         stmt.bindLong(9, entity.getIsUnderline() ? 1L: 0L);
         stmt.bindLong(10, entity.getIsSelected() ? 1L: 0L);
-        stmt.bindLong(11, entity.getSortNumber());
-        stmt.bindLong(12, entity.getProgramId());
-        stmt.bindLong(13, entity.getTextEffect());
-        stmt.bindLong(14, entity.getTextSpeed());
+        stmt.bindLong(11, entity.getIsTextReverse() ? 1L: 0L);
+        stmt.bindLong(12, entity.getSortNumber());
+        stmt.bindLong(13, entity.getProgramId());
+        stmt.bindLong(14, entity.getTextEffect());
+        stmt.bindLong(15, entity.getTextSpeed());
     }
 
     @Override
@@ -127,10 +130,11 @@ public class TextContentDao extends AbstractDao<TextContent, Long> {
         stmt.bindLong(8, entity.getIsIlatic() ? 1L: 0L);
         stmt.bindLong(9, entity.getIsUnderline() ? 1L: 0L);
         stmt.bindLong(10, entity.getIsSelected() ? 1L: 0L);
-        stmt.bindLong(11, entity.getSortNumber());
-        stmt.bindLong(12, entity.getProgramId());
-        stmt.bindLong(13, entity.getTextEffect());
-        stmt.bindLong(14, entity.getTextSpeed());
+        stmt.bindLong(11, entity.getIsTextReverse() ? 1L: 0L);
+        stmt.bindLong(12, entity.getSortNumber());
+        stmt.bindLong(13, entity.getProgramId());
+        stmt.bindLong(14, entity.getTextEffect());
+        stmt.bindLong(15, entity.getTextSpeed());
     }
 
     @Override
@@ -151,10 +155,11 @@ public class TextContentDao extends AbstractDao<TextContent, Long> {
             cursor.getShort(offset + 7) != 0, // isIlatic
             cursor.getShort(offset + 8) != 0, // isUnderline
             cursor.getShort(offset + 9) != 0, // isSelected
-            cursor.getInt(offset + 10), // sortNumber
-            cursor.getLong(offset + 11), // programId
-            cursor.getInt(offset + 12), // textEffect
-            cursor.getInt(offset + 13) // textSpeed
+            cursor.getShort(offset + 10) != 0, // isTextReverse
+            cursor.getInt(offset + 11), // sortNumber
+            cursor.getLong(offset + 12), // programId
+            cursor.getInt(offset + 13), // textEffect
+            cursor.getInt(offset + 14) // textSpeed
         );
         return entity;
     }
@@ -171,10 +176,11 @@ public class TextContentDao extends AbstractDao<TextContent, Long> {
         entity.setIsIlatic(cursor.getShort(offset + 7) != 0);
         entity.setIsUnderline(cursor.getShort(offset + 8) != 0);
         entity.setIsSelected(cursor.getShort(offset + 9) != 0);
-        entity.setSortNumber(cursor.getInt(offset + 10));
-        entity.setProgramId(cursor.getLong(offset + 11));
-        entity.setTextEffect(cursor.getInt(offset + 12));
-        entity.setTextSpeed(cursor.getInt(offset + 13));
+        entity.setIsTextReverse(cursor.getShort(offset + 10) != 0);
+        entity.setSortNumber(cursor.getInt(offset + 11));
+        entity.setProgramId(cursor.getLong(offset + 12));
+        entity.setTextEffect(cursor.getInt(offset + 13));
+        entity.setTextSpeed(cursor.getInt(offset + 14));
      }
     
     @Override

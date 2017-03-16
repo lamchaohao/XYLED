@@ -20,7 +20,7 @@
         <EditText
             android:layout_margin="3dp"
             android:id="@+id/et_fgText_input"
-            android:hint="请输入文本"
+            android:hint="@string/msg_hint_input"
             android:gravity="left"
             android:background="#FFFFFF"
             android:layout_width="match_parent"

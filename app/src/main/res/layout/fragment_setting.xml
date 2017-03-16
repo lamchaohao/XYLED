@@ -4,65 +4,34 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent">
 
-    <LinearLayout
-        style="@style/MainFragGuideGroup"
-        android:id="@+id/ll_setting_enterWifi">
-        <ImageView
-            android:src="@drawable/ic_wifi_green_a700_36dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-        <TextView
-            style="@style/MainFragGuideText"
-            android:text="连接屏幕"/>
-    </LinearLayout>
+    <TextView
+        android:id="@+id/tv_setfrgm_enterWifi"
+        android:drawableLeft="@drawable/ic_wifi_green_a700_36dp"
+        style="@style/MainFragGuideText"
+        android:text="@string/connect_screen"/>
 
+    <TextView
+        android:id="@+id/tv_setfrgm_testConnnet"
+        android:drawableLeft="@drawable/ic_developer_board_primary_dark_36dp"
+        style="@style/MainFragGuideText"
+        android:text="@string/test_connet"/>
 
-    <LinearLayout
-        style="@style/MainFragGuideGroup"
-        android:id="@+id/ll_setting_socket">
-        <ImageView
-            android:src="@drawable/ic_developer_board_primary_dark_36dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-        <TextView
-            style="@style/MainFragGuideText"
-            android:text="测试通信"/>
-    </LinearLayout>
-    <LinearLayout
-        android:id="@+id/ll_setting_screenConfig"
-        style="@style/MainFragGuideGroup">
-        <ImageView
-            android:src="@drawable/ic_phonelink_setup_primary_dark_36dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-        <TextView
-            style="@style/MainFragGuideText"
-            android:text="屏幕设置"/>
-    </LinearLayout>
+    <TextView
+        android:id="@+id/tv_setfrgm_screenSet"
+        android:drawableLeft="@drawable/ic_phonelink_setup_primary_dark_36dp"
+        style="@style/MainFragGuideText"
+        android:text="@string/screen_setting"/>
 
-    <LinearLayout
-        style="@style/MainFragGuideGroup"
-        android:id="@+id/ll_setting_remoteSwitch">
-        <ImageView
-            android:src="@drawable/ic_settings_remote_green_a700_36dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-        <TextView
-            style="@style/MainFragGuideText"
-            android:text="远程切换"/>
-    </LinearLayout>
+    <TextView
+        android:id="@+id/tv_setfrgm_remote"
+        android:drawableLeft="@drawable/ic_settings_remote_green_a700_36dp"
+        style="@style/MainFragGuideText"
+        android:text="@string/remote_switch"/>
 
-    <LinearLayout
-        style="@style/MainFragGuideGroup"
-        android:id="@+id/ll_setting_language"
-        android:orientation="horizontal">
-        <ImageView
-            android:src="@drawable/ic_language_primary_dark_36dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-        <TextView
-            style="@style/MainFragGuideText"
-            android:text="语言设置"/>
-    </LinearLayout>
+    <TextView
+        android:id="@+id/tv_setfrgm_language"
+        android:drawableLeft="@drawable/ic_language_primary_dark_36dp"
+        style="@style/MainFragGuideText"
+        android:text="@string/language_setting"/>
 
 </LinearLayout>

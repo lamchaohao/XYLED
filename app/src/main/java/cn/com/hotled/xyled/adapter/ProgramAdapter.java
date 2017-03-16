@@ -66,7 +66,7 @@ public class ProgramAdapter extends RecyclerView.Adapter {
             text = textContent.getText();
         }
         if (TextUtils.isEmpty(text)&&programType==ProgramType.Text) {
-            viewHolder.tvContent.setText("无文字");
+            viewHolder.tvContent.setText(mContext.getString(R.string.empty_text));
         }else {
             viewHolder.tvContent.setText(text);
         }

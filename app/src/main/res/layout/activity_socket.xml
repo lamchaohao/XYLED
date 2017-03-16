@@ -38,7 +38,7 @@
                     android:background="@drawable/sendbutton_bg"
                     android:id="@+id/socket_test"
                     android:layout_weight="1"
-                    android:text="Test"
+                    android:text="@string/test"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"/>
                 <Button
@@ -46,7 +46,7 @@
                     android:background="@drawable/sendbutton_bg"
                     android:id="@+id/socket_rest"
                     android:layout_weight="1"
-                    android:text="Rest"
+                    android:text="@string/reset"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"/>
                 <Button
@@ -54,7 +54,7 @@
                     android:background="@drawable/sendbutton_bg"
                     android:id="@+id/socket_pause"
                     android:layout_weight="1"
-                    android:text="Pause"
+                    android:text="@string/pause"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"/>
                 <Button
@@ -62,7 +62,7 @@
                     android:background="@drawable/sendbutton_bg"
                     android:id="@+id/socket_resume"
                     android:layout_weight="1"
-                    android:text="Resume"
+                    android:text="@string/resume"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"/>
             </LinearLayout>

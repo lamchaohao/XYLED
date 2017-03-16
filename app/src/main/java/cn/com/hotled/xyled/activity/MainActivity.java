@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
@@ -25,7 +24,7 @@ import cn.com.hotled.xyled.fragment.MoreFragment;
 import cn.com.hotled.xyled.fragment.ScreenFragment;
 import cn.com.hotled.xyled.fragment.SettingFragment;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends BaseAppCompatAtivity implements View.OnClickListener {
 
     @BindView(R.id.iv_main_screen)
     ImageView ivScreen;
@@ -57,12 +56,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private FragmentManager mFragmentManager;
     private TextView mToolbarTitle;
     private ScreenFragment mScreenFragment;
+    private ConnectFragment mConnectFragment;
     private SettingFragment mSettingFragment;
     private MoreFragment mMoreFragment;
     private boolean backFlag;
     private long firstTime;
     private long lastTime;
-    private ConnectFragment mConnectFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,7 +76,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Toolbar mToolbar = (Toolbar) findViewById(R.id.toolbar_main);
         Button sendButton = (Button) mToolbar.findViewById(R.id.bt_toolbar_send);
         mToolbarTitle = (TextView) mToolbar.findViewById(R.id.tv_toolbar_title);
-        mToolbarTitle.setText("显示屏");
+        mToolbarTitle.setText(R.string.program);
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -116,22 +115,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     case 0:
                         ivScreen.setImageResource(R.drawable.ic_live_tv_primary_dark_700_36dp);
                         tvScreen.setTextColor(getResources().getColor(R.color.colorPrimaryDark));
-                        mToolbarTitle.setText("显示屏");
+                        mToolbarTitle.setText(R.string.program);
                         break;
                     case 1:
                         ivConnect.setImageResource(R.drawable.ic_search_primary_dark_36dp);
                         tvConnect.setTextColor(getResources().getColor(R.color.colorPrimaryDark));
-                        mToolbarTitle.setText("连接");
+                        mToolbarTitle.setText(R.string.connect);
                         break;
                     case 2:
                         ivSetting.setImageResource(R.drawable.ic_settings_primary_dark_36dp);
                         tvSetting.setTextColor(getResources().getColor(R.color.colorPrimaryDark));
-                        mToolbarTitle.setText("设置");
+                        mToolbarTitle.setText(R.string.setting);
                         break;
                     case 3:
                         ivMore.setImageResource(R.drawable.ic_more_primary_dark_700_36dp);
                         tvMore.setTextColor(getResources().getColor(R.color.colorPrimaryDark));
-                        mToolbarTitle.setText("更多");
+                        mToolbarTitle.setText(R.string.more);
                         break;
                 }
             }
@@ -187,8 +186,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onBackPressed() {
-        if (!backFlag){//第一次点击
-            Toast.makeText(this, "再按一次返回退出程序", Toast.LENGTH_SHORT).show();
+        if(mViewPager.getCurrentItem()==0&&mScreenFragment.isMenuClose()) {
+            mScreenFragment.closeFabMenu();
+        }else if (!backFlag){//第一次点击
+            Toast.makeText(this, R.string.tos_press_again, Toast.LENGTH_SHORT).show();
             firstTime = System.currentTimeMillis();
             backFlag=true;
         }else{
@@ -200,7 +201,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                finish();
             }else{
                 //防止时间过长再次点击没反应
-                Toast.makeText(this, "再按一次返回退出程序", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.tos_press_again, Toast.LENGTH_SHORT).show();
                 firstTime = System.currentTimeMillis();
 
             }

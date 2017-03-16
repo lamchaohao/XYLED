@@ -1,6 +1,5 @@
 package cn.com.hotled.xyled.fragment;
 
-import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -12,6 +11,7 @@ import android.view.ViewGroup;
 import cn.com.hotled.xyled.R;
 import cn.com.hotled.xyled.activity.AboutUsActivity;
 import cn.com.hotled.xyled.activity.ConnectWifiActivity;
+import cn.com.hotled.xyled.activity.UpdateActivity;
 
 /**
  * Created by Lam on 2016/12/1.
@@ -28,31 +28,27 @@ public class MoreFragment extends Fragment {
 
     private void initView(View view ) {
 
-        view.findViewById(R.id.ll_more_checkscreen).setOnClickListener(new View.OnClickListener() {
+        view.findViewById(R.id.tv_more_search).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(getContext(), ConnectWifiActivity.class));
             }
         });
-        view.findViewById(R.id.ll_more_about_us).setOnClickListener(new View.OnClickListener() {
+        view.findViewById(R.id.tv_more_about).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(getContext(), AboutUsActivity.class));
             }
         });
 
-        view.findViewById(R.id.ll_more_update).setOnClickListener(new View.OnClickListener() {
+        view.findViewById(R.id.tv_more_update).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new AlertDialog.Builder(getContext())
-                        .setTitle("coming soon")
-                        .setMessage("正在开发")
-                        .setPositiveButton("好的",null)
-                        .show();
+                startActivity(new Intent(getContext(), UpdateActivity.class));
             }
         });
 
-        view.findViewById(R.id.ll_more_help).setOnClickListener(new View.OnClickListener(){
+        view.findViewById(R.id.tv_more_help).setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
 

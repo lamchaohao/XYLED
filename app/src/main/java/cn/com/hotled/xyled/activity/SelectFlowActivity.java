@@ -13,7 +13,7 @@ import java.util.List;
 
 import cn.com.hotled.xyled.R;
 import cn.com.hotled.xyled.adapter.FlowAdapter;
-import cn.com.hotled.xyled.global.Global;
+import cn.com.hotled.xyled.global.Common;
 
 public class SelectFlowActivity extends BaseActivity {
 
@@ -51,7 +51,7 @@ public class SelectFlowActivity extends BaseActivity {
             public void onItemClick(View view, int position) {
                 File selectFile = mFileList.get(position);
                 Intent intent = new Intent();
-                intent.putExtra(Global.EXTRA_SELECT_FLOW,selectFile.getAbsolutePath());
+                intent.putExtra(Common.EX_setlectFlow,selectFile.getAbsolutePath());
                 setResult(RESULT_OK,intent);
                 SelectFlowActivity.this.finish();
             }
@@ -61,6 +61,6 @@ public class SelectFlowActivity extends BaseActivity {
 
     @Override
     public void onCreateCustomToolBar(Toolbar toolbar) {
-        toolbar.setTitle("选择边框");
+        toolbar.setTitle(R.string.choose_bound);
     }
 }

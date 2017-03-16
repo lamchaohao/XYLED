@@ -30,6 +30,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -62,15 +63,16 @@ import cn.com.hotled.xyled.bean.Program;
 import cn.com.hotled.xyled.bean.TextContent;
 import cn.com.hotled.xyled.dao.ProgramDao;
 import cn.com.hotled.xyled.dao.TextContentDao;
+import cn.com.hotled.xyled.global.Common;
 import cn.com.hotled.xyled.global.Global;
 import cn.com.hotled.xyled.util.android.DensityUtil;
 import cn.com.hotled.xyled.view.photoview.PhotoView;
 import cn.com.hotled.xyled.view.numberpicker.NumberPicker;
 
-import static cn.com.hotled.xyled.global.Global.EXTRA_TEXT_CONTENT;
 import static cn.com.hotled.xyled.global.Global.TEXT_CONTENT_CHANGE_CODE;
 
-public class ChangeLineTextActivity extends BaseActivity implements View.OnClickListener,AdapterView.OnItemSelectedListener,SeekBar.OnSeekBarChangeListener {
+public class ChangeLineTextActivity extends BaseActivity implements View.OnClickListener,AdapterView.OnItemSelectedListener,
+        SeekBar.OnSeekBarChangeListener,CompoundButton.OnCheckedChangeListener {
 
     private static final int SELECT_FLOW_CODE = 202;
     private static final int SELECT_FONT_CODE = 303;
@@ -122,6 +124,8 @@ public class ChangeLineTextActivity extends BaseActivity implements View.OnClick
     Spinner spn_setFlowSpeed;
     @BindView(R.id.sw_openFlow)
     Switch swOpenFlow;
+    @BindView(R.id.sw_reverse)
+    Switch swReverse;
     @BindView(R.id.ll_fgText_setFlow)
     LinearLayout llSetFlow;
     @BindView(R.id.sb_fgText_stayTime)
@@ -171,7 +175,7 @@ public class ChangeLineTextActivity extends BaseActivity implements View.OnClick
         mTextContent.setTextColor(Color.RED);
         mTextContent.setTextBackgroudColor(Color.BLACK);
 
-        mProgramId = getIntent().getLongExtra("programId", -1);
+        mProgramId = getIntent().getLongExtra(Common.EX_programId, -1);
         mTextContentDao = ((App) getApplication()).getDaoSession().getTextContentDao();
         mProgramDao = ((App) getApplication()).getDaoSession().getProgramDao();
         List<Program> programList=null;
@@ -221,7 +225,7 @@ public class ChangeLineTextActivity extends BaseActivity implements View.OnClick
                     setFlowBound(absolutePath,false,false);
                 }
                 spnTextEffect.setSelection(mTextContent.getTextEffect());
-                mBt_textSize.setText("size:"+mTextContent.getTextSize());
+                mBt_textSize.setText(String.valueOf(mTextContent.getTextSize()));
                 if (mTextContent.getTypeface()!=null) {
                     int lastIndexOf = mTextContent.getTypeface().getName().lastIndexOf(".");
                     String fontFile = mTextContent.getTypeface().getName().substring(0, lastIndexOf);
@@ -248,7 +252,7 @@ public class ChangeLineTextActivity extends BaseActivity implements View.OnClick
             }else {
                 llSetFlow.setVisibility(View.GONE);
             }
-
+            swReverse.setChecked(mTextContent.getIsTextReverse());
         }
         isLoadData=false;
     }
@@ -298,6 +302,7 @@ public class ChangeLineTextActivity extends BaseActivity implements View.OnClick
         spn_setFlowEffect.setOnItemSelectedListener(this);
         spn_setFlowSpeed.setOnItemSelectedListener(this);
         swOpenFlow.setOnClickListener(this);
+        swReverse.setOnCheckedChangeListener(this);
         sb_stayTime.setOnSeekBarChangeListener(this);
         sb_speed.setOnSeekBarChangeListener(this);
     }
@@ -339,7 +344,7 @@ public class ChangeLineTextActivity extends BaseActivity implements View.OnClick
     private void saveImageToDisk() {
         FileOutputStream fos = null;
         try {
-            fos = new FileOutputStream(getCacheDir()+"/preview.png");
+            fos = new FileOutputStream(getCacheDir()+Common.FL_PREVIEW);
             targetBitmap.compress(Bitmap.CompressFormat.PNG,100,fos);
             fos.flush();
         } catch (FileNotFoundException e) {
@@ -357,6 +362,16 @@ public class ChangeLineTextActivity extends BaseActivity implements View.OnClick
     }
 
     private void drawText() {
+        String text = mTextContent.getText();
+        if (swReverse.isChecked()) {
+            //倒叙的文字
+            StringBuilder reverseText = new StringBuilder();
+            for (int i = mTextContent.getText().length()-1; i >=0 ; i--) {
+                String substring = mTextContent.getText().substring(i, i + 1);
+                reverseText.append(substring);
+            }
+            text = reverseText.toString();
+        }
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
         canvas.drawPaint(paint);
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
@@ -400,7 +415,7 @@ public class ChangeLineTextActivity extends BaseActivity implements View.OnClick
         paint.setTextAlign(Paint.Align.LEFT);
 
         //设置好画笔，开始计算
-        float drawWidth = computeWidth(mTextContent.getText());
+        float drawWidth = computeWidth(text);
         //需要加上流水边框的宽度,左右都需要加上
         int tempBaseX=mBaseX;
         int tempBaseY=mBaseY;
@@ -412,6 +427,7 @@ public class ChangeLineTextActivity extends BaseActivity implements View.OnClick
             tempBaseY+=mFlowBitmap.getHeight();
             translateCount=mFlowBitmap.getHeight();
         }
+
         //画图时，分两种情况
         if (mTextContent.getTextEffect()<=Global.TEXT_EFFECT_STATIC){
             //固定
@@ -424,7 +440,7 @@ public class ChangeLineTextActivity extends BaseActivity implements View.OnClick
                 drawBgColor(drawWidth,mScreenHeight);
                 //文本
                 paint.setTextAlign(Paint.Align.CENTER);
-                canvas.drawText(mTextContent.getText(), mScreenWidth/2, mBaseY, paint);
+                canvas.drawText(text, mScreenWidth/2, mBaseY, paint);
             }else {//左移右移
                 if (drawWidth>mScreenWidth) {
                     int width = (int) drawWidth;
@@ -437,16 +453,7 @@ public class ChangeLineTextActivity extends BaseActivity implements View.OnClick
                 drawBgColor(drawWidth,mScreenHeight);
                 //文本
                 if (mTextContent.getText()!=null&& !TextUtils.isEmpty(mTextContent.getText())) {
-                    if (mTextContent.getTextEffect()==Global.TEXT_EFFECT_MOVE_RIGHT){
-                        StringBuilder sb = new StringBuilder();
-                        for (int i = mTextContent.getText().length()-1; i >=0 ; i--) {
-                            String substring = mTextContent.getText().substring(i, i + 1);
-                            sb.append(substring);
-                        }//右移的话倒叙文字
-                        canvas.drawText(sb.toString(),tempBaseX,tempBaseY,paint);
-                    }else {
-                        canvas.drawText(mTextContent.getText(),tempBaseX,tempBaseY,paint);
-                    }
+                    canvas.drawText(text,tempBaseX,tempBaseY,paint);
                 }
             }
 
@@ -458,24 +465,12 @@ public class ChangeLineTextActivity extends BaseActivity implements View.OnClick
                 textPaint.set(paint);
                 //Layout.Alignment.ALIGN_CENTER 表明居中
                 StaticLayout currentLayout = null;
-                switch (mTextContent.getTextEffect()){
-                    case Global.TEXT_EFFECT_MOVE_UP:
-                        currentLayout = new StaticLayout(mTextContent.getText(), textPaint, mScreenWidth, Layout.Alignment.ALIGN_CENTER, 1.0f, 0f, false);
-                        break;
-                    case Global.TEXT_EFFECT_MOVE_DOWN:
-                        StringBuilder sb = new StringBuilder();
-                        for (int i = mTextContent.getText().length()-1; i >=0 ; i--) {
-                            String substring = mTextContent.getText().substring(i, i + 1);
-                            sb.append(substring);
-                        }//如果是下移的话就倒叙文字
-                        currentLayout = new StaticLayout(sb.toString(), textPaint, mScreenWidth, Layout.Alignment.ALIGN_CENTER, 1.0f, 0f, false);
-                        break;
-                }
+                currentLayout = new StaticLayout(text, textPaint, mScreenWidth, Layout.Alignment.ALIGN_CENTER, 1.0f, 0f, false);
 
                 int height = currentLayout.getHeight();
                 if (height>=3072) {
                     if (!isWarnShowed) {
-                        Toast.makeText(this, "文字过长，预览图后部分省略，但不会影响屏幕实际显示", Toast.LENGTH_LONG).show();
+                        Toast.makeText(this, R.string.tos_warn_long, Toast.LENGTH_LONG).show();
                         isWarnShowed=true;
                     }
                     height=3072;
@@ -511,7 +506,7 @@ public class ChangeLineTextActivity extends BaseActivity implements View.OnClick
         //为了避免OOM，bitmap的最大宽度设置为2048,bitmap的最大尺寸为4096*4096
         if (drawWidth>=2048){
             if (!isWarnShowed) {
-                Toast.makeText(this, "文字过长，预览图后部分省略，但不会影响屏幕实际显示", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, R.string.tos_warn_long, Toast.LENGTH_LONG).show();
                 isWarnShowed=true;
             }
             return 2048;
@@ -613,9 +608,9 @@ public class ChangeLineTextActivity extends BaseActivity implements View.OnClick
             }
         });
         new AlertDialog.Builder(this)
-                .setTitle("设置垂直方向偏移量")
+                .setTitle(R.string.msg_set_vertical)
                 .setView(outerView)
-                .setPositiveButton("OK", null)
+                .setPositiveButton(R.string.msg_confirm, null)
                 .show();
     }
     //垂直居中
@@ -644,15 +639,15 @@ public class ChangeLineTextActivity extends BaseActivity implements View.OnClick
             }
         });
         new AlertDialog.Builder(this)
-                .setTitle("设置水平方向偏移量")
+                .setTitle(R.string.msg_set_horizon)
                 .setView(outerView)
-                .setPositiveButton("OK", null)
+                .setPositiveButton(R.string.msg_confirm, null)
                 .show();
     }
 
     private void setTextBgMore() {
         ColorPickerDialogBuilder.with(this)
-                .setTitle("选择字体背景颜色")
+                .setTitle(R.string.msg_set_backgroud)
                 .initialColor(Color.RED)
                 .wheelType(ColorPickerView.WHEEL_TYPE.FLOWER)
                 .density(12)
@@ -662,14 +657,14 @@ public class ChangeLineTextActivity extends BaseActivity implements View.OnClick
 
                     }
                 })
-                .setPositiveButton("确定", new ColorPickerClickListener() {
+                .setPositiveButton(R.string.msg_confirm, new ColorPickerClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i, Integer[] integers) {
                         setTextBgColor(i);
 
                     }
                 })
-                .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                .setNegativeButton(R.string.msg_cancle, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
@@ -685,7 +680,7 @@ public class ChangeLineTextActivity extends BaseActivity implements View.OnClick
 
     private void setTextColorMore() {
         ColorPickerDialogBuilder.with(this)
-                .setTitle("选择字体颜色")
+                .setTitle(R.string.msg_set_fontColor)
                 .initialColor(Color.RED)
                 .wheelType(ColorPickerView.WHEEL_TYPE.FLOWER)
                 .density(12)
@@ -695,14 +690,14 @@ public class ChangeLineTextActivity extends BaseActivity implements View.OnClick
 
                     }
                 })
-                .setPositiveButton("确定", new ColorPickerClickListener() {
+                .setPositiveButton(R.string.msg_confirm, new ColorPickerClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i, Integer[] integers) {
                         setTextColor(i);
 
                     }
                 })
-                .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                .setNegativeButton(R.string.msg_cancle, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
@@ -755,16 +750,16 @@ public class ChangeLineTextActivity extends BaseActivity implements View.OnClick
         sizePicker.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
             @Override
             public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
-                mBt_textSize.setText("size:"+newVal);
+                mBt_textSize.setText(String.valueOf(newVal));
                 mTextContent.setTextSize(newVal);
                 drawText();
             }
         });
 
         new AlertDialog.Builder(this)
-                .setTitle("设置文字大小")
+                .setTitle(R.string.msg_set_text_size)
                 .setView(outerView)
-                .setPositiveButton("OK", null)
+                .setPositiveButton(R.string.msg_confirm, null)
                 .show();
 
     }
@@ -831,6 +826,7 @@ public class ChangeLineTextActivity extends BaseActivity implements View.OnClick
         }
     }
 
+
     private void setUseFlowToggle() {
         if (swOpenFlow.isChecked()) {
             setCenterHoriz(false);
@@ -839,7 +835,7 @@ public class ChangeLineTextActivity extends BaseActivity implements View.OnClick
             if (mFlowBitmap==null){
                 boolean isFirstIn = getSharedPreferences(Global.SP_SYSTEM_CONFIG, MODE_PRIVATE).getBoolean(Global.KEY_IS_FIRSTIN, false);
                 if (!isFirstIn) {
-                    File file = new File(getFilesDir() + "/flow/bounds_1_01.bmp");
+                    File file = new File(getFilesDir() + Common.FL_FLOW_DEFAULT);
                     if (file.exists()) {
                         mProgram.setFlowBoundFile(file);
                         setFlowBound(file.toString(),false,false);
@@ -867,11 +863,11 @@ public class ChangeLineTextActivity extends BaseActivity implements View.OnClick
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode==RESULT_OK&&requestCode==SELECT_FLOW_CODE){
-            String fileName = data.getStringExtra(Global.EXTRA_SELECT_FLOW);
+            String fileName = data.getStringExtra(Common.EX_setlectFlow);
             mProgram.setFlowBoundFile(new File(fileName));
             setFlowBound(fileName,true,true);
         }else if (resultCode==RESULT_OK&&requestCode==SELECT_FONT_CODE){
-            String fileName = data.getStringExtra(Global.EXTRA_SELECT_FONT);
+            String fileName = data.getStringExtra(Common.EX_setelctFont);
             File fontFile = new File(fileName);
             if (fontFile.exists()){
                 mTextContent.setTypeface(fontFile);
@@ -919,7 +915,7 @@ public class ChangeLineTextActivity extends BaseActivity implements View.OnClick
         mProgram.setBaseX(mBaseX);
         mProgramDao.insertOrReplace(mProgram);
         Intent intent = new Intent();
-        intent.putExtra(EXTRA_TEXT_CONTENT,mTextContent.getText());
+        intent.putExtra(Common.EX_textContent,mTextContent.getText());
         setResult(TEXT_CONTENT_CHANGE_CODE,intent);
         ChangeLineTextActivity.super.onBackPressed();
     }
@@ -938,9 +934,9 @@ public class ChangeLineTextActivity extends BaseActivity implements View.OnClick
             @Override
             public void onClick(View v) {
                 MaterialDialog.Builder builder = new MaterialDialog.Builder(ChangeLineTextActivity.this);
-                builder.title("修改节目名称")
+                builder.title(R.string.msg_edit_programName)
                         .inputType(InputType.TYPE_CLASS_TEXT)
-                        .input("请输入节目名称", mProgram.getProgramName(), new MaterialDialog.InputCallback() {
+                        .input(getResources().getString(R.string.msg_hint_programName), mProgram.getProgramName(), new MaterialDialog.InputCallback() {
                             @Override
                             public void onInput(@NonNull MaterialDialog dialog, CharSequence input) {
                                 mProgram.setProgramName(input.toString());
@@ -948,18 +944,18 @@ public class ChangeLineTextActivity extends BaseActivity implements View.OnClick
                                 setSupportActionBar(toolbar);
                                 dialog.dismiss();
                                 Intent intent = new Intent();
-                                intent.putExtra("newProgramName",input.toString());
+                                intent.putExtra(Common.EX_newProGramName,input.toString());
                                 setResult(RESULT_OK,intent);
                             }
                         })
-                        .positiveText("确定")
+                        .positiveText(getResources().getString(R.string.msg_confirm))
                         .onPositive(new MaterialDialog.SingleButtonCallback() {
                             @Override
                             public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
 
                             }
                         })
-                        .negativeText("取消")
+                        .negativeText(getResources().getString(R.string.msg_cancle))
                         .onNegative(new MaterialDialog.SingleButtonCallback() {
                             @Override
                             public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
@@ -970,7 +966,7 @@ public class ChangeLineTextActivity extends BaseActivity implements View.OnClick
             }
         });
         toolbar.addView(ivEdit,prams);
-        String programName = getIntent().getStringExtra("programName");
+        String programName = getIntent().getStringExtra(Common.EX_programName);
         toolbar.setTitle(programName);
     }
 
@@ -1001,12 +997,12 @@ public class ChangeLineTextActivity extends BaseActivity implements View.OnClick
             switch (seekBar.getId()) {
                 case R.id.sb_fgText_speed:
                     int i = progress/5 +1;
-                    tv_showSpeed.setText(i+"");
+                    tv_showSpeed.setText(String.valueOf(i));
                     mProgram.setFrameTime(i*2);
                     break;
                 case R.id.sb_fgText_stayTime:
                     int second = progress/10;
-                    tv_showStaytime.setText(second+" s");
+                    tv_showStaytime.setText(String.valueOf(second)+getString(R.string.screen_scan_symbol));
                     mProgram.setStayTime(second);
                     break;
 
@@ -1022,5 +1018,11 @@ public class ChangeLineTextActivity extends BaseActivity implements View.OnClick
     @Override
     public void onStopTrackingTouch(SeekBar seekBar) {
 
+    }
+
+    @Override
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        mTextContent.setIsTextReverse(isChecked);
+        drawText();
     }
 }

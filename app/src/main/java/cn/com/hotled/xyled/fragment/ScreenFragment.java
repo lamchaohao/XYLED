@@ -21,6 +21,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.github.clans.fab.FloatingActionMenu;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -36,6 +38,7 @@ import cn.com.hotled.xyled.bean.ProgramType;
 import cn.com.hotled.xyled.bean.TextContent;
 import cn.com.hotled.xyled.dao.ProgramDao;
 import cn.com.hotled.xyled.dao.TextContentDao;
+import cn.com.hotled.xyled.global.Common;
 import cn.com.hotled.xyled.global.Global;
 import cn.com.hotled.xyled.util.communicate.ReadScreenDataUtil;
 
@@ -60,7 +63,6 @@ public class ScreenFragment extends Fragment implements View.OnClickListener {
     private String mTitlePart;
     private int mProgramPosition;
     private List<Program> mProgramList;
-    private View mScreenView;
     private ImageView mIvRefresh;
     private Animation mRefreshAnim;
     private SharedPreferences.OnSharedPreferenceChangeListener mListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
@@ -80,16 +82,16 @@ public class ScreenFragment extends Fragment implements View.OnClickListener {
             switch (msg.what) {
                 case WIFI_ERRO:
                     mRefreshAnim.cancel();
-                    Toast.makeText(getContext(), "未连接屏幕，请查屏", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), R.string.tos_disConnect_screen, Toast.LENGTH_SHORT).show();
                     break;
                 case READ_SUCCESS:
                     mRefreshAnim.cancel();
-                    Toast.makeText(getContext(), "刷新屏幕参数完成！", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), R.string.tos_refresh_success, Toast.LENGTH_SHORT).show();
                     updateScreenView();
                     break;
                 case READ_FAILE:
                     mRefreshAnim.cancel();
-                    Toast.makeText(getContext(), "屏幕无响应，请重试", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), R.string.tos_screen_noresponse, Toast.LENGTH_SHORT).show();
                     break;
             }
         }
@@ -98,6 +100,7 @@ public class ScreenFragment extends Fragment implements View.OnClickListener {
     private TextView mTvScreenSize;
     private TextView mTvScreenScanCount;
     private ProgramDao mProgramDao;
+    private FloatingActionMenu mFabMenu;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -119,12 +122,12 @@ public class ScreenFragment extends Fragment implements View.OnClickListener {
     private void initView(View view) {
         initActionButton(view);
         TextContentDao textContentDao = ((App) (getActivity().getApplication())).getDaoSession().getTextContentDao();
-        mScreenView = view.findViewById(R.id.cv_contentScreen_screen);
+        View screenView = view.findViewById(R.id.cv_contentScreen_screen);
         mIvRefresh = (ImageView) view.findViewById(R.id.iv_screenCatag_refresh);
         mTvCardName = (TextView) view.findViewById(R.id.tv_screenCatag_card);
         mTvScreenSize = (TextView) view.findViewById(R.id.tv_screenCatag_size);
         mTvScreenScanCount = (TextView) view.findViewById(R.id.tv_screenCatag_scanCount);
-        mScreenView.setOnClickListener(this);
+        screenView.setOnClickListener(this);
         mIvRefresh.setOnClickListener(this);
         mRecyclerView = (RecyclerView) view.findViewById(R.id.rv_fragmScreen);
         mAdapter = new ProgramAdapter(getContext(), mProgramList,textContentDao);
@@ -136,14 +139,14 @@ public class ScreenFragment extends Fragment implements View.OnClickListener {
                 ProgramType programType = mProgramList.get(position).getProgramType();
                 if (programType == ProgramType.Pic) {
                     Intent intent = new Intent(getContext(), PhotoEditActivity.class);
-                    intent.putExtra("programId", mProgramList.get(position).getId());
-                    intent.putExtra("programName", mProgramList.get(position).getProgramName());
+                    intent.putExtra(Common.EX_programId, mProgramList.get(position).getId());
+                    intent.putExtra(Common.EX_programName, mProgramList.get(position).getProgramName());
                     mProgramPosition = position;
                     startActivityForResult(intent, PHOTO_REQUEST_CODE);
                 } else if (programType == ProgramType.Text) {
                     Intent intent = new Intent(getContext(), ChangeLineTextActivity.class);
-                    intent.putExtra("programId", mProgramList.get(position).getId());
-                    intent.putExtra("programName", mProgramList.get(position).getProgramName());
+                    intent.putExtra(Common.EX_programId, mProgramList.get(position).getId());
+                    intent.putExtra(Common.EX_programName, mProgramList.get(position).getProgramName());
                     mProgramPosition = position;
                     startActivityForResult(intent, EASY_TEXT_REQUEST_CODE);
                 }
@@ -154,9 +157,9 @@ public class ScreenFragment extends Fragment implements View.OnClickListener {
             public void onLongClick(View v, final int position) {
                 mTitlePart = mProgramList.get(position).getProgramName();
                 new AlertDialog.Builder(getContext())
-                        .setTitle("删除节目")
-                        .setMessage("确定删除" + mTitlePart + "?")
-                        .setPositiveButton("确定", new DialogInterface.OnClickListener() {
+                        .setTitle(R.string.msg_delete_program)
+                        .setMessage(getString(R.string.msg_confirm_delete)+mTitlePart)
+                        .setPositiveButton(R.string.msg_confirm, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 dialog.dismiss();
@@ -179,10 +182,10 @@ public class ScreenFragment extends Fragment implements View.OnClickListener {
                                 ((App) getActivity().getApplication()).getDaoSession().getTextContentDao().deleteInTx(textContents);
                                 mAdapter.notifyItemRemoved(position);
                                 mAdapter.notifyDataSetChanged();
-                                Snackbar.make(mRecyclerView, "已删除节目" + mTitlePart, Snackbar.LENGTH_LONG).show();
+                                Snackbar.make(mRecyclerView, getString(R.string.msg_deleted) + mTitlePart, Snackbar.LENGTH_LONG).show();
                             }
                         })
-                        .setNegativeButton("取消", null)
+                        .setNegativeButton(R.string.msg_cancle, null)
                         .show();
             }
         });
@@ -192,6 +195,7 @@ public class ScreenFragment extends Fragment implements View.OnClickListener {
     private void initActionButton(View view) {
         View fabAddText = view.findViewById(R.id.fab_screen_add_text);
         View fabAddPic = view.findViewById(R.id.fab_screen_add_pic);
+        mFabMenu = (FloatingActionMenu) view.findViewById(R.id.fab_screen_menu);
         fabAddText.setOnClickListener(this);
         fabAddPic.setOnClickListener(this);
     }
@@ -216,9 +220,9 @@ public class ScreenFragment extends Fragment implements View.OnClickListener {
         int screenWidth = sharedPre.getInt(Global.KEY_SCREEN_W, -64);
         int screenHight = sharedPre.getInt(Global.KEY_SCREEN_H, -32);
         int screenScan = sharedPre.getInt(Global.KEY_SCREEN_SCAN, -1);
-        String cardName = sharedPre.getString(Global.KEY_CARD_SERIES, "none");
-        mTvScreenSize.setText(screenWidth + " x " + screenHight);
-        mTvScreenScanCount.setText(screenScan + " S");
+        String cardName = sharedPre.getString(Global.KEY_CARD_SERIES, getString(R.string.msg_none));
+        mTvScreenSize.setText(screenWidth + getString(R.string.pic_plus) + screenHight);
+        mTvScreenScanCount.setText(screenScan + getString(R.string.screen_scan_symbol));
         mTvCardName.setText(cardName);
     }
 
@@ -230,7 +234,7 @@ public class ScreenFragment extends Fragment implements View.OnClickListener {
                 size++;
                 Program program = new Program();
                 program.setId(System.currentTimeMillis());
-                program.setProgramName("new Text" + size);
+                program.setProgramName(getString(R.string.new_text_program) + size);
                 program.setSortNumber(mProgramList.size());
                 program.setProgramType(ProgramType.Text);
                 mProgramDao.insert(program);
@@ -249,7 +253,7 @@ public class ScreenFragment extends Fragment implements View.OnClickListener {
                 proSize++;
                 Program picProgram = new Program();
                 picProgram.setId(System.currentTimeMillis());
-                picProgram.setProgramName("new pic" + proSize);
+                picProgram.setProgramName(getString(R.string.new_pic_program) + proSize);
                 picProgram.setSortNumber(mProgramList.size());
                 picProgram.setProgramType(ProgramType.Pic);
                 mProgramDao.insert(picProgram);
@@ -262,7 +266,7 @@ public class ScreenFragment extends Fragment implements View.OnClickListener {
     private void readData() {
         mRefreshAnim = AnimationUtils.loadAnimation(getContext(), R.anim.search_round);
         mIvRefresh.startAnimation(mRefreshAnim);
-        ReadScreenDataUtil readUtil = new ReadScreenDataUtil(getContext(), mHandler);
+        ReadScreenDataUtil readUtil = new ReadScreenDataUtil(getActivity(), mHandler);
         readUtil.startReadData();
     }
 
@@ -270,7 +274,7 @@ public class ScreenFragment extends Fragment implements View.OnClickListener {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
 
         if (resultCode == RESULT_OK && requestCode == EASY_TEXT_REQUEST_CODE) {
-            String newProgramName = data.getStringExtra("newProgramName");
+            String newProgramName = data.getStringExtra(Common.EX_newProGramName);
             mProgramList.get(mProgramPosition).setProgramName(newProgramName);
             mAdapter.notifyItemChanged(mProgramPosition);
         }if (resultCode == TEXT_CONTENT_CHANGE_CODE && requestCode == EASY_TEXT_REQUEST_CODE) {
@@ -290,6 +294,16 @@ public class ScreenFragment extends Fragment implements View.OnClickListener {
             mProgramList.addAll(programs);
             mAdapter.notifyDataSetChanged();
         }
+    }
+
+    public void closeFabMenu(){
+        if (mFabMenu.isOpened()) {
+            mFabMenu.close(true);
+        }
+    }
+
+    public boolean isMenuClose(){
+        return mFabMenu.isOpened();
     }
 
     @Override

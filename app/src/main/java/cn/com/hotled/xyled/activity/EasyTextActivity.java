@@ -12,18 +12,18 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.InputType;
+import android.text.Layout;
+import android.text.StaticLayout;
+import android.text.TextPaint;
+import android.text.TextUtils;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -35,8 +35,10 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
@@ -50,28 +52,28 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import cn.com.hotled.xyled.App;
 import cn.com.hotled.xyled.R;
-import cn.com.hotled.xyled.adapter.TypefaceAdapter;
 import cn.com.hotled.xyled.bean.Program;
 import cn.com.hotled.xyled.bean.TextContent;
-import cn.com.hotled.xyled.bean.TypefaceFile;
 import cn.com.hotled.xyled.dao.ProgramDao;
 import cn.com.hotled.xyled.dao.TextContentDao;
-import cn.com.hotled.xyled.decoration.WifiItemDecoration;
+import cn.com.hotled.xyled.global.Common;
 import cn.com.hotled.xyled.global.Global;
 import cn.com.hotled.xyled.util.android.DensityUtil;
 import cn.com.hotled.xyled.view.photoview.PhotoView;
 import cn.com.hotled.xyled.view.numberpicker.NumberPicker;
 
-public class EasyTextActivity extends BaseActivity implements View.OnClickListener,AdapterView.OnItemSelectedListener {
+import static cn.com.hotled.xyled.global.Global.TEXT_CONTENT_CHANGE_CODE;
+
+public class EasyTextActivity extends BaseActivity implements View.OnClickListener,AdapterView.OnItemSelectedListener,SeekBar.OnSeekBarChangeListener {
 
     private static final int SELECT_FLOW_CODE = 202;
+    private static final int SELECT_FONT_CODE = 303;
     @BindView(R.id.pv_fgText_photo)
     PhotoView mPhotoView;
     @BindView(R.id.et_fgText_input)
@@ -122,6 +124,14 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
     Switch swOpenFlow;
     @BindView(R.id.ll_fgText_setFlow)
     LinearLayout llSetFlow;
+    @BindView(R.id.sb_fgText_stayTime)
+    SeekBar sb_stayTime;
+    @BindView(R.id.sb_fgText_speed)
+    SeekBar sb_speed;
+    @BindView(R.id.tv_fgText_showSpeed)
+    TextView tv_showSpeed;
+    @BindView(R.id.tv_fgText_showStaytime)
+    TextView tv_showStaytime;
 
     private Canvas canvas;
     private Bitmap targetBitmap;
@@ -132,17 +142,13 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
     private int mBaseX;
     private int mBaseY;
     private TextContent mTextContent;
-    private TypefaceAdapter typefaceAdapter;
-    private float mFrameTime;
-    private float mStayTime;
     private long mProgramId;
-    private TextContentDao mTextButtonDao;
+    private TextContentDao mTextContentDao;
     private boolean isLoadData;
     private boolean isWarnShowed;
     private ProgramDao mProgramDao;
     private Program mProgram;
     private Bitmap mFlowBitmap;
-    private File mSelectedFontFile;
 
 
     @Override
@@ -155,7 +161,7 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
         initEditText();
         loadData();
     }
-//
+    //
     private void loadData() {
         RECOMAND_SIZE = mScreenHeight;
         mBaseY=mScreenHeight/2;
@@ -165,14 +171,14 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
         mTextContent.setTextColor(Color.RED);
         mTextContent.setTextBackgroudColor(Color.BLACK);
 
-        mProgramId = getIntent().getLongExtra("programId", -1);
-        mTextButtonDao = ((App) getApplication()).getDaoSession().getTextContentDao();
+        mProgramId = getIntent().getLongExtra(Common.EX_programId, -1);
+        mTextContentDao = ((App) getApplication()).getDaoSession().getTextContentDao();
         mProgramDao = ((App) getApplication()).getDaoSession().getProgramDao();
         List<Program> programList=null;
         List<TextContent> textContentsList = null;
         if (mProgramId!=-1) {
             programList = mProgramDao.queryBuilder().where(ProgramDao.Properties.Id.eq(mProgramId)).list();
-            textContentsList = mTextButtonDao.queryBuilder().where(TextContentDao.Properties.ProgramId.eq(mProgramId)).list();
+            textContentsList = mTextContentDao.queryBuilder().where(TextContentDao.Properties.ProgramId.eq(mProgramId)).list();
         }
 
         if (programList!=null&&programList.size()==1){
@@ -181,7 +187,7 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
             //新增的节目的话就是0，所以让其居中
             if (mProgram.getBaseY()==0) {
                 if (mScreenHeight==32) {
-                    mBaseY=24;
+                    mBaseY=28;
                 }else if (mScreenHeight==64){
                     mBaseY=57;
                 }else {
@@ -192,9 +198,19 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
             }
             mBaseX = mProgram.getBaseX();
 
-            mFrameTime=mProgram.getFrameTime();
-            mStayTime = mProgram.getStayTime();
+            float frameTime=mProgram.getFrameTime();
+            float stayTime = mProgram.getStayTime();
+            frameTime /=2;
+            frameTime --;
+            frameTime *=5;
+            sb_speed.setProgress((int) frameTime);
+            stayTime *=10;
+            sb_stayTime.setProgress((int) stayTime);
+            if (stayTime==0){
+                tv_showStaytime.setText("0 s");
+            }
             spn_setFlowEffect.setSelection(mProgram.getFlowEffect());
+            spn_setFlowSpeed.setSelection(mProgram.getFlowSpeed());
             if (textContentsList!=null&&textContentsList.size()==1&&textContentsList.get(0)!=null){
 
                 mTextContent = textContentsList.get(0);
@@ -205,7 +221,7 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
                     setFlowBound(absolutePath,false,false);
                 }
                 spnTextEffect.setSelection(mTextContent.getTextEffect());
-                mBt_textSize.setText("size:"+mTextContent.getTextSize());
+                mBt_textSize.setText(String.valueOf(mTextContent.getTextSize()));
                 if (mTextContent.getTypeface()!=null) {
                     int lastIndexOf = mTextContent.getTypeface().getName().lastIndexOf(".");
                     String fontFile = mTextContent.getTypeface().getName().substring(0, lastIndexOf);
@@ -222,6 +238,9 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
                 }
                 //读取完后绘图
                 drawText();
+            }else {
+                sb_speed.setProgress(50);
+                sb_stayTime.setProgress(50);
             }
             swOpenFlow.setChecked(mProgram.getUseFlowBound());
             if (swOpenFlow.isChecked()) {
@@ -279,6 +298,8 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
         spn_setFlowEffect.setOnItemSelectedListener(this);
         spn_setFlowSpeed.setOnItemSelectedListener(this);
         swOpenFlow.setOnClickListener(this);
+        sb_stayTime.setOnSeekBarChangeListener(this);
+        sb_speed.setOnSeekBarChangeListener(this);
     }
 
     private void initPhotoView() {
@@ -318,7 +339,7 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
     private void saveImageToDisk() {
         FileOutputStream fos = null;
         try {
-            fos = new FileOutputStream(getCacheDir()+"/preview.png");
+            fos = new FileOutputStream(getCacheDir()+Common.FL_PREVIEW);
             targetBitmap.compress(Bitmap.CompressFormat.PNG,100,fos);
             fos.flush();
         } catch (FileNotFoundException e) {
@@ -339,9 +360,6 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
         canvas.drawPaint(paint);
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
-
-        //如果图片比所设置的宽，则需加长
-
         //先设置好画笔，才进行计算
         paint.setColor(mTextContent.getTextColor());
         paint.setTextSize(mTextContent.getTextSize());
@@ -386,30 +404,97 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
         //需要加上流水边框的宽度,左右都需要加上
         int tempBaseX=mBaseX;
         int tempBaseY=mBaseY;
+        int translateCount=0;
         if (mFlowBitmap!=null&&mProgram.getUseFlowBound()){
             drawWidth+=mFlowBitmap.getHeight()*2;
             //加上流水边框后，文字需要偏移流水边框的一个宽度
             tempBaseX+=mFlowBitmap.getHeight();
             tempBaseY+=mFlowBitmap.getHeight();
+            translateCount=mFlowBitmap.getHeight();
         }
-        if (drawWidth>mScreenWidth) {
-            int width = (int) drawWidth;
-            targetBitmap = Bitmap.createBitmap(width, mScreenHeight, Bitmap.Config.ARGB_4444);
-            if (targetBitmap != null)
-                canvas.setBitmap(targetBitmap);
-            mPhotoView.setImageBitmap(targetBitmap);
-        }
+        //画图时，分两种情况
+        if (mTextContent.getTextEffect()<=Global.TEXT_EFFECT_STATIC){
+            //固定
+            if (mTextContent.getTextEffect()==Global.TEXT_EFFECT_STATIC){
+                targetBitmap = Bitmap.createBitmap(mScreenWidth, mScreenHeight, Bitmap.Config.ARGB_4444);
+                if (targetBitmap != null)
+                    canvas.setBitmap(targetBitmap);
+                mPhotoView.setImageBitmap(targetBitmap);
+                //背景
+                drawBgColor(drawWidth,mScreenHeight);
+                //文本
+                paint.setTextAlign(Paint.Align.CENTER);
+                canvas.drawText(mTextContent.getText(), mScreenWidth/2, mBaseY, paint);
+            }else {//左移右移
+                if (drawWidth>mScreenWidth) {
+                    int width = (int) drawWidth;
+                    targetBitmap = Bitmap.createBitmap(width, mScreenHeight, Bitmap.Config.ARGB_4444);
+                    if (targetBitmap != null)
+                        canvas.setBitmap(targetBitmap);
+                    mPhotoView.setImageBitmap(targetBitmap);
+                }
+                //背景
+                drawBgColor(drawWidth,mScreenHeight);
+                //文本
+                if (mTextContent.getText()!=null&& !TextUtils.isEmpty(mTextContent.getText())) {
+                    if (mTextContent.getTextEffect()==Global.TEXT_EFFECT_MOVE_RIGHT){
+                        StringBuilder sb = new StringBuilder();
+                        for (int i = mTextContent.getText().length()-1; i >=0 ; i--) {
+                            String substring = mTextContent.getText().substring(i, i + 1);
+                            sb.append(substring);
+                        }//右移的话倒叙文字
+                        canvas.drawText(sb.toString(),tempBaseX,tempBaseY,paint);
+                    }else {
+                        canvas.drawText(mTextContent.getText(),tempBaseX,tempBaseY,paint);
+                    }
+                }
+            }
 
-        //背景
-        drawBgColor(drawWidth);
+        }else {
+            //上下移动
+            //文本
+            if (mTextContent.getText()!=null){
+                TextPaint textPaint =new TextPaint();
+                textPaint.set(paint);
+                //Layout.Alignment.ALIGN_CENTER 表明居中
+                StaticLayout currentLayout = null;
+                switch (mTextContent.getTextEffect()){
+                    case Global.TEXT_EFFECT_MOVE_UP:
+                        currentLayout = new StaticLayout(mTextContent.getText(), textPaint, mScreenWidth, Layout.Alignment.ALIGN_CENTER, 1.0f, 0f, false);
+                        break;
+                    case Global.TEXT_EFFECT_MOVE_DOWN:
+                        StringBuilder sb = new StringBuilder();
+                        for (int i = mTextContent.getText().length()-1; i >=0 ; i--) {
+                            String substring = mTextContent.getText().substring(i, i + 1);
+                            sb.append(substring);
+                        }//如果是下移的话就倒叙文字
+                        currentLayout = new StaticLayout(sb.toString(), textPaint, mScreenWidth, Layout.Alignment.ALIGN_CENTER, 1.0f, 0f, false);
+                        break;
+                }
+
+                int height = currentLayout.getHeight();
+                if (height>=3072) {
+                    if (!isWarnShowed) {
+                        Toast.makeText(this, R.string.tos_warn_long, Toast.LENGTH_LONG).show();
+                        isWarnShowed=true;
+                    }
+                    height=3072;
+                }
+                height+=translateCount*2;//加上流水边的宽度
+                targetBitmap = Bitmap.createBitmap(mScreenWidth, height, Bitmap.Config.ARGB_4444);
+                if (targetBitmap != null)
+                    canvas.setBitmap(targetBitmap);
+                mPhotoView.setImageBitmap(targetBitmap);
+                //背景
+                drawBgColor(mScreenWidth,height);
+                currentLayout.draw(canvas);
+            }
+        }
         if (mFlowBitmap!=null&&mProgram.getUseFlowBound()){
-        //流水边框
+            //流水边框
             drawFlowBound();
         }
-        //文本
-        if (mTextContent.getText()!=null){
-            canvas.drawText(mTextContent.getText(),tempBaseX,tempBaseY,paint);
-        }
+
 
     }
 
@@ -421,13 +506,12 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
             for (int i = 0; i < widths.length; i++) {
                 drawWidth+=widths[i];
             }
-            Log.i("advance", "computeWidth:drawWidth "+drawWidth);
         }
 
         //为了避免OOM，bitmap的最大宽度设置为2048,bitmap的最大尺寸为4096*4096
         if (drawWidth>=2048){
             if (!isWarnShowed) {
-                Toast.makeText(this, "文字过长，预览图后部分省略，但不会影响屏幕实际显示", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, R.string.tos_warn_long, Toast.LENGTH_LONG).show();
                 isWarnShowed=true;
             }
             return 2048;
@@ -435,10 +519,10 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
         return drawWidth;
     }
 
-    private void drawBgColor(float drawWidth) {
+    private void drawBgColor(float drawWidth,int drawHeight) {
         Paint bgPaint=new Paint();
         bgPaint.setColor(mTextContent.getTextBackgroudColor());
-        canvas.drawRect(mBaseX,0,drawWidth,mScreenHeight,bgPaint);
+        canvas.drawRect(mBaseX,0,drawWidth,drawHeight,bgPaint);
     }
     private void drawFlowBound() {
 
@@ -451,7 +535,7 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
             }
         }
 
-        int screenHeight = mScreenHeight;
+        int screenHeight = getTargetBitmap().getHeight();
         int screenWidth = getTargetBitmap().getWidth();
         Paint flowPaint=new Paint();
 
@@ -529,9 +613,9 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
             }
         });
         new AlertDialog.Builder(this)
-                .setTitle("设置垂直方向偏移量")
+                .setTitle(R.string.msg_set_vertical)
                 .setView(outerView)
-                .setPositiveButton("OK", null)
+                .setPositiveButton(R.string.msg_confirm, null)
                 .show();
     }
     //垂直居中
@@ -560,15 +644,15 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
             }
         });
         new AlertDialog.Builder(this)
-                .setTitle("设置水平方向偏移量")
+                .setTitle(R.string.msg_set_horizon)
                 .setView(outerView)
-                .setPositiveButton("OK", null)
+                .setPositiveButton(R.string.msg_confirm, null)
                 .show();
     }
 
     private void setTextBgMore() {
         ColorPickerDialogBuilder.with(this)
-                .setTitle("选择字体背景颜色")
+                .setTitle(R.string.msg_set_backgroud)
                 .initialColor(Color.RED)
                 .wheelType(ColorPickerView.WHEEL_TYPE.FLOWER)
                 .density(12)
@@ -578,14 +662,14 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
 
                     }
                 })
-                .setPositiveButton("确定", new ColorPickerClickListener() {
+                .setPositiveButton(R.string.msg_confirm, new ColorPickerClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i, Integer[] integers) {
                         setTextBgColor(i);
 
                     }
                 })
-                .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                .setNegativeButton(R.string.msg_cancle, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
@@ -601,7 +685,7 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
 
     private void setTextColorMore() {
         ColorPickerDialogBuilder.with(this)
-                .setTitle("选择字体颜色")
+                .setTitle(R.string.msg_set_fontColor)
                 .initialColor(Color.RED)
                 .wheelType(ColorPickerView.WHEEL_TYPE.FLOWER)
                 .density(12)
@@ -611,14 +695,14 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
 
                     }
                 })
-                .setPositiveButton("确定", new ColorPickerClickListener() {
+                .setPositiveButton(R.string.msg_confirm, new ColorPickerClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i, Integer[] integers) {
                         setTextColor(i);
 
                     }
                 })
-                .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                .setNegativeButton(R.string.msg_cancle, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.dismiss();
@@ -663,62 +747,6 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
         drawText();
     }
 
-    private void setFont() {
-        File file =new File("/system/fonts");
-        File[] files = file.listFiles();
-        File downloadFontDir = new File(Environment.getExternalStorageDirectory()+"/fonts/xyledfonts");
-        if (!downloadFontDir.exists()){
-            downloadFontDir.mkdir();
-        }
-        File[] downloadFonts = downloadFontDir.listFiles();
-        final List<TypefaceFile> fileList=new ArrayList<>();
-        if(downloadFonts!=null)
-            for (File downloadFont : downloadFonts) {
-                fileList.add(new TypefaceFile(downloadFont,false));
-            }
-        for (int i=0;i<files.length;i++){
-            String name = files[i].getName();
-            if(name.contains("-Regular")&&!name.contains("MiuiEx")){
-                fileList.add(new TypefaceFile(files[i],false));
-            }
-        }
-        View view = LayoutInflater.from(this).inflate(R.layout.typeface_list, null);
-        RecyclerView typefaceRecycler = (RecyclerView) view.findViewById(R.id.typeFaceListView);
-        typefaceRecycler.setLayoutManager(new LinearLayoutManager(this));
-        typefaceAdapter = new TypefaceAdapter(fileList, this);
-        typefaceRecycler.setAdapter(typefaceAdapter);
-        typefaceRecycler.addItemDecoration(new WifiItemDecoration(this,WifiItemDecoration.VERTICAL_LIST));
-        mSelectedFontFile = null;
-        typefaceAdapter.setOnItemClickListener(new TypefaceAdapter.OnItemOnClickListener() {
-            @Override
-            public void onItemClick(View view, int position) {
-                //1.先获取选择了哪个字体
-                mSelectedFontFile = fileList.get(position).getFile();
-                mTextContent.setTypeface(fileList.get(position).getFile());
-            }
-        });
-
-
-        new AlertDialog.Builder(this)
-                .setTitle("Choose Typeface")
-                .setView(view)
-                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        if (mSelectedFontFile!=null){
-                            mTextContent.setTypeface(mSelectedFontFile);
-                            int lastIndexOf = mSelectedFontFile.getName().lastIndexOf(".");
-                            String fontFile = mSelectedFontFile.getName().substring(0, lastIndexOf);
-                            mBt_setFont.setText(fontFile);
-                            dialog.dismiss();
-                            drawText();
-                        }
-
-                    }
-                })
-                .setNegativeButton("cancle",null)
-                .show();
-    }
 
     private void setTextSize(){
         View outerView = LayoutInflater.from(this).inflate(R.layout.wheel_view, null);
@@ -727,16 +755,16 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
         sizePicker.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
             @Override
             public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
-                mBt_textSize.setText("size:"+newVal);
+                mBt_textSize.setText(String.valueOf(newVal));
                 mTextContent.setTextSize(newVal);
                 drawText();
             }
         });
 
         new AlertDialog.Builder(this)
-                .setTitle("设置文字大小")
+                .setTitle(R.string.msg_set_text_size)
                 .setView(outerView)
-                .setPositiveButton("OK", null)
+                .setPositiveButton(R.string.msg_confirm, null)
                 .show();
 
     }
@@ -748,7 +776,8 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
                 setTextSize();
                 break;
             case R.id.bt_fgText_font: //字体
-                setFont();
+                Intent intent = new Intent(this,SelectFontActivity.class);
+                startActivityForResult(intent,SELECT_FONT_CODE);
                 break;
             case R.id.ib_fgText_setBold:
                 setBold();
@@ -798,6 +827,7 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
             case R.id.rl_fgText_flowLayout:
                 startActivityForResult(new Intent(this,SelectFlowActivity.class),SELECT_FLOW_CODE);
                 break;
+
         }
     }
 
@@ -809,7 +839,7 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
             if (mFlowBitmap==null){
                 boolean isFirstIn = getSharedPreferences(Global.SP_SYSTEM_CONFIG, MODE_PRIVATE).getBoolean(Global.KEY_IS_FIRSTIN, false);
                 if (!isFirstIn) {
-                    File file = new File(getFilesDir() + "/flow/bounds_1_01.bmp");
+                    File file = new File(getFilesDir() + Common.FL_FLOW_DEFAULT);
                     if (file.exists()) {
                         mProgram.setFlowBoundFile(file);
                         setFlowBound(file.toString(),false,false);
@@ -828,17 +858,6 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
         }
     }
 
-    public float getFrameTime() {
-        if (mFrameTime==0)
-            return 20;
-        return mFrameTime;
-    }
-
-    public float getStayTime() {
-        if (mStayTime==0)
-            return mFrameTime;//如果staytime没有设置，则与帧速一致
-        return mStayTime;
-    }
 
     public Bitmap getTargetBitmap() {
         return targetBitmap;
@@ -848,10 +867,19 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode==RESULT_OK&&requestCode==SELECT_FLOW_CODE){
-            String fileName = data.getStringExtra("fileName");
+            String fileName = data.getStringExtra(Common.EX_setlectFlow);
             mProgram.setFlowBoundFile(new File(fileName));
             setFlowBound(fileName,true,true);
-
+        }else if (resultCode==RESULT_OK&&requestCode==SELECT_FONT_CODE){
+            String fileName = data.getStringExtra(Common.EX_setelctFont);
+            File fontFile = new File(fileName);
+            if (fontFile.exists()){
+                mTextContent.setTypeface(fontFile);
+                int lastIndexOf = fontFile.getName().lastIndexOf(".");
+                String fontFileName = fontFile.getName().substring(0, lastIndexOf);
+                mBt_setFont.setText(fontFileName);
+                drawText();
+            }
         }
     }
 
@@ -885,14 +913,14 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
     public void onBackPressed() {
         if (mTextContent.getId()==0)
             mTextContent.setId(System.currentTimeMillis()*2);
-        mTextContent.setProgramId(mProgramId);
-        mTextButtonDao.insertOrReplaceInTx(mTextContent);
+        mTextContent.setProgramId(mProgram.getId());
+        mTextContentDao.insertOrReplace(mTextContent);
         mProgram.setBaseY(mBaseY);
         mProgram.setBaseX(mBaseX);
-        mProgram.setStayTime(getStayTime());
-        mProgram.setFrameTime(getFrameTime());
         mProgramDao.insertOrReplace(mProgram);
-
+        Intent intent = new Intent();
+        intent.putExtra(Common.EX_textContent,mTextContent.getText());
+        setResult(TEXT_CONTENT_CHANGE_CODE,intent);
         EasyTextActivity.super.onBackPressed();
     }
 
@@ -910,9 +938,9 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
             @Override
             public void onClick(View v) {
                 MaterialDialog.Builder builder = new MaterialDialog.Builder(EasyTextActivity.this);
-                builder.title("修改节目名称")
+                builder.title(R.string.msg_edit_programName)
                         .inputType(InputType.TYPE_CLASS_TEXT)
-                        .input("请输入节目名称", mProgram.getProgramName(), new MaterialDialog.InputCallback() {
+                        .input(getResources().getString(R.string.msg_hint_programName), mProgram.getProgramName(), new MaterialDialog.InputCallback() {
                             @Override
                             public void onInput(@NonNull MaterialDialog dialog, CharSequence input) {
                                 mProgram.setProgramName(input.toString());
@@ -920,18 +948,18 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
                                 setSupportActionBar(toolbar);
                                 dialog.dismiss();
                                 Intent intent = new Intent();
-                                intent.putExtra("newProgramName",input.toString());
+                                intent.putExtra(Common.EX_newProGramName,input.toString());
                                 setResult(RESULT_OK,intent);
                             }
                         })
-                        .positiveText("确定")
+                        .positiveText(getResources().getString(R.string.msg_confirm))
                         .onPositive(new MaterialDialog.SingleButtonCallback() {
                             @Override
                             public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
 
                             }
                         })
-                        .negativeText("取消")
+                        .negativeText(getResources().getString(R.string.msg_cancle))
                         .onNegative(new MaterialDialog.SingleButtonCallback() {
                             @Override
                             public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
@@ -942,22 +970,57 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
             }
         });
         toolbar.addView(ivEdit,prams);
-        String programName = getIntent().getStringExtra("programName");
+        String programName = getIntent().getStringExtra(Common.EX_programName);
         toolbar.setTitle(programName);
     }
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        if (parent.getId()==R.id.spn_fgText_textEffect){
-            mTextContent.setTextEffect(position);
-        }else if (parent.getId()==R.id.spn_fgText_flowShowEffect){
-            mProgram.setFlowEffect(position);
+        switch (parent.getId()) {
+            case R.id.spn_fgText_flowShowSpeed:
+                mProgram.setFlowSpeed(position);
+                break;
+            case R.id.spn_fgText_textEffect:
+                mTextContent.setTextEffect(position);
+                drawText();
+                break;
+            case R.id.spn_fgText_flowShowEffect:
+                mProgram.setFlowEffect(position);
+                break;
         }
 
     }
 
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
+
+    }
+
+    @Override
+    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+        switch (seekBar.getId()) {
+            case R.id.sb_fgText_speed:
+                int i = progress/5 +1;
+                tv_showSpeed.setText(String.valueOf(i));
+                mProgram.setFrameTime(i*2);
+                break;
+            case R.id.sb_fgText_stayTime:
+                int second = progress/10;
+                tv_showStaytime.setText(String.valueOf(second)+getString(R.string.screen_scan_symbol));
+                mProgram.setStayTime(second);
+                break;
+
+        }
+
+    }
+
+    @Override
+    public void onStartTrackingTouch(SeekBar seekBar) {
+
+    }
+
+    @Override
+    public void onStopTrackingTouch(SeekBar seekBar) {
 
     }
 }

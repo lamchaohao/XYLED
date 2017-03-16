@@ -22,14 +22,13 @@
                 android:layout_alignParentLeft="true"
                 android:layout_centerVertical="true"
                 android:textSize="22sp"
-                android:text="显示屏"
                 android:textColor="#FFFFFF"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
             <Button
                 android:layout_alignParentRight="true"
                 android:id="@+id/bt_toolbar_send"
-                android:text="发送"
+                android:text="@string/msg_send"
                 android:textSize="20sp"
                 android:background="@drawable/button_bg"
                 android:layout_margin="5dp"

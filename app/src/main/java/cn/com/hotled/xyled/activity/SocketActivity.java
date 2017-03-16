@@ -6,7 +6,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -39,7 +38,6 @@ public class SocketActivity extends BaseActivity implements View.OnClickListener
 
     @BindView(R.id.rv_message)
     RecyclerView mRecyclerView;
-
     @BindView(R.id.socket_test)
     Button btTest;
     @BindView(R.id.socket_pause)
@@ -83,7 +81,9 @@ public class SocketActivity extends BaseActivity implements View.OnClickListener
         WifiInfo wifiInfo = wifiAdmin.getWifiInfo();
         String ssid = wifiInfo.getSSID();
         String macStr = "";
-        if (ssid.contains("HC-LED")){
+        boolean startFlag = ssid.contains(Global.SSID_START);
+        boolean endFlag = ssid.contains(Global.SSID_END);
+        if (startFlag&&endFlag){
             macStr = ssid.substring(ssid.indexOf("[")+1, ssid.indexOf("]"));
         }else {
             Message msg=new Message();
@@ -141,7 +141,7 @@ public class SocketActivity extends BaseActivity implements View.OnClickListener
 
                 SendCMD pause=new SendCMD(pauseCMD);
                 new Thread(pause).start();
-                SocketMessage pauseMSG = new SocketMessage("Pause指令",System.currentTimeMillis(),true,false);
+                SocketMessage pauseMSG = new SocketMessage(getString(R.string.pause),System.currentTimeMillis(),true,false);
                 mMessageList.add(pauseMSG);
                 break;
             case R.id.socket_rest:
@@ -155,7 +155,7 @@ public class SocketActivity extends BaseActivity implements View.OnClickListener
 
                 SendCMD reset=new SendCMD(resetCMD);
                 new Thread(reset).start();
-                SocketMessage reSetMSG = new SocketMessage("RESET指令",System.currentTimeMillis(),true,false);
+                SocketMessage reSetMSG = new SocketMessage(getString(R.string.reset),System.currentTimeMillis(),true,false);
                 mMessageList.add(reSetMSG);
                 break;
             case R.id.socket_resume:
@@ -169,7 +169,7 @@ public class SocketActivity extends BaseActivity implements View.OnClickListener
 
                 SendCMD resume=new SendCMD(resumeCMD);
                 new Thread(resume).start();
-                SocketMessage resumeMSG = new SocketMessage("Resume指令",System.currentTimeMillis(),true,false);
+                SocketMessage resumeMSG = new SocketMessage(getString(R.string.resume),System.currentTimeMillis(),true,false);
                 mMessageList.add(resumeMSG);
                 break;
             case R.id.socket_test:
@@ -187,7 +187,7 @@ public class SocketActivity extends BaseActivity implements View.OnClickListener
                 SendCMD test=new SendCMD(testCMD);
                 new Thread(test).start();
 
-                SocketMessage testMSG = new SocketMessage("Test指令",System.currentTimeMillis(),true,false);
+                SocketMessage testMSG = new SocketMessage(getString(R.string.test),System.currentTimeMillis(),true,false);
                 mMessageList.add(testMSG);
                 break;
         }
@@ -196,9 +196,9 @@ public class SocketActivity extends BaseActivity implements View.OnClickListener
     }
 
     class SendCMD extends Thread{
-        byte[] msgByte;
+        byte[] CMDbyte;
         public SendCMD(byte[] msgB) {
-            msgByte = msgB;
+            CMDbyte = msgB;
         }
 
         @Override
@@ -207,14 +207,11 @@ public class SocketActivity extends BaseActivity implements View.OnClickListener
             try {
 
                 client = new Socket(Global.SERVER_IP,Global.SERVER_PORT);
-
-
                 byte[] readBuf = new byte[16];
 
                 OutputStream os = client.getOutputStream();
                 InputStream is = client.getInputStream();
-
-                os.write(msgByte);
+                os.write(CMDbyte);
 
                 is.read(readBuf);
                 String result="";
@@ -222,16 +219,16 @@ public class SocketActivity extends BaseActivity implements View.OnClickListener
                     if (i==11){
                         switch (readBuf[i]) {
                             case 0:
-                                result="通信成功";
+                                result=getString(R.string.testSuccess);
                                 break;
                             case 8:
-                                result="暂停成功";
+                                result=getString(R.string.pauseSuccess);
                                 break;
                             case 12:
-                                result="恢复成功";
+                                result=getString(R.string.resumeSuccess);
                                 break;
                             case 4:
-                                result="重置成功";
+                                result=getString(R.string.restSuccess);
                                 break;
                         }
                     }
@@ -244,7 +241,6 @@ public class SocketActivity extends BaseActivity implements View.OnClickListener
                 b.putString("result",result);
                 msg.setData(b);
                 msgHandler.sendMessage(msg);
-                Log.i("handler-rec",toString());
             } catch (SocketException e) {
                 e.printStackTrace();
                 Message msg=new Message();
@@ -292,9 +288,9 @@ public class SocketActivity extends BaseActivity implements View.OnClickListener
                     String error1 = bundle.getString("error");
                     String message = "";
                     if (error1.contains("ECONNREFUSED")) {
-                        message= "连接错误";//android.system.ErrnoException: connect failed: ECONNREFUSED (Connection refused)
+                        message= getString(R.string.refuse_connect);//android.system.ErrnoException: connect failed: ECONNREFUSED (Connection refused)
                     }else {
-                        message= "连接超时";
+                        message= getString(R.string.tos_wifi_timeout);
                     }
                     SocketMessage error=new SocketMessage(message,System.currentTimeMillis(),false,true);
                     mMessageList.add(error);
@@ -309,7 +305,7 @@ public class SocketActivity extends BaseActivity implements View.OnClickListener
                     mRecyclerView.smoothScrollToPosition(mMessageList.size());
                     break;
                 case ERROR_WIFI:
-                    Toast.makeText(SocketActivity.this,"所连接WiFi非本公司产品，请切换WiFi",Toast.LENGTH_LONG).show();
+                    Toast.makeText(SocketActivity.this,R.string.tos_wifi_switch,Toast.LENGTH_LONG).show();
                     break;
             }
             mLinearLayoutManager.scrollToPosition(mMessageList.size());

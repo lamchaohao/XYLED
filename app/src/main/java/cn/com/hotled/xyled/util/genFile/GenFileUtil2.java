@@ -87,11 +87,19 @@ public class GenFileUtil2 {
         mTextProgramList = new ArrayList<>();
         mTextContentList = contents;
         mProgramList = programs;
+        int contentIndex =0;
         for (Program program : programs) {
             if (program.getProgramType()== ProgramType.Pic) {
-                mPicProgramList.add(program);
+                if (program.getPicFile()!=null) {
+                    mPicProgramList.add(program);
+                }
             }else if (program.getProgramType()==ProgramType.Text){
-                mTextProgramList.add(program);
+                if (mTextContentList.get(contentIndex).getText()!=null){
+                    mTextProgramList.add(program);
+                    contentIndex++;
+                }else {
+                    mTextContentList.remove(contentIndex);
+                }
             }
         }
     }
@@ -162,18 +170,20 @@ public class GenFileUtil2 {
     private void initPicContent(){
         mPicContentList = new ArrayList<>();
         for (Program program : mPicProgramList) {
-            Bitmap bitmap = BitmapFactory.decodeFile(program.getPicFile().getAbsolutePath());
-            byte[] bytes = BitmapToPixel.convertBitmapToPixel(bitmap,mActivity);
-            FullCompressAlgorithm full=new FullCompressAlgorithm();
-            List<Byte> compress = full.compress(bytes);
-            byte[]  picBytes=new byte[compress.size()];
-            int i=0;
-            for (Byte compres : compress) {
-                picBytes[i]=compres;
-                i++;
+            if (program.getPicFile()!=null) {
+                Bitmap bitmap = BitmapFactory.decodeFile(program.getPicFile().getAbsolutePath());
+                byte[] bytes = BitmapToPixel.convertBitmapToPixel(bitmap,mActivity);
+                FullCompressAlgorithm full=new FullCompressAlgorithm();
+                List<Byte> compress = full.compress(bytes);
+                byte[]  picBytes=new byte[compress.size()];
+                int i=0;
+                for (Byte compres : compress) {
+                    picBytes[i]=compres;
+                    i++;
+                }
+                mPicContentList.add(picBytes);
             }
 
-            mPicContentList.add(picBytes);
         }
     }
 
@@ -188,6 +198,7 @@ public class GenFileUtil2 {
         mColByteCountList = new ArrayList<>();
         int textProgramIndex=0;
         for (Program program : mTextProgramList) {
+
             DrawBitmapUtil3 bitmapUtil=new DrawBitmapUtil3(program,mTextContentList.get(textProgramIndex),mTextScreenWidthList.get(textProgramIndex),mTextScreenHeightList.get(textProgramIndex));
             Bitmap bitmap = bitmapUtil.drawBitmap();
             //左右移动
@@ -333,8 +344,10 @@ public class GenFileUtil2 {
         int picProgramIndex=0;
         for (Program program : mProgramList) {
             if (program.getProgramType()== ProgramType.Pic) {
-                setPicProgramTimeAxis(picProgramIndex);
-                picProgramIndex++;
+                if (program.getPicFile()!=null) {
+                    setPicProgramTimeAxis(picProgramIndex);
+                    picProgramIndex++;
+                }
             }else {
                 setTextProgramTimeAxis(textProgramIndex);
                 textProgramIndex++;

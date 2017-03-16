@@ -4,50 +4,28 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent">
 
-    <LinearLayout
-        style="@style/MainFragGuideGroup"
-        android:id="@+id/ll_more_checkscreen">
-        <ImageView
-            android:src="@drawable/ic_search_green_a700_36dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-        <TextView
-            style="@style/MainFragGuideText"
-            android:text="查屏"/>
-    </LinearLayout>
-    <LinearLayout
-        style="@style/MainFragGuideGroup"
-        android:id="@+id/ll_more_about_us">
-        <ImageView
-            android:src="@drawable/ic_copyright_primary_dark_36dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-        <TextView
-            style="@style/MainFragGuideText"
-            android:text="关于我们"/>
-    </LinearLayout>
-    <LinearLayout
-        style="@style/MainFragGuideGroup"
-        android:id="@+id/ll_more_update">
-        <ImageView
-            android:src="@drawable/ic_update_primary_dark_36dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-        <TextView
-            style="@style/MainFragGuideText"
-            android:text="检查更新"/>
-    </LinearLayout>
+    <TextView
+        android:id="@+id/tv_more_search"
+        android:drawableLeft="@drawable/ic_search_green_a700_36dp"
+        style="@style/MainFragGuideText"
+        android:text="@string/check_screen"/>
 
-    <LinearLayout
-        style="@style/MainFragGuideGroup"
-        android:id="@+id/ll_more_help">
-        <ImageView
-            android:src="@drawable/ic_help_black_36dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-        <TextView
-            style="@style/MainFragGuideText"
-            android:text="使用指导"/>
-    </LinearLayout>
+    <TextView
+        android:id="@+id/tv_more_about"
+        android:drawableLeft="@drawable/ic_copyright_primary_dark_36dp"
+        style="@style/MainFragGuideText"
+        android:text="@string/about"/>
+
+    <TextView
+        android:id="@+id/tv_more_update"
+        android:drawableLeft="@drawable/ic_update_primary_dark_36dp"
+        style="@style/MainFragGuideText"
+        android:text="@string/check_update"/>
+
+    <TextView
+        android:id="@+id/tv_more_help"
+        android:drawableLeft="@drawable/ic_help_black_36dp"
+        style="@style/MainFragGuideText"
+        android:text="@string/use_help"/>
 
 </LinearLayout>

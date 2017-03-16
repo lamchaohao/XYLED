@@ -5,7 +5,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v7.app.AppCompatActivity;
 import android.view.Window;
 import android.view.WindowManager;
 
@@ -20,7 +19,7 @@ import java.io.InputStream;
 import cn.com.hotled.xyled.App;
 import cn.com.hotled.xyled.R;
 
-public class WelcomeActivity extends AppCompatActivity {
+public class WelcomeActivity extends BaseAppCompatAtivity {
     private static final int COPY_FINISH = 200;
     private static final int START_ACTIVITY = 300;
     private Handler mHandler=new Handler(){
@@ -157,7 +156,6 @@ public class WelcomeActivity extends AppCompatActivity {
 
             }
         } catch (Exception e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
             //如果捕捉到错误则通知UI线程
         }finally {

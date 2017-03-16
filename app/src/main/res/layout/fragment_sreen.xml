@@ -89,6 +89,7 @@
 
 
     <com.github.clans.fab.FloatingActionMenu
+        android:id="@+id/fab_screen_menu"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
@@ -111,7 +112,7 @@
             app:fab_colorRipple="#99FFFFFF"
             android:src="@drawable/ic_text_fields_white_24dp"
             app:fab_size="normal"
-            app:fab_label="文字节目" />
+            app:fab_label="@string/text_program" />
         <com.github.clans.fab.FloatingActionButton
             android:id="@+id/fab_screen_add_pic"
             android:layout_width="wrap_content"
@@ -121,7 +122,7 @@
             app:fab_colorRipple="#99FFFFFF"
             android:src="@drawable/ic_photo_white_24dp"
             app:fab_size="normal"
-            app:fab_label="图片节目" />
+            app:fab_label="@string/pic_program" />
     </com.github.clans.fab.FloatingActionMenu>
 
 </RelativeLayout>

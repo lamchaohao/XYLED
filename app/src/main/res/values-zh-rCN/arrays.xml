@@ -1,35 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="textEffect">
-        <item>Left move</item>
-        <item>Right move</item>
-        <item>Immediately appear and move left</item>
-        <item>Immediately appear and move right</item>
-        <item>Static (fixed) display</item>
-        <item>Move up</item>
-        <item>Move down</item>
+        <item>连续左移</item>
+        <item>连续右移</item>
+        <item>立刻出现并左移</item>
+        <item>立刻出现并右移</item>
+        <item>静态(固定)显示</item>
+        <item>上移</item>
+        <item>下移</item>
     </string-array>
 
     <array name="flowEffect">
-        <item>Clockwise</item>
-        <item>Counterclockwise</item>
+        <item>顺时针</item>
+        <item>逆时针</item>
     </array>
     <array name="flowSpeed">
-        <item>Stationary</item>
-        <item>Speed 1</item>
-        <item>Speed 2</item>
-        <item>Speed 3</item>
-        <item>Speed 4</item>
-        <item>Speed 5</item>
-        <item>Speed 6</item>
-        <item>Speed 7</item>
-        <item>Speed 8</item>
-        <item>Speed 9</item>
-        <item>Speed 10</item>
+        <item>静 止</item>
+        <item>速度 1</item>
+        <item>速度 2</item>
+        <item>速度 3</item>
+        <item>速度 4</item>
+        <item>速度 5</item>
+        <item>速度 6</item>
+        <item>速度 7</item>
+        <item>速度 8</item>
+        <item>速度 9</item>
+        <item>速度 10</item>
     </array>
-
+    
     <array name="space_trace">
-        <item>All dot pitch</item>
+        <item>全部点距</item>
         <item>P1.8</item>
         <item>P2</item>
         <item>P3</item>
@@ -44,7 +44,7 @@
         <item>P20</item>
     </array>
     <array name="scan_trace">
-        <item>All scan</item>
+        <item>全部扫描</item>
         <item>Scan 1</item>
         <item>Scan 2</item>
         <item>Scan 3</item>
@@ -57,7 +57,7 @@
         <item>Scan 32</item>
     </array>
     <array name="size_trace">
-        <item>All dimensions</item>
+        <item>全部尺寸</item>
         <item>16*8</item>
         <item>16*16</item>
         <item>32*16</item>
@@ -67,27 +67,27 @@
         <item>20*10</item>
     </array>
     <array name="hub_trace">
-        <item>All interfaces</item>
+        <item>全部接口</item>
         <item>hub-75</item>
         <item>hub-08</item>
         <item>hub-12</item>
         <item>hub-75-1</item>
     </array>
     <string-array name="dataOrientation">
-        <item>0-Right to left(Horizontal)</item>
+        <item>0-右到左(横)</item>
         <item>1----------</item>
         <item>2----------</item>
-        <item>3-Up to down(Vertical)</item>
+        <item>3-上到下(竖)</item>
     </string-array>
     <string-array name="pref_special">
-        <item>None</item>
-        <item>Across heighten(8*8)</item>
-        <item>Across heighten(16*8)</item>
-        <item>Across heighten(16*16)</item>
-        <item>Across heighten(32*16)</item>
-        <item>Across heighten(32*32)</item>
-        <item>Across heighten(H:16)</item>
-        <item>Across heighten(H:32)</item>
+        <item>无</item>
+        <item>交叉增高(8*8)</item>
+        <item>交叉增高(16*8)</item>
+        <item>交叉增高(16*16)</item>
+        <item>交叉增高(32*16)</item>
+        <item>交叉增高(32*32)</item>
+        <item>链接增高(H:16)</item>
+        <item>链接增高(H:32)</item>
     </string-array>
     <string-array name="pref_rgbSequence">
         <item>R-G-B</item>
@@ -98,17 +98,18 @@
         <item>B-G-R</item>
     </string-array>
     <array name="pref_data">
-        <item>0-In phase</item>
-        <item>1-Reverse phase</item>
+        <item>0-同相</item>
+        <item>1-反相</item>
     </array>
     <array name="pref_oe">
-        <item>0-Low level normal</item>
-        <item>1-High level normal</item>
+        <item>0-低电平正常</item>
+        <item>1-高电平正常</item>
     </array>
 
     <string-array name="pref_138code">
-        <item>0-with 138 decoder</item>
-        <item>1-without 138 decoder</item>
-        <item>2-enable 595 progressive</item>
+        <item>0-有138行译码</item>
+        <item>1-无138行译码</item>
+        <item>2-使用595逐行扫描</item>
     </string-array>
+
 </resources>

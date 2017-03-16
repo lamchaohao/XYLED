@@ -16,7 +16,7 @@ import cn.com.hotled.xyled.R;
 import cn.com.hotled.xyled.adapter.TypefaceAdapter;
 import cn.com.hotled.xyled.bean.TypefaceFile;
 import cn.com.hotled.xyled.decoration.WifiItemDecoration;
-import cn.com.hotled.xyled.global.Global;
+import cn.com.hotled.xyled.global.Common;
 
 public class SelectFontActivity extends BaseActivity {
 
@@ -31,9 +31,9 @@ public class SelectFontActivity extends BaseActivity {
     }
 
     private void loadData() {
-        File file =new File("/system/fonts");
+        File file =new File(Common.FL_SYSTEMFONT);
         File[] files = file.listFiles();
-        File downloadFontDir = new File(Environment.getExternalStorageDirectory()+"/fonts/LedFonts");
+        File downloadFontDir = new File(Environment.getExternalStorageDirectory()+Common.FL_LEDFONTS);
         if (!downloadFontDir.exists()){
             downloadFontDir.mkdir();
         }
@@ -64,7 +64,7 @@ public class SelectFontActivity extends BaseActivity {
                 //1.先获取选择了哪个字体
                 File file = mFileList.get(position).getFile();
                 Intent intent = new Intent();
-                intent.putExtra(Global.EXTRA_SELECT_FONT,file.getAbsolutePath());
+                intent.putExtra(Common.EX_setelctFont,file.getAbsolutePath());
                 setResult(RESULT_OK,intent);
                 SelectFontActivity.this.finish();
             }
@@ -73,6 +73,6 @@ public class SelectFontActivity extends BaseActivity {
 
     @Override
     public void onCreateCustomToolBar(Toolbar toolbar) {
-        toolbar.setTitle("选择字体");
+        toolbar.setTitle(R.string.choose_font);
     }
 }

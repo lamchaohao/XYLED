@@ -40,7 +40,6 @@
                 android:layout_weight="1"
                 android:id="@+id/tv_screenProgm_content"
                 android:padding="10dp"
-                android:text="文字节目 今日大减价"
                 android:layout_gravity="center"
                 android:layout_width="0dp"
                 android:maxLines="1"
