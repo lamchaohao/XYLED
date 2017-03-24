@@ -88,16 +88,29 @@ public class TypefaceAdapter extends RecyclerView.Adapter {
     }
 
     private String dealFileName(String fileName) {
-        //2.get lastIndexof -Regular
-        int lastIndexOf = fileName.lastIndexOf("-Regular");
-        //3.substring
-        String substring=null;
-        if (lastIndexOf!=-1){
-            substring = fileName.substring(0, lastIndexOf);
-            return substring;
+        if (fileName.contains("-Regular")){
+            //2.get lastIndexof -Regular
+            int lastIndexOf = fileName.lastIndexOf("-Regular");
+            //3.substring
+            String substring=null;
+            if (lastIndexOf!=-1){
+                substring = fileName.substring(0, lastIndexOf);
+                return substring;
+            }else {
+                return fileName;
+            }
         }else {
-            return fileName;
+            int lastIndexOf = fileName.lastIndexOf(".");
+            //3.substring
+            String substring=null;
+            if (lastIndexOf!=-1){
+                substring = fileName.substring(0, lastIndexOf);
+                return substring;
+            }else {
+                return fileName;
+            }
         }
+
     }
 
 

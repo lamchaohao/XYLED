@@ -14,7 +14,7 @@
     <application
         android:name=".App"
         android:allowBackup="true"
-        android:icon="@drawable/live_tv_logo"
+        android:icon="@drawable/logo"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar">
@@ -26,7 +26,7 @@
         <activity
             android:name=".activity.SocketActivity"
             android:windowSoftInputMode="adjustPan"/>
-        <activity android:name=".activity.ConnectWifiActivity"/>
+        <activity android:name=".activity.CheckScreenActivity"/>
         <activity
             android:name=".activity.BrowsePhotoActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
@@ -64,6 +64,10 @@
             android:name=".activity.ConnectHelpDiagActivity"
             android:theme="@style/Theme.AppCompat.Light.Dialog">
         </activity>
+        <activity
+            android:name=".activity.SetParamsHelpDiagActivity"
+            android:theme="@style/Theme.AppCompat.Light.Dialog">
+        </activity>
         <activity android:name=".activity.ChangeLineTextActivity">
         </activity>
         <activity android:name=".activity.SelectFontActivity">
@@ -80,7 +84,22 @@
         </activity>
         <activity android:name=".activity.SelectLanguageActivity">
         </activity>
-        <activity android:name=".activity.UpdateActivity">
+        <activity android:name=".activity.SendPcDataActivity"/>
+
+        <receiver
+            android:name=".receiver.ApkInstallReceiver"
+            android:enabled="true"
+            android:exported="true">
+        </receiver>
+
+        <activity android:name=".activity.ForwardDataActivity">
+        </activity>
+        <activity
+            android:name=".activity.UseGuideActivity"
+            android:label="@string/title_activity_use_guide"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+        <activity android:name=".activity.ConnectCardActivity">
         </activity>
     </application>
 

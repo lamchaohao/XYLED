@@ -26,6 +26,7 @@ import cn.com.hotled.xyled.global.Common;
 import cn.com.hotled.xyled.global.Global;
 import cn.com.hotled.xyled.util.android.WifiAdmin;
 
+import static cn.com.hotled.xyled.global.Common.FL_TRACE_DIR;
 import static cn.com.hotled.xyled.global.Global.READ_FAILE;
 import static cn.com.hotled.xyled.global.Global.READ_SUCCESS;
 import static cn.com.hotled.xyled.global.Global.WIFI_ERRO;
@@ -63,7 +64,6 @@ public class ReadScreenDataUtil {
         boolean startFlag = ssid.contains(Global.SSID_START);
         boolean endFlag = ssid.contains(Global.SSID_END);
         if (startFlag&&endFlag){
-            Log.w("tcpSend","ssid = "+ssid);
             macStr = ssid.substring(ssid.indexOf("[")+1, ssid.indexOf("]"));
         }else {
             Message message = mHandler.obtainMessage();
@@ -78,37 +78,31 @@ public class ReadScreenDataUtil {
         String regExEight = "[0-9a-fA-F]{8}";
         Pattern patEight = Pattern.compile(regExEight);
         Matcher matcEight = patEight.matcher(macStr);
-        int macInt1 = 0;
-        int macInt2 = 0;
-        int macInt3 = 0;
-        int macInt4 = 0;
+        String mac1;
+        String mac2;
+        String mac3;
+        String mac4;
         if(mat.matches()){
-            String mac0 = "80";
-            String mac1 = macStr.substring(0, 2);
-            String mac2 = macStr.substring(2, 4);
-            String mac3 = macStr.substring(4, 6);
+            mac1 = "80";
+            mac2 = macStr.substring(0, 2);
+            mac3 = macStr.substring(2, 4);
+            mac4 = macStr.substring(4, 6);
 
-            macInt1 = Integer.parseInt(mac0, 16);
-            macInt2 = Integer.parseInt(mac1, 16);
-            macInt3 = Integer.parseInt(mac2, 16);
-            macInt4 = Integer.parseInt(mac3, 16);
         }else if (matcEight.matches()){
-            String mac1 = macStr.substring(0, 2);
-            String mac2 = macStr.substring(2, 4);
-            String mac3 = macStr.substring(4, 6);
-            String mac4 = macStr.substring(6, 8);
-
-            macInt1 = Integer.parseInt(mac1, 16);
-            macInt2 = Integer.parseInt(mac2, 16);
-            macInt3 = Integer.parseInt(mac3, 16);
-            macInt4 = Integer.parseInt(mac4, 16);
+            mac1 = macStr.substring(0, 2);
+            mac2 = macStr.substring(2, 4);
+            mac3 = macStr.substring(4, 6);
+            mac4 = macStr.substring(6, 8);
         } else{
             Message message = mHandler.obtainMessage();
             message.what=WIFI_ERRO;
             mHandler.sendMessage(message);
             return;
         }
-
+        int macInt1 = Integer.parseInt(mac1, 16);
+        int macInt2 = Integer.parseInt(mac2, 16);
+        int macInt3 = Integer.parseInt(mac3, 16);
+        int macInt4 = Integer.parseInt(mac4, 16);
         Log.w("tcpSend","mac = "+macInt1+":"+macInt2+":"+macInt3+":"+macInt4);
         try {
             socket = new Socket(Global.SERVER_IP, Global.SERVER_PORT);
@@ -162,8 +156,6 @@ public class ReadScreenDataUtil {
             for (int i = 0; i < readMsg.length; i++) {
                 if(testCMD[i]!=readMsg[i]){
                     mHandler.sendEmptyMessageDelayed(READ_FAILE,1000);
-                }else {
-
                 }
             }
 
@@ -242,7 +234,7 @@ public class ReadScreenDataUtil {
             for (TraceFile traceFile : list) {
                 //比较折数与模组宽度是否一致
                 if (traceFile.getFoldCount()==foldCount&&traceFile.getModuleWidth()==batW) {
-                    File file = new File(mContext.getFilesDir()+"/trace",traceFile.getFilePath().getAbsolutePath());
+                    File file = new File(mContext.getFilesDir()+FL_TRACE_DIR,traceFile.getFilePath().getAbsolutePath());
                     byte[] fileData =new byte[512];
                     try {
                         fis =new FileInputStream(file);
@@ -280,6 +272,13 @@ public class ReadScreenDataUtil {
 
     private void saveConfigToSharedPref(byte[] readbackmsg) {
         //转换过程中可能会出现负数，故而与0xFF进行与运算
+        String readCard = new String(readbackmsg,0,12);
+        String cardSeries="";
+        if (readCard.equals(Global.HC1_FILENAME)){
+            cardSeries = Global.HC1_CARD;
+        }else {
+            cardSeries = Global.HC2_CARD;
+        }
         int screenWid=readbackmsg[35]&0xff; //宽度
         int screenHei=readbackmsg[37]&0xff; // 高度
         int data=readbackmsg[42]&0xff; //data
@@ -299,17 +298,18 @@ public class ReadScreenDataUtil {
         screenWid+=readbackmsg[36]&0xff;
 
         SharedPreferences.Editor edit = mContext.getSharedPreferences(Global.SP_SCREEN_CONFIG, Context.MODE_PRIVATE).edit();
-        edit.putInt(Global.KEY_RGB_ORDER,RGBorder);
-        edit.putInt(Global.KEY_SCREEN_W,screenWid);
-        edit.putInt(Global.KEY_SCREEN_H,screenHei);
-        edit.putInt(Global.KEY_SCREEN_SCAN,screenScan);
-        edit.putInt(Global.KEY_DATA,data);
-        edit.putInt(Global.KEY_OE,oe);
-        edit.putInt(Global.KEY_138CODE,code);
-        edit.putInt(Global.KEY_BATH,batH);
-        edit.putInt(Global.KEY_BATW,batW);
-        edit.putInt(Global.KEY_SPECIAL,special);
-        edit.putInt(Global.KEY_DATA_ORIENTATION,dataOrientation);
+        edit.putString(Global.KEY_CARD_SERIES,cardSeries);
+        edit.putInt(Global.KEY_RGB_ORDER,RGBorder<6?RGBorder:0);
+        edit.putInt(Global.KEY_SCREEN_W,screenWid<1025?screenWid:64);
+        edit.putInt(Global.KEY_SCREEN_H,screenHei<1025?screenHei:64);
+        edit.putInt(Global.KEY_SCREEN_SCAN,screenScan<64?screenScan:8);
+        edit.putInt(Global.KEY_DATA,data<2?data:0);
+        edit.putInt(Global.KEY_OE,oe<2?oe:0);
+        edit.putInt(Global.KEY_138CODE,code<3?code:0);
+        edit.putInt(Global.KEY_BATH,batH<255?batH:16);
+        edit.putInt(Global.KEY_BATW,batW<255?batW:16);
+        edit.putInt(Global.KEY_SPECIAL,special<8?special:0);
+        edit.putInt(Global.KEY_DATA_ORIENTATION,dataOrientation<4?dataOrientation:0);
         edit.apply();
     }
 

@@ -23,6 +23,7 @@ import cn.com.hotled.xyled.fragment.ConnectFragment;
 import cn.com.hotled.xyled.fragment.MoreFragment;
 import cn.com.hotled.xyled.fragment.ScreenFragment;
 import cn.com.hotled.xyled.fragment.SettingFragment;
+import cn.com.hotled.xyled.global.Global;
 
 public class MainActivity extends BaseAppCompatAtivity implements View.OnClickListener {
 
@@ -144,6 +145,12 @@ public class MainActivity extends BaseAppCompatAtivity implements View.OnClickLi
         mViewPager.setCurrentItem(0);//先设置一个
         ivScreen.setImageResource(R.drawable.ic_live_tv_primary_dark_700_36dp);
         tvScreen.setTextColor(getResources().getColor(R.color.colorPrimaryDark));
+        boolean isFirstProgram = getSharedPreferences(Global.SP_SYSTEM_CONFIG, MODE_PRIVATE).getBoolean(Global.KEY_FIRST_IN_PROGRAM, true);
+        if (isFirstProgram) {
+            startActivity(new Intent(this,SetParamsHelpDiagActivity.class));
+            startActivity(new Intent(this,UseGuideActivity.class));
+            getSharedPreferences(Global.SP_SYSTEM_CONFIG, MODE_PRIVATE).edit().putBoolean(Global.KEY_FIRST_IN_PROGRAM, false).apply();
+        }
     }
 
     private void initBottom() {

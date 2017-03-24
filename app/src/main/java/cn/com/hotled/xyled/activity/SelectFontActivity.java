@@ -33,7 +33,7 @@ public class SelectFontActivity extends BaseActivity {
     private void loadData() {
         File file =new File(Common.FL_SYSTEMFONT);
         File[] files = file.listFiles();
-        File downloadFontDir = new File(Environment.getExternalStorageDirectory()+Common.FL_LEDFONTS);
+        File downloadFontDir = new File(Environment.getExternalStorageDirectory()+Common.FL_FONTS_FOLDER);
         if (!downloadFontDir.exists()){
             downloadFontDir.mkdir();
         }

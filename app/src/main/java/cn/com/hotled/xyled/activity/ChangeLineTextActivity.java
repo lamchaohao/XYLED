@@ -66,8 +66,8 @@ import cn.com.hotled.xyled.dao.TextContentDao;
 import cn.com.hotled.xyled.global.Common;
 import cn.com.hotled.xyled.global.Global;
 import cn.com.hotled.xyled.util.android.DensityUtil;
-import cn.com.hotled.xyled.view.photoview.PhotoView;
 import cn.com.hotled.xyled.view.numberpicker.NumberPicker;
+import cn.com.hotled.xyled.view.photoview.PhotoView;
 
 import static cn.com.hotled.xyled.global.Global.TEXT_CONTENT_CHANGE_CODE;
 
@@ -204,14 +204,13 @@ public class ChangeLineTextActivity extends BaseActivity implements View.OnClick
 
             float frameTime=mProgram.getFrameTime();
             float stayTime = mProgram.getStayTime();
-            frameTime /=2;
-            frameTime --;
-            frameTime *=5;
+            frameTime--;
+            frameTime *=2;
             sb_speed.setProgress((int) frameTime);
-            stayTime *=10;
+            stayTime *=2;
             sb_stayTime.setProgress((int) stayTime);
             if (stayTime==0){
-                tv_showStaytime.setText("0 s");
+                tv_showStaytime.setText("0 S");
             }
             spn_setFlowEffect.setSelection(mProgram.getFlowEffect());
             spn_setFlowSpeed.setSelection(mProgram.getFlowSpeed());
@@ -437,7 +436,7 @@ public class ChangeLineTextActivity extends BaseActivity implements View.OnClick
                     canvas.setBitmap(targetBitmap);
                 mPhotoView.setImageBitmap(targetBitmap);
                 //背景
-                drawBgColor(drawWidth,mScreenHeight);
+                drawBgColor(mScreenWidth,mScreenHeight);
                 //文本
                 paint.setTextAlign(Paint.Align.CENTER);
                 canvas.drawText(text, mScreenWidth/2, mBaseY, paint);
@@ -796,7 +795,7 @@ public class ChangeLineTextActivity extends BaseActivity implements View.OnClick
                 setTextColorMore();
                 break;
             case R.id.ib_fgText_textBgRed:
-                setTextBgColor(Color.RED);
+                setTextBgColor(Color.BLACK);
                 break;
             case R.id.ib_fgText_textBgGreen:
                 setTextBgColor(Color.GREEN);
@@ -996,12 +995,12 @@ public class ChangeLineTextActivity extends BaseActivity implements View.OnClick
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
             switch (seekBar.getId()) {
                 case R.id.sb_fgText_speed:
-                    int i = progress/5 +1;
+                    int i = progress/2 +1;
                     tv_showSpeed.setText(String.valueOf(i));
-                    mProgram.setFrameTime(i*2);
+                    mProgram.setFrameTime(i);
                     break;
                 case R.id.sb_fgText_stayTime:
-                    int second = progress/10;
+                    int second = progress/2;
                     tv_showStaytime.setText(String.valueOf(second)+getString(R.string.screen_scan_symbol));
                     mProgram.setStayTime(second);
                     break;

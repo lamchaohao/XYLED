@@ -47,7 +47,7 @@ public class GenSettingUtil {
         int batH = height/foldCount;
         int batW = mTraceFile.getModuleWidth();
 
-        String fileName = Global.FILE_NAME;
+        String fileName = Global.HC1_FILENAME;
         byte[] fileBytes = fileName.getBytes();     //0-11 文件名
         ByteUtil.setInbyteArray(0,fileBytes,dataBytes);
         dataBytes[19] = 97; //19 版本号

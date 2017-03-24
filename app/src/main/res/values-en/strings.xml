@@ -5,6 +5,9 @@
     <string name="screen_scan_symbol"> S</string>
     <string name="shareNames">share_startActivity</string>
     <!--节目页-->
+    <string name="completing">Completing</string>
+    <string name="initialize">Initializing</string>
+    <string name="next">next</string>
     <string name="program">Program</string>
     <string name="connect">Connection</string>
     <string name="setting">Setting</string>
@@ -15,6 +18,7 @@
     <string name="new_pic_program">New Picture</string>
     <string name="empty_text">Empty text</string>
     <string name="program_manage">Program management</string>
+    <string name="program_manage_tip">Hold the icon to drag and sort</string>
     <!--连接页面-->
     <string name="click_check">Search</string>
     <string name="check_result">detected</string>
@@ -24,6 +28,10 @@
     <string name="disconnecting">Disconnecting</string>
     <string name="disconnect">Disconnected</string>
     <string name="search_result">detected screen: </string>
+    <string name="set_guide">Set Guidance</string>
+    <string name="setGuide_part1">Your control card has not set parameters yet</string>
+    <string name="setGuide_part2">If your control card is already in use, press "readback parameter"</string>
+    <string name="setGuide_part3">If your control card is used for the first time, please enter the "Screen settings", and then send parameters to the control card</string>
     <!--设置页面-->
     <string name="screenSet_title">Screen parameters settings</string>
     <string name="connect_screen">Connection</string>
@@ -38,7 +46,7 @@
     <string name="testSuccess">Communication success</string>
     <string name="pauseSuccess">Pause success</string>
     <string name="resumeSuccess">Resume success</string>
-    <string name="restSuccess">Reset success</string>
+    <string name="resetSuccess">Reset success</string>
     <string name="save">save</string>
     <string name="auto">Auto</string>
 
@@ -67,6 +75,7 @@
     <string name="screen_height_setHint">Please enter the screen height</string>
     <!--更多页-->
     <string name="check_screen">Search screen</string>
+    <string name="forward_framPC">Forward data from PC</string>
     <string name="about">About</string>
     <string name="check_update">Check for updates</string>
     <string name="use_help">Use guidance</string>
@@ -90,6 +99,7 @@
     <string name="connectHelp">Connection instructions</string>
     <string name="connectHelp_first">1.System is 6.0 or above, please click on the Wi-Fi connection for the first connection</string>
     <string name="connectHelp_second">2.If the connection is unsuccessful, click on the Wi-Fi connection</string>
+    <string name="connectHelp_password">3.Wi-Fi password:12345678</string>
     <string name="WiFi_connect">Wi-Fi</string>
     <string name="got_it">I know</string>
     <!--消息提示-->
@@ -120,14 +130,21 @@
     <string name="from_phone">From me</string>
     <string name="from_card">From Screen</string>
 
+    <string name="file_illegal">The selected file is incorrect</string>
+    <string name="title_activity_use_guide">How to use</string>
+    <string name="fromQQ">from QQ file</string>
+    <string name="fromWechat">from wechat file</string>
+    <string name="fromOther">from other</string>
     <!--toast tip-->
     <string name="tos_genAndSend">The file has been generated and started sendding</string>
     <string name="tos_wait">Please be patient while converting data</string>
     <string name="tos_press_send">If the transmission does not start after the conversion is complete, press the Send key</string>
     <string name="tos_sendProgram_done">The program was sent successfully</string>
+    <string name="tos_start_send">Sending</string>
     <string name="tos_isSending">Already in transmission</string>
     <string name="tos_warn_long">The text is too long and the preview is partially omitted, but does not affect the actual display of the screen</string>
     <string name="tos_disConnect_screen">Not connected screen, please connect the screen</string>
+    <string name="tos_reading">reading,please wait</string>
     <string name="tos_refresh_success">Successfully refreshes screen parameters!</string>
     <string name="tos_screen_noresponse">The screen is not responding. Please try again</string>
     <string name="tos_set_wifi_enable">Please enable Wi-Fi</string>
@@ -142,5 +159,18 @@
     <string name="tos_read_config_success">Readback parameters are completed</string>
     <string name="tos_read_fail">The readback parameter failed. Please try again later</string>
     <string name="tos_press_again">Press again to exit the program</string>
+    <string name="tos_check_success">check completed</string>
 
+    <string name="help_part0">The Wi-Fi password:12345678</string>
+    <string name="help_part1">1.Read the parameters. For the first time, if your screen can be used normally, please connect the control card, and then read back the screen parameters</string>
+    <string name="help_part1.1">You can in the main interface of the program bar click on this button, read back the screen parameters</string>
+    <string name="help_part1.2">You can also set the parameters manually, enter the screen settings, set the screen width, the screen height and set other options, send the parameters set to the control card</string>
+    <string name="help_part2">2.Add the program. After the parameter is set, in the main interface of the program bar, click the lower right corner of the button to choose to add the program content</string>
+    <string name="help_part3">3.Add font. If you want to add a font, you can copy the font file to your phone storage directory, the file location is:ExternalStorageDirectory/fonts/LedFonts/</string>
+    <string name="help_part3.1">Font file. Click here to open the font file directory</string>
+    <string name="help_part4">4.Preview the program. In the program editing interface, click on the picture can be full screen preview</string>
+    <string name="help_part5">5.Program sort.Enter the program management, long press the icon can be drag and sort</string>
+    <string name="help_part5.1">5.1Delete the program. In the main interface of the program section, long press the program can delete the program</string>
+    <string name="help_part6">6.Connection.In the connection page, if multiple screens are detected, click the screen you want to connect to connect, if the connection is not successful, please open the WiFi settings interface to connect</string>
+    <string name="help_part7">7.Program switching.Enter the settings section of the remote switch, you can switch programs, if the recording multiple sets of programs, please use the PC version of the software to record</string>
 </resources>

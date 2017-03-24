@@ -97,7 +97,18 @@ public class PhotoEditActivity extends BaseActivity implements SeekBar.OnSeekBar
         startActivityForResult(Intent.createChooser(intent, getString(R.string.msg_choose_pic)), REQUEST_CHOOSE_PIC);
     }
     public void setBitmapToView(Bitmap bm){
-        mBitmap = bm;
+        // 设置想要的大小
+        int newWidth = bm.getWidth()*5;
+        int newHeight = bm.getHeight()*5;
+        // 计算缩放比例
+        float scaleWidth = ((float) newWidth) / bm.getWidth();
+        float scaleHeight = ((float) newHeight) / bm.getHeight();
+        // 取得想要缩放的matrix参数
+        Matrix matrix = new Matrix();
+        matrix.postScale(scaleWidth, scaleHeight);
+        // 得到新的图片
+        mBitmap = Bitmap.createBitmap(bm, 0, 0, bm.getWidth(), bm.getHeight(), matrix,
+                true);
         mPhotoView.setImageBitmap(mBitmap);
     }
     @Override

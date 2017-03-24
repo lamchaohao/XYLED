@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.wifi.WifiInfo;
 import android.os.Handler;
-import android.os.Message;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -17,6 +16,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import cn.com.hotled.xyled.bean.TraceFile;
+import cn.com.hotled.xyled.global.Common;
 import cn.com.hotled.xyled.global.Global;
 import cn.com.hotled.xyled.util.android.WifiAdmin;
 
@@ -53,6 +53,15 @@ public class SendSetDataUtil {
         }.start();
     }
 
+    public void startSendPcConfig(){
+        new Thread(){
+            @Override
+            public void run() {
+                sendPcConfigData();
+            }
+        }.start();
+    }
+
     private void sendSetData(){
         Socket socket = null;
         OutputStream os =null;
@@ -66,9 +75,7 @@ public class SendSetDataUtil {
         if (startFlag&&endFlag){
             macStr = ssid.substring(ssid.indexOf("[")+1, ssid.indexOf("]"));
         }else {
-            Message message = mHandler.obtainMessage();
-            message.what=WIFI_ERRO;
-            mHandler.sendMessage(message);
+            mHandler.sendEmptyMessage(WIFI_ERRO);
             return;
         }
         String regEx = "[0-9a-fA-F]{6}";
@@ -78,35 +85,29 @@ public class SendSetDataUtil {
         String regExEight = "[0-9a-fA-F]{8}";
         Pattern patEight = Pattern.compile(regExEight);
         Matcher matcEight = patEight.matcher(macStr);
-        int macInt1 = 0;
-        int macInt2 = 0;
-        int macInt3 = 0;
-        int macInt4 = 0;
+        String mac1;
+        String mac2;
+        String mac3;
+        String mac4;
         if(mat.matches()){
-            String mac0 = "80";
-            String mac1 = macStr.substring(0, 2);
-            String mac2 = macStr.substring(2, 4);
-            String mac3 = macStr.substring(4, 6);
+            mac1 = "80";
+            mac2 = macStr.substring(0, 2);
+            mac3 = macStr.substring(2, 4);
+            mac4 = macStr.substring(4, 6);
 
-            macInt1 = Integer.parseInt(mac0, 16);
-            macInt2 = Integer.parseInt(mac1, 16);
-            macInt3 = Integer.parseInt(mac2, 16);
-            macInt4 = Integer.parseInt(mac3, 16);
         }else if (matcEight.matches()){
-            String mac1 = macStr.substring(0, 2);
-            String mac2 = macStr.substring(2, 4);
-            String mac3 = macStr.substring(4, 6);
-            String mac4 = macStr.substring(6, 8);
-
-            macInt1 = Integer.parseInt(mac1, 16);
-            macInt2 = Integer.parseInt(mac2, 16);
-            macInt3 = Integer.parseInt(mac3, 16);
-            macInt4 = Integer.parseInt(mac4, 16);
+            mac1 = macStr.substring(0, 2);
+            mac2 = macStr.substring(2, 4);
+            mac3 = macStr.substring(4, 6);
+            mac4 = macStr.substring(6, 8);
         } else{
-
             mHandler.sendEmptyMessage(WIFI_ERRO);
             return;
         }
+        int macInt1 = Integer.parseInt(mac1, 16);
+        int macInt2 = Integer.parseInt(mac2, 16);
+        int macInt3 = Integer.parseInt(mac3, 16);
+        int macInt4 = Integer.parseInt(mac4, 16);
         try {
             socket = new Socket(Global.SERVER_IP, Global.SERVER_PORT);
 
@@ -154,7 +155,7 @@ public class SendSetDataUtil {
                 int serialNum = 4;
                 int flashAddress=129024;
                 File filePath = mTraceFile.getFilePath();
-                File traceFile=new File(mContext.getFilesDir()+"/trace",filePath.getAbsolutePath());
+                File traceFile=new File(mContext.getFilesDir()+ Common.FL_TRACE_DIR,filePath.getAbsolutePath());
                 fis= new FileInputStream(traceFile);
 
                 byte[] traceFileBytes=new byte[512];
@@ -191,9 +192,7 @@ public class SendSetDataUtil {
 
         }catch (IOException e){
             e.printStackTrace();
-            Message message = mHandler.obtainMessage();
-            message.what=CONNECT_TIMEOUT;
-            mHandler.sendMessage(message);
+            mHandler.sendEmptyMessage(CONNECT_TIMEOUT);
         }finally {
             if (os!=null){
                 try {
@@ -223,7 +222,7 @@ public class SendSetDataUtil {
     public void testPrintData(){
         FileInputStream fis = null;
         FileOutputStream fos =null;
-        File traceFile=new File(mContext.getFilesDir()+"/trace",mTraceFile.getFilePath().getAbsolutePath());
+        File traceFile=new File(mContext.getFilesDir()+ Common.FL_TRACE_DIR,mTraceFile.getFilePath().getAbsolutePath());
         try {
             fis= new FileInputStream(traceFile);
             fos =new FileOutputStream(mContext.getFilesDir()+"/setting.prg",true);
@@ -264,8 +263,6 @@ public class SendSetDataUtil {
         }
 
 
-
-
     }
 
 
@@ -296,11 +293,11 @@ public class SendSetDataUtil {
         int batH = scanCount*foldCount;
         int batW = mTraceFile.getModuleWidth();
 
-        String fileName = Global.FILE_NAME;
+        String fileName = Global.HC1_FILENAME;
         byte[] fileBytes = fileName.getBytes();     //0-11 文件名
         setInbyteArray(0,fileBytes,dataBytes);
         dataBytes[19] = 97; //19 版本号
-        dataBytes[24] = 81; //24
+        dataBytes[24] = (byte) 195; //24
 
         byte[] pictureArray = intToByteArray(picture, 3);//实像素  32-34
         setInbyteArray(32,pictureArray,dataBytes);
@@ -332,5 +329,157 @@ public class SendSetDataUtil {
 
         return dataBytes;
     }
+
+
+    private void sendPcConfigData(){
+        Socket socket = null;
+        OutputStream os =null;
+        FileInputStream fis = null;
+        WifiAdmin wifiAdmin =new WifiAdmin(mContext);
+        WifiInfo wifiInfo = wifiAdmin.getWifiInfo();
+        String ssid = wifiInfo.getSSID();
+        String macStr = "";
+        boolean startFlag = ssid.contains(Global.SSID_START);
+        boolean endFlag = ssid.contains(Global.SSID_END);
+        if (startFlag&&endFlag){
+            macStr = ssid.substring(ssid.indexOf("[")+1, ssid.indexOf("]"));
+        }else {
+            mHandler.sendEmptyMessage(WIFI_ERRO);
+            return;
+        }
+        String regEx = "[0-9a-fA-F]{6}";
+        Pattern pat = Pattern.compile(regEx);
+        Matcher mat = pat.matcher(macStr);
+        //旧的8位
+        String regExEight = "[0-9a-fA-F]{8}";
+        Pattern patEight = Pattern.compile(regExEight);
+        Matcher matcEight = patEight.matcher(macStr);
+        String mac1;
+        String mac2;
+        String mac3;
+        String mac4;
+        if(mat.matches()){
+            mac1 = "80";
+            mac2 = macStr.substring(0, 2);
+            mac3 = macStr.substring(2, 4);
+            mac4 = macStr.substring(4, 6);
+
+        }else if (matcEight.matches()){
+            mac1 = macStr.substring(0, 2);
+            mac2 = macStr.substring(2, 4);
+            mac3 = macStr.substring(4, 6);
+            mac4 = macStr.substring(6, 8);
+        } else{
+            mHandler.sendEmptyMessage(WIFI_ERRO);
+            return;
+        }
+        int macInt1 = Integer.parseInt(mac1, 16);
+        int macInt2 = Integer.parseInt(mac2, 16);
+        int macInt3 = Integer.parseInt(mac3, 16);
+        int macInt4 = Integer.parseInt(mac4, 16);
+        try {
+            socket = new Socket(Global.SERVER_IP, Global.SERVER_PORT);
+
+            byte[] pauseCMD = new byte[16];
+            pauseCMD[0]= (byte) macInt1;
+            pauseCMD[1]= (byte) macInt2;
+            pauseCMD[2]= (byte) macInt3;
+            pauseCMD[3]= (byte) macInt4;
+            pauseCMD[4]= 16;
+            pauseCMD[11]= 8; //cmd
+
+            byte[] resetCMD=new byte[16];
+            resetCMD[0]= (byte) macInt1;
+            resetCMD[1]= (byte) macInt2;
+            resetCMD[2]= (byte) macInt3;
+            resetCMD[3]= (byte) macInt4;
+            resetCMD[4]= 16;
+            resetCMD[11]= 4; //cmd
+
+            byte[] writeCMD = new byte[16];
+            writeCMD[0]= (byte) macInt1;
+            writeCMD[1]= (byte) macInt2;
+            writeCMD[2]= (byte) macInt3;
+            writeCMD[3]= (byte) macInt4;
+            writeCMD[4]= 16;
+            writeCMD[11]= 21; //read cmd 0x00010001  write cmd=0x00010101;
+
+            os = socket.getOutputStream();
+            byte[] readMsg = new byte[16];
+
+            //执行暂停指令
+            os.write(pauseCMD);
+            socket.getInputStream().read(readMsg);//读取返回
+            boolean pauseSuccess = true;
+            for (int i = 0; i < readMsg.length; i++) {
+                if(pauseCMD[i]!=readMsg[i]){
+                    mHandler.sendEmptyMessageDelayed(PAUSE_FAILE,1500);
+                    pauseSuccess = false;
+                }
+            }
+            if (pauseSuccess) {
+                //暂停成功，开始写入
+                byte[] feedbackcmd=new byte[16];
+                int length =512;
+                int serialNum = 4;
+                int flashAddress=129024;
+                File configData=new File(mContext.getFilesDir() + Common.FL_CONFIG_FROM_PC);
+                fis= new FileInputStream(configData);
+
+                byte[] configByte=new byte[512];
+
+                for (int i = 0; i < 4; i++) {
+                    serialNum--;
+                    byte[] sendPack = new byte[16+512];
+                    byte[] dataPackLength = intToByteArray(length, 3);
+                    byte[] serialNumBytes = intToByteArray(serialNum, 3);
+                    byte[] flashAddBytes = intToByteArray(flashAddress, 4);
+                    setInbyteArray(5,dataPackLength,writeCMD);//包长度
+                    setInbyteArray(8,serialNumBytes,writeCMD); //包序
+                    setInbyteArray(12,flashAddBytes,writeCMD); //flash地址
+                    fis.read(configByte);
+                    setInbyteArray(0,writeCMD,sendPack);
+                    setInbyteArray(16,configByte,sendPack);
+                    os.write(sendPack);
+                    socket.getInputStream().read(feedbackcmd);
+                    flashAddress += length;
+
+                }
+                os.write(resetCMD);
+                socket.getInputStream().read(feedbackcmd);
+                mHandler.sendEmptyMessageDelayed(SEND_DONE,2000);//发送完参数后等待重启,然后在发送重要文件
+            }
+
+        }catch (IOException e){
+            e.printStackTrace();
+            mHandler.sendEmptyMessage(CONNECT_TIMEOUT);
+        }finally {
+            if (os!=null){
+                try {
+                    os.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (socket!=null&&!socket.isClosed()){
+                try {
+                    socket.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (fis!=null){
+                try {
+                    fis.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+
+    }
+
+
 
 }

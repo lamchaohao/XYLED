@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_forward_data"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="cn.com.hotled.xyled.activity.ForwardDataActivity">
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:id="@+id/tv_forward_fromQQ"
+            android:text="@string/fromQQ"
+            android:textSize="24sp"
+            android:gravity="center"
+            android:layout_margin="10dp"
+            android:background="@drawable/recycler_bg"
+            android:drawableLeft="@drawable/tencentqq"
+            android:layout_width="match_parent"
+            android:layout_height="90dp"/>
+
+        <TextView
+            android:id="@+id/tv_forward_fromWechat"
+            android:text="@string/fromWechat"
+            android:layout_margin="10dp"
+            android:textSize="24sp"
+            android:gravity="center"
+            android:background="@drawable/recycler_bg"
+            android:drawableLeft="@drawable/wechat"
+            android:layout_width="match_parent"
+            android:layout_height="90dp"/>
+
+        <TextView
+            android:id="@+id/tv_forward_fromOther"
+            android:text="@string/fromOther"
+            android:layout_margin="10dp"
+            android:textSize="24sp"
+            android:gravity="center"
+            android:background="@drawable/recycler_bg"
+            android:drawableLeft="@drawable/ic_insert_drive_file_black_24dp"
+            android:layout_width="match_parent"
+            android:layout_height="90dp"/>
+
+        <TextView
+            android:id="@+id/tv_forward_selectResult"
+            android:textSize="18sp"
+            android:layout_marginBottom="20dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <ProgressBar
+            android:id="@+id/pb_forward_check"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+        <TextView
+            android:id="@+id/tv_forward_checking"
+            android:gravity="center"
+            android:layout_marginTop="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <Button
+                android:id="@+id/bt_forward_send"
+                android:text="@string/msg_send"
+                android:background="@drawable/sendbutton_bg"
+                android:layout_alignParentBottom="true"
+                android:layout_margin="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+        </RelativeLayout>
+    </LinearLayout>
+
+
+</ScrollView>

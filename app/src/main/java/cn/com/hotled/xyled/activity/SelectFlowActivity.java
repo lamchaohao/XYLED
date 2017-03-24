@@ -15,6 +15,8 @@ import cn.com.hotled.xyled.R;
 import cn.com.hotled.xyled.adapter.FlowAdapter;
 import cn.com.hotled.xyled.global.Common;
 
+import static cn.com.hotled.xyled.global.Common.FL_FLOW_DIR;
+
 public class SelectFlowActivity extends BaseActivity {
 
     private RecyclerView mRvSelectFlow;
@@ -36,7 +38,7 @@ public class SelectFlowActivity extends BaseActivity {
 
     private void initView() {
 
-        File fileDir=new File(getFilesDir()+"/flow");
+        File fileDir=new File(getFilesDir()+FL_FLOW_DIR);
         File[] files = fileDir.listFiles();
 
         mFileList = new ArrayList<>();

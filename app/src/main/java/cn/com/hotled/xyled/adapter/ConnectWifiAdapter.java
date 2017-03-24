@@ -13,7 +13,7 @@ import android.widget.TextView;
 import java.util.List;
 
 import cn.com.hotled.xyled.R;
-import cn.com.hotled.xyled.activity.ConnectWifiActivity;
+import cn.com.hotled.xyled.activity.CheckScreenActivity;
 import cn.com.hotled.xyled.util.android.WifiAdmin;
 
 /**
@@ -23,7 +23,7 @@ import cn.com.hotled.xyled.util.android.WifiAdmin;
 public class ConnectWifiAdapter extends RecyclerView.Adapter {
 
 
-    ConnectWifiActivity mContextAct;
+    CheckScreenActivity mContextAct;
     List<ScanResult> mWifiList;
     public OnItemOnClickListener mOnItemClickLitener;
     public WifiInfo wifiInfo;
@@ -36,7 +36,7 @@ public class ConnectWifiAdapter extends RecyclerView.Adapter {
         void onItemLongClick(View view ,int position);
     }
 
-    public ConnectWifiAdapter(ConnectWifiActivity context, List<ScanResult> wifiList, WifiAdmin wifiAdmin) {
+    public ConnectWifiAdapter(CheckScreenActivity context, List<ScanResult> wifiList, WifiAdmin wifiAdmin) {
         mContextAct=context;
         mWifiList=wifiList;
         mWifiAdmin=wifiAdmin;
@@ -121,16 +121,16 @@ public class ConnectWifiAdapter extends RecyclerView.Adapter {
             switch (mContextAct.getWifiStatuCode()){
                 default:
                     tv_wifiState.setText("已连接by default");
-                case ConnectWifiActivity.WIFI_STATE_CONNECTING:
+                case CheckScreenActivity.WIFI_STATE_CONNECTING:
                     tv_wifiState.setText("正在连接");
                     break;
-                case ConnectWifiActivity.WIFI_STATE_CONNECTED:
+                case CheckScreenActivity.WIFI_STATE_CONNECTED:
                     tv_wifiState.setText("已连接");
                     break;
-                case ConnectWifiActivity.WIFI_STATE_DISCONNECTING:
+                case CheckScreenActivity.WIFI_STATE_DISCONNECTING:
                     tv_wifiState.setText("正在断开");
                     break;
-                case ConnectWifiActivity.WIFI_STATE_DISCONNECTED:
+                case CheckScreenActivity.WIFI_STATE_DISCONNECTED:
                     tv_wifiState.setText("已断开");
                     break;
             }

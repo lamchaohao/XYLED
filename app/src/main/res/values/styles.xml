@@ -9,11 +9,13 @@
         <item name="android:windowBackground">@color/window_background</item>
         <item name="android:listDivider">@drawable/devider</item>
     </style>
+
     <style name="FullscreenForWel" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:windowFullscreen">true</item>
         <item name="android:windowNoTitle">true</item>
         <item name="windowActionBar">false</item>
     </style>
+
     <style name="AppTheme.NoActionBar" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
@@ -63,6 +65,7 @@
         <item name="android:layout_marginBottom">0dp</item>
 
     </style>
+
     <style name="TextEditIcon">
         <item name="android:paddingLeft">2dp</item>
         <item name="android:paddingRight">2dp</item>
@@ -82,6 +85,7 @@
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
     </style>
+
     <style name="MainFragGuideGroup">
         <item name="android:layout_marginTop">20dp</item>
         <item name="android:padding">8dp</item>
@@ -90,4 +94,9 @@
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
     </style>
+
+    <style name="AppTheme.NoActionBar.AppBarOverlay"
+           parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
+
+    <style name="AppTheme.NoActionBar.PopupOverlay" parent="ThemeOverlay.AppCompat.Light"/>
 </resources>

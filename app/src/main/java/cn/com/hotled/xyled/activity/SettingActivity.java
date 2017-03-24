@@ -28,6 +28,7 @@ import com.afollestad.materialdialogs.MaterialDialog;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -101,7 +102,8 @@ public class SettingActivity extends BaseActivity implements View.OnClickListene
         mTraceFileDao = ((App) getApplication()).getDaoSession().getTraceFileDao();
         mSharedPreferences = getSharedPreferences(Global.SP_SCREEN_CONFIG, MODE_PRIVATE);
         int langInt = mSharedPreferences.getInt(Global.KEY_LANGUAGE, 0);
-        isChinese=(langInt==1);
+        Locale locale = getResources().getConfiguration().locale;
+        isChinese=(langInt==1||locale.equals(Locale.SIMPLIFIED_CHINESE)||locale.equals(Locale.CHINESE));
         mEditor = mSharedPreferences.edit();
         String cardSeries = mSharedPreferences.getString(Global.KEY_CARD_SERIES, getString(R.string.default_card));
         int width = mSharedPreferences.getInt(Global.KEY_SCREEN_W, 64);

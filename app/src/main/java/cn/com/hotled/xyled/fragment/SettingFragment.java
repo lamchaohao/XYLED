@@ -8,7 +8,11 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 import cn.com.hotled.xyled.R;
 import cn.com.hotled.xyled.activity.MainActivity;
 import cn.com.hotled.xyled.activity.RemoteActivity;
@@ -19,67 +23,62 @@ import cn.com.hotled.xyled.activity.SocketActivity;
 import static android.app.Activity.RESULT_OK;
 
 /**
+ * 设置页面
  * Created by Lam on 2016/12/1.
  */
 
 public class SettingFragment extends Fragment {
 
     private static final int SELECT_LANGUAGE_CODE = 201;
+    @BindView(R.id.tv_setfrgm_enterWifi)
+    TextView mTvSetfrgmEnterWifi;
+    @BindView(R.id.tv_setfrgm_testConnnet)
+    TextView mTvSetfrgmTestConnnet;
+    @BindView(R.id.tv_setfrgm_screenSet)
+    TextView mTvSetfrgmScreenSet;
+    @BindView(R.id.tv_setfrgm_remote)
+    TextView mTvSetfrgmRemote;
+    @BindView(R.id.tv_setfrgm_language)
+    TextView mTvSetfrgmLanguage;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_setting, null);
-        initView(view);
+        ButterKnife.bind(this, view);
         return view;
     }
 
-    private void initView(View view) {
-
-        View ll_enterWifi = view.findViewById(R.id.tv_setfrgm_enterWifi);
-        ll_enterWifi.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+    @OnClick({R.id.tv_setfrgm_enterWifi, R.id.tv_setfrgm_testConnnet, R.id.tv_setfrgm_screenSet, R.id.tv_setfrgm_remote, R.id.tv_setfrgm_language})
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.tv_setfrgm_enterWifi:
                 startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
-            }
-        });
-
-        view.findViewById(R.id.tv_setfrgm_testConnnet).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+                break;
+            case R.id.tv_setfrgm_testConnnet:
                 startActivity(new Intent(getContext(), SocketActivity.class));
-            }
-        });
-
-        view.findViewById(R.id.tv_setfrgm_screenSet).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+                break;
+            case R.id.tv_setfrgm_screenSet:
                 startActivity(new Intent(getContext(), SettingActivity.class));
-            }
-        });
-
-
-        view.findViewById(R.id.tv_setfrgm_remote).setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v) {
+                break;
+            case R.id.tv_setfrgm_remote:
                 startActivity(new Intent(getContext(), RemoteActivity.class));
-            }
-        });
-        view.findViewById(R.id.tv_setfrgm_language).setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v) {
-                Intent intent =new Intent(getContext(), SelectLanguageActivity.class);
-                startActivityForResult(intent,SELECT_LANGUAGE_CODE);
-            }
-        });
+                break;
+            case R.id.tv_setfrgm_language:
+                Intent intent = new Intent(getContext(), SelectLanguageActivity.class);
+                startActivityForResult(intent, SELECT_LANGUAGE_CODE);
+                break;
+        }
     }
+
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode==RESULT_OK&&requestCode==SELECT_LANGUAGE_CODE){
-            Intent intent =new Intent(getContext(), MainActivity.class);
+        if (resultCode == RESULT_OK && requestCode == SELECT_LANGUAGE_CODE) {
+            Intent intent = new Intent(getContext(), MainActivity.class);
             startActivity(intent);
             getActivity().finish();
         }
     }
+
 }

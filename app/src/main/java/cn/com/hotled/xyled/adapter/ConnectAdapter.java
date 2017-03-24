@@ -2,7 +2,6 @@ package cn.com.hotled.xyled.adapter;
 
 import android.content.Context;
 import android.net.wifi.ScanResult;
-import android.net.wifi.WifiInfo;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,17 +21,15 @@ import cn.com.hotled.xyled.util.android.WifiAdmin;
 public class ConnectAdapter extends RecyclerView.Adapter {
 
 
-    Context mContextAct;
-    List<ScanResult> mWifiList;
-    public OnItemOnClickListener mOnItemClickLitener;
-    public WifiInfo mWifiInfo;
-    WifiAdmin mWifiAdmin;
+    private Context mContextAct;
+    private List<ScanResult> mWifiList;
+    private OnItemOnClickListener mOnItemClickLitener;
+    private WifiAdmin mWifiAdmin;
     /**
      * 点击事件监听借口
      */
     public interface OnItemOnClickListener{
         void onItemClick(View view, int position);
-        void onItemLongClick(View view, int position);
     }
 
     public ConnectAdapter(Context context, List<ScanResult> wifiList, WifiAdmin wifiAdmin) {
@@ -72,14 +69,6 @@ public class ConnectAdapter extends RecyclerView.Adapter {
                 }
             });
 
-            viewHolder.rl_wifilist.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-                    int pos = viewHolder.getLayoutPosition();
-                    mOnItemClickLitener.onItemLongClick(viewHolder.itemView, pos);
-                    return true;
-                }
-            });
         }
         if (mWifiAdmin.getWifiInfo().getSSID().equals("\""+mWifiList.get(position).SSID+"\"")){
             viewHolder.iv_isConnected.setVisibility(View.VISIBLE);
@@ -145,8 +134,5 @@ public class ConnectAdapter extends RecyclerView.Adapter {
         }
     }
 
-    public void setWifiInfo(WifiInfo wifiInfo) {
-        mWifiInfo = wifiInfo;
-    }
 }
 

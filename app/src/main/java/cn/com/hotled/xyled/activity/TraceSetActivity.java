@@ -11,6 +11,7 @@ import android.widget.Spinner;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -80,12 +81,15 @@ public class TraceSetActivity extends BaseActivity implements AdapterView.OnItem
         mTraceFile = new TraceFile();
         mRvSelectFile.setLayoutManager(new LinearLayoutManager(this));
         int langInt = getSharedPreferences(Global.SP_SYSTEM_CONFIG, MODE_PRIVATE).getInt(Global.KEY_LANGUAGE, 0);
-        mTraceAdapter = new TraceSelectAdapter(mTraceList, this,langInt==1);
+        Locale locale = getResources().getConfiguration().locale;
+        mTraceAdapter = new TraceSelectAdapter(mTraceList, this,langInt==1||locale.equals(Locale.SIMPLIFIED_CHINESE)||locale.equals(Locale.CHINESE));
         mRvSelectFile.setAdapter(mTraceAdapter);
         mTraceAdapter.setOnItemClickListener(new TraceSelectAdapter.OnItemOnClickListener() {
             @Override
             public void onItemClick(View view, int position) {
                mTraceFile = mTraceList.get(position).getTraceFile();
+                int scanCount = mTraceFile.getScanCount();
+                getSharedPreferences(Global.SP_SCREEN_CONFIG,MODE_PRIVATE).edit().putInt(Global.KEY_SCREEN_SCAN,scanCount).apply();
             }
         });
         mSpnTracePixel.setOnItemSelectedListener(this);

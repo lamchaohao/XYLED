@@ -9,23 +9,22 @@
         android:drawableLeft="@drawable/ic_search_green_a700_36dp"
         style="@style/MainFragGuideText"
         android:text="@string/check_screen"/>
-
     <TextView
-        android:id="@+id/tv_more_about"
-        android:drawableLeft="@drawable/ic_copyright_primary_dark_36dp"
+        android:id="@+id/tv_more_sendFromComputer"
+        android:drawableLeft="@drawable/ic_screen_share_green_a700_36dp"
         style="@style/MainFragGuideText"
-        android:text="@string/about"/>
-
-    <TextView
-        android:id="@+id/tv_more_update"
-        android:drawableLeft="@drawable/ic_update_primary_dark_36dp"
-        style="@style/MainFragGuideText"
-        android:text="@string/check_update"/>
+        android:text="@string/forward_framPC"/>
 
     <TextView
         android:id="@+id/tv_more_help"
         android:drawableLeft="@drawable/ic_help_black_36dp"
         style="@style/MainFragGuideText"
         android:text="@string/use_help"/>
+
+    <TextView
+        android:id="@+id/tv_more_about"
+        android:drawableLeft="@drawable/ic_copyright_primary_dark_36dp"
+        style="@style/MainFragGuideText"
+        android:text="@string/about"/>
 
 </LinearLayout>

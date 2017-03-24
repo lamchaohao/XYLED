@@ -2,6 +2,9 @@
     <string name="app_name">LED</string>
     <string name="shareNames">share_startActivity</string>
     <!--节目页-->
+    <string name="completing">正在做最后的处理</string>
+    <string name="initialize">初始化</string>
+    <string name="next">下一步</string>
     <string name="program">节目</string>
     <string name="connect">连接</string>
     <string name="setting">设置</string>
@@ -12,6 +15,7 @@
     <string name="new_pic_program">新建图片</string>
     <string name="empty_text">空文字</string>
     <string name="program_manage">节目管理</string>
+    <string name="program_manage_tip">按住图标可进行拖曳排序</string>
     <!--连接页面-->
     <string name="click_check">点击查屏</string>
     <string name="check_result">检测到</string>
@@ -20,7 +24,11 @@
     <string name="connected">已连接</string>
     <string name="disconnecting">正在断开</string>
     <string name="disconnect">已断开</string>
-    <string name="search_result">检测到屏幕</string>
+    <string name="search_result">检测到屏幕数:</string>
+    <string name="set_guide">设置指导</string>
+    <string name="setGuide_part1">你的控制卡还没设置参数</string>
+    <string name="setGuide_part2">如果你的控制卡已经正常使用,请按"回读参数"</string>
+    <string name="setGuide_part3">如果你的控制卡是初次使用,请进入"屏参设置",然后发送参数到控制卡</string>
     <!--设置页面-->
     <string name="screenSet_title">屏参设置</string>
     <string name="connect_screen">连接屏幕</string>
@@ -35,7 +43,7 @@
     <string name="testSuccess">通信成功</string>
     <string name="pauseSuccess">暂停成功</string>
     <string name="resumeSuccess">恢复成功</string>
-    <string name="restSuccess">重置成功</string>
+    <string name="resetSuccess">重置成功</string>
     <string name="save">保存</string>
     <string name="auto">跟随系统</string>
 
@@ -64,6 +72,7 @@
     <string name="screen_height_setHint">请输入屏高</string>
     <!--更多页-->
     <string name="check_screen">查屏</string>
+    <string name="forward_framPC">转发电脑数据</string>
     <string name="about">关于</string>
     <string name="check_update">检查更新</string>
     <string name="use_help">使用指导</string>
@@ -87,6 +96,7 @@
     <string name="connectHelp">连接说明</string>
     <string name="connectHelp_first">1.系统为6.0或以上，第一次连接请点击WLAN连接</string>
     <string name="connectHelp_second">2.如果连接不成功，请点击WLAN连接</string>
+    <string name="connectHelp_password">3.Wi-Fi密码为:12345678</string>
     <string name="WiFi_connect">WLAN连接</string>
     <string name="got_it">我知道了</string>
     <!--消息提示-->
@@ -114,16 +124,26 @@
     <string name="send_data">发送数据</string>
     <string name="refuse_connect">拒绝服务</string>
     <string name="ready">Ready</string>
-    <string name="from_phone">来自手机发送的消息</string>
-    <string name="from_card">来自控制卡回应的消息</string>
+    <string name="from_phone">来自你</string>
+    <string name="from_card">来自控制卡</string>
+    <string name="fromQQ">从QQ文件目录</string>
+    <string name="fromWechat">从微信文件目录</string>
+    <string name="fromOther">其他目录</string>
+    <string name="file_illegal">所选文件不正确</string>
+    <string name="pic_plus">x</string>
+    <string name="screen_scan_symbol">S</string>
+    <string name="title_activity_use_guide">使用指导</string>
+
 
     <string name="tos_genAndSend">文件已生成，开始传送</string>
     <string name="tos_wait">请耐心等候，正在转换数据</string>
     <string name="tos_press_send">如转换完成后未开始发送,请按发送键</string>
     <string name="tos_sendProgram_done">节目发送成功</string>
+    <string name="tos_start_send">开始传送</string>
     <string name="tos_isSending">已经在传送</string>
     <string name="tos_warn_long">文字过长，预览图后部分省略，但不会影响屏幕实际显示</string>
     <string name="tos_disConnect_screen">未连接屏幕，请查屏</string>
+    <string name="tos_reading">正在回读,请稍后</string>
     <string name="tos_refresh_success">刷新屏幕参数完成！</string>
     <string name="tos_screen_noresponse">屏幕无响应，请重试</string>
     <string name="tos_set_wifi_enable">请开启Wi-Fi</string>
@@ -138,4 +158,20 @@
     <string name="tos_read_config_success">回读参数完成</string>
     <string name="tos_read_fail">回读参数失败，请稍后重试</string>
     <string name="tos_press_again">再按一次返回退出程序</string>
+    <string name="tos_check_success">检查完毕</string>
+
+    <string name="help_part0">Wi-Fi密码为:12345678</string>
+    <string name="help_part1">1.回读参数.第一次使用时候,如果你的屏幕能够正常使用,请连接控制卡,然后回读屏幕参数</string>
+    <string name="help_part1.1">你可以在主界面的节目栏中点击此按钮,回读屏幕参数</string>
+    <string name="help_part1.2">你也可以手动设置参数,进入屏幕设置,设置屏幕宽度,屏幕高度以及设置其他选项后,发送参数设置到控制卡</string>
+    <string name="help_part2">2.添加节目.参数设置完成后,在主界面的节目栏中,点击右下角的按钮可选择添加节目内容</string>
+    <string name="help_part3">3.添加字体.如果你想添加字体,可以复制字体文件到你的手机存储目录中,文件位置为:存储设备目录下的fonts/LedFonts/</string>
+    <string name="help_part3.1">字体文件.点击这里可打开字体文件目录</string>
+    <string name="help_part4">4.预览节目.在节目编辑界面,点击图片可全屏预览</string>
+    <string name="help_part5">5.节目排序.进入节目管理,按住图标可进行拖曳排序</string>
+    <string name="help_part5.1">5.1删除节目.在主界面中的节目栏目中,长按节目可删除节目</string>
+    <string name="help_part6">6.连接.在连接页面,如果检测到多个屏幕,则可点击你需要连接的屏幕进行连接,如连接不成功请打开WiFi设置界面连接</string>
+    <string name="help_part7">7.节目切换.进入设置栏目的远程切换,可以切换节目,如若录制多套节目,请使用PC版软件录制</string>
+
+
 </resources>

@@ -16,16 +16,26 @@
         android:gravity="center"
         android:text="@string/connectHelp"
         android:textSize="22sp"
+        android:layout_margin="3dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
     <TextView
         android:padding="5dp"
+        android:layout_margin="3dp"
         android:text="@string/connectHelp_first"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
     <TextView
         android:padding="5dp"
+        android:layout_margin="3dp"
         android:text="@string/connectHelp_second"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+    <TextView
+        android:padding="5dp"
+        android:layout_margin="3dp"
+        android:text="@string/connectHelp_password"
+        android:textColor="@color/colorAccent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
     <LinearLayout

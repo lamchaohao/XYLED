@@ -29,7 +29,7 @@ import java.util.List;
 
 import cn.com.hotled.xyled.App;
 import cn.com.hotled.xyled.R;
-import cn.com.hotled.xyled.activity.ChangeLineTextActivity;
+import cn.com.hotled.xyled.activity.EasyTextActivity;
 import cn.com.hotled.xyled.activity.PhotoEditActivity;
 import cn.com.hotled.xyled.activity.ProgramManageActivity;
 import cn.com.hotled.xyled.adapter.ProgramAdapter;
@@ -50,10 +50,11 @@ import static cn.com.hotled.xyled.global.Global.TEXT_CONTENT_CHANGE_CODE;
 import static cn.com.hotled.xyled.global.Global.WIFI_ERRO;
 
 /**
+ * 节目页面
  * Created by Lam on 2016/12/1.
  */
 
-public class ScreenFragment extends Fragment implements View.OnClickListener {
+public class ScreenFragment extends Fragment implements View.OnClickListener ,ProgramAdapter.OnItemClickListener,ProgramAdapter.OnItemLongClickListener{
     private static final int EASY_TEXT_REQUEST_CODE = 0x23;
     private static final int PHOTO_REQUEST_CODE = 0x24;
     private static final int ITEM_MANAGE_REQUEST_CODE = 0x25;
@@ -133,62 +134,8 @@ public class ScreenFragment extends Fragment implements View.OnClickListener {
         mAdapter = new ProgramAdapter(getContext(), mProgramList,textContentDao);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         mRecyclerView.setAdapter(mAdapter);
-        mAdapter.setOnItemClickListener(new ProgramAdapter.OnItemClickListener() {
-            @Override
-            public void onClick(View v, int position) {
-                ProgramType programType = mProgramList.get(position).getProgramType();
-                if (programType == ProgramType.Pic) {
-                    Intent intent = new Intent(getContext(), PhotoEditActivity.class);
-                    intent.putExtra(Common.EX_programId, mProgramList.get(position).getId());
-                    intent.putExtra(Common.EX_programName, mProgramList.get(position).getProgramName());
-                    mProgramPosition = position;
-                    startActivityForResult(intent, PHOTO_REQUEST_CODE);
-                } else if (programType == ProgramType.Text) {
-                    Intent intent = new Intent(getContext(), ChangeLineTextActivity.class);
-                    intent.putExtra(Common.EX_programId, mProgramList.get(position).getId());
-                    intent.putExtra(Common.EX_programName, mProgramList.get(position).getProgramName());
-                    mProgramPosition = position;
-                    startActivityForResult(intent, EASY_TEXT_REQUEST_CODE);
-                }
-            }
-        });
-        mAdapter.setOnItemLongClickListener(new ProgramAdapter.OnItemLongClickListener() {
-            @Override
-            public void onLongClick(View v, final int position) {
-                mTitlePart = mProgramList.get(position).getProgramName();
-                new AlertDialog.Builder(getContext())
-                        .setTitle(R.string.msg_delete_program)
-                        .setMessage(getString(R.string.msg_confirm_delete)+mTitlePart)
-                        .setPositiveButton(R.string.msg_confirm, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                                Program program = mProgramList.get(position);
-                                ((App) getActivity().getApplication()).getDaoSession().getProgramDao().delete(program);
-                                //删除一个节目后，要重新排序sortNum，不然会引发indexoutofbound,app就无法启动
-                                //2017/1/14 修复，由于之前重新排序的时候是所有屏幕的节目都重新排序，导致不该改变的屏幕的节目的sortnum都改变了，所以app无法启动
-                                int sortNumber = program.getSortNumber();
-                                for (Program program1 : mProgramList) {//在被删除的节目的sortnum后的，sortNUm都减一，保持队列
-                                    if (program1.getSortNumber() > sortNumber) {
-                                        int currentSortNum = program1.getSortNumber();
-                                        currentSortNum--;
-                                        program1.setSortNumber(currentSortNum);
-                                    }
-                                }
-                                mProgramList.remove(position);
-                                ((App) getActivity().getApplication()).getDaoSession().getProgramDao().insertOrReplaceInTx(mProgramList);
-                                //删除文字
-                                List<TextContent> textContents = ((App) getActivity().getApplication()).getDaoSession().getTextContentDao().queryBuilder().where(TextContentDao.Properties.ProgramId.eq(program.getId())).list();
-                                ((App) getActivity().getApplication()).getDaoSession().getTextContentDao().deleteInTx(textContents);
-                                mAdapter.notifyItemRemoved(position);
-                                mAdapter.notifyDataSetChanged();
-                                Snackbar.make(mRecyclerView, getString(R.string.msg_deleted) + mTitlePart, Snackbar.LENGTH_LONG).show();
-                            }
-                        })
-                        .setNegativeButton(R.string.msg_cancle, null)
-                        .show();
-            }
-        });
+        mAdapter.setOnItemClickListener(this);
+        mAdapter.setOnItemLongClickListener(this);
 
     }
 
@@ -203,7 +150,6 @@ public class ScreenFragment extends Fragment implements View.OnClickListener {
     private void loadData() {
         mProgramList = new ArrayList<>();
         mProgramDao = ((App) (getActivity().getApplication())).getDaoSession().getProgramDao();
-
         List<Program> tempPrograms = mProgramDao.queryBuilder().list();
         Program[] sortProgramList = new Program[tempPrograms.size()];
         for (Program program : tempPrograms) {
@@ -233,7 +179,8 @@ public class ScreenFragment extends Fragment implements View.OnClickListener {
                 int size = mProgramList.size();
                 size++;
                 Program program = new Program();
-                program.setId(System.currentTimeMillis());
+                long programId = System.currentTimeMillis();
+                program.setId(programId);
                 program.setProgramName(getString(R.string.new_text_program) + size);
                 program.setSortNumber(mProgramList.size());
                 program.setProgramType(ProgramType.Text);
@@ -310,5 +257,59 @@ public class ScreenFragment extends Fragment implements View.OnClickListener {
     public void onDestroy() {
         super.onDestroy();
         getActivity().getSharedPreferences(Global.SP_SCREEN_CONFIG,MODE_PRIVATE).unregisterOnSharedPreferenceChangeListener(mListener);
+    }
+
+    @Override
+    public void onClick(View v, int position) {
+        ProgramType programType = mProgramList.get(position).getProgramType();
+        if (programType == ProgramType.Pic) {
+            Intent intent = new Intent(getContext(), PhotoEditActivity.class);
+            intent.putExtra(Common.EX_programId, mProgramList.get(position).getId());
+            intent.putExtra(Common.EX_programName, mProgramList.get(position).getProgramName());
+            mProgramPosition = position;
+            startActivityForResult(intent, PHOTO_REQUEST_CODE);
+        } else if (programType == ProgramType.Text) {
+            Intent intent = new Intent(getContext(), EasyTextActivity.class);
+            intent.putExtra(Common.EX_programId, mProgramList.get(position).getId());
+            intent.putExtra(Common.EX_programName, mProgramList.get(position).getProgramName());
+            mProgramPosition = position;
+            startActivityForResult(intent, EASY_TEXT_REQUEST_CODE);
+        }
+    }
+
+    @Override
+    public void onLongClick(View v, final int position) {
+        mTitlePart = mProgramList.get(position).getProgramName();
+        new AlertDialog.Builder(getContext())
+                .setTitle(R.string.msg_delete_program)
+                .setMessage(getString(R.string.msg_confirm_delete)+mTitlePart)
+                .setPositiveButton(R.string.msg_confirm, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                        Program program = mProgramList.get(position);
+                        ((App) getActivity().getApplication()).getDaoSession().getProgramDao().delete(program);
+                        //删除一个节目后，要重新排序sortNum，不然会引发indexoutofbound,app就无法启动
+                        //2017/1/14 修复，由于之前重新排序的时候是所有屏幕的节目都重新排序，导致不该改变的屏幕的节目的sortnum都改变了，所以app无法启动
+                        int sortNumber = program.getSortNumber();
+                        for (Program program1 : mProgramList) {//在被删除的节目的sortnum后的，sortNUm都减一，保持队列
+                            if (program1.getSortNumber() > sortNumber) {
+                                int currentSortNum = program1.getSortNumber();
+                                currentSortNum--;
+                                program1.setSortNumber(currentSortNum);
+                            }
+                        }
+                        mProgramList.remove(position);
+                        ((App) getActivity().getApplication()).getDaoSession().getProgramDao().insertOrReplaceInTx(mProgramList);
+                        //删除文字
+                        List<TextContent> textContents = ((App) getActivity().getApplication()).getDaoSession().getTextContentDao().queryBuilder().where(TextContentDao.Properties.ProgramId.eq(program.getId())).list();
+                        ((App) getActivity().getApplication()).getDaoSession().getTextContentDao().deleteInTx(textContents);
+                        mAdapter.notifyItemRemoved(position);
+                        mAdapter.notifyDataSetChanged();
+                        Snackbar.make(mRecyclerView, getString(R.string.msg_deleted) + mTitlePart, Snackbar.LENGTH_LONG).show();
+                    }
+                })
+                .setNegativeButton(R.string.msg_cancle, null)
+                .show();
     }
 }

@@ -1,6 +1,7 @@
 package cn.com.hotled.xyled.util.genFile;
 
 import android.app.Activity;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Handler;
@@ -19,6 +20,7 @@ import cn.com.hotled.xyled.bean.Program;
 import cn.com.hotled.xyled.bean.ProgramType;
 import cn.com.hotled.xyled.bean.TextContent;
 import cn.com.hotled.xyled.flowbound.GenFlow;
+import cn.com.hotled.xyled.global.Common;
 import cn.com.hotled.xyled.global.Global;
 import cn.com.hotled.xyled.util.timeaxis.BaseTimeAxis;
 import cn.com.hotled.xyled.util.timeaxis.MoveDown;
@@ -77,6 +79,7 @@ public class GenFileUtil2 {
     private int[] mFrameCountArrays;
     private int mHorizontalIndex;
     private int mVerticalIndex;
+    private boolean isOrientationReverse;
 
     public GenFileUtil2(Activity activity, Handler handler,List<Program> programs, List<TextContent> contents, int screenWidth, int screenHeight) {
         mActivity = activity;
@@ -197,12 +200,15 @@ public class GenFileUtil2 {
         mVerticalTextByteList = new ArrayList<>();
         mColByteCountList = new ArrayList<>();
         int textProgramIndex=0;
+        int orientation = mActivity.getSharedPreferences(Global.SP_SCREEN_CONFIG, Context.MODE_PRIVATE).getInt(Global.KEY_DATA_ORIENTATION, 0);
+        isOrientationReverse = (orientation==3);
         for (Program program : mTextProgramList) {
 
-            DrawBitmapUtil3 bitmapUtil=new DrawBitmapUtil3(program,mTextContentList.get(textProgramIndex),mTextScreenWidthList.get(textProgramIndex),mTextScreenHeightList.get(textProgramIndex));
+            DrawBitmapUtil3 bitmapUtil=new DrawBitmapUtil3(program,mTextContentList.get(textProgramIndex),
+                    mTextScreenWidthList.get(textProgramIndex),mTextScreenHeightList.get(textProgramIndex),orientation);
             Bitmap bitmap = bitmapUtil.drawBitmap();
             //左右移动
-            if (mTextContentList.get(textProgramIndex).getTextEffect()<= Global.TEXT_EFFECT_STATIC) {
+            if (mTextContentList.get(textProgramIndex).getTextEffect()<= Global.TEXT_EFFECT_STATIC||isOrientationReverse) {//如果屏幕是竖直的,则全部都转成水平方向移动
                 convertBitmapHorizontal(bitmap,textProgramIndex );
             }else {
             //上下移动
@@ -271,8 +277,10 @@ public class GenFileUtil2 {
 
         if (mTextContentList.get(textIndex).getTextEffect()== Global.TEXT_EFFECT_STATIC) {
             float stayTime = mTextProgramList.get(textIndex).getStayTime();
-            mFrameCountArrays[textIndex] = (int) (stayTime*20);
-            mFrameCount += (int) (stayTime*20);
+            if (stayTime==0)
+                stayTime+=10;
+            mFrameCountArrays[textIndex] = (int) (stayTime*40);
+            mFrameCount += (int) (stayTime*40);
         }else {
             mFrameCountArrays[textIndex] = widthToCompress-mTextScreenWidthList.get(textIndex);
             mFrameCount += (widthToCompress-mTextScreenWidthList.get(textIndex));
@@ -381,7 +389,15 @@ public class GenFileUtil2 {
         Integer screenWidth = mTextScreenWidthList.get(textProgramIndex);
         Integer screenHeight = mTextScreenHeightList.get(textProgramIndex);
         BaseTimeAxis baseTimeAxis =null;
-        switch (mTextContentList.get(textProgramIndex).getTextEffect()){
+        int textEffect = mTextContentList.get(textProgramIndex).getTextEffect();
+        if (isOrientationReverse) {
+            if (textEffect== Global.TEXT_EFFECT_MOVE_UP) {
+                textEffect=Global.TEXT_EFFECT_MOVE_LEFT;
+            }else if (textEffect== Global.TEXT_EFFECT_MOVE_DOWN) {
+                textEffect = Global.TEXT_EFFECT_MOVE_RIGHT;
+            }
+        }
+        switch (textEffect){
             case Global.TEXT_EFFECT_APPEAR_MOVE_LEFT:
                 baseTimeAxis = new MoveLeft();
                 baseTimeAxis.setProgram(program)
@@ -606,7 +622,7 @@ public class GenFileUtil2 {
             Log.i("genfile2", "帧数 mframeCount = " + mFrameCount);
             Log.i("genfile2", "时间轴 mTimeAxisList = " + mTimeAxisList.size());
 
-            File colorPRGFile = new File(mActivity.getFilesDir()+"/color.prg");
+            File colorPRGFile = new File(mActivity.getFilesDir()+ Common.FL_COLOR_PRG);
             if (colorPRGFile.exists()) {
                 colorPRGFile.delete();
             }
