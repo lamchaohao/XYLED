@@ -28,6 +28,7 @@ import static cn.com.hotled.xyled.global.Common.FL_SEND_FILE;
 import static cn.com.hotled.xyled.global.Global.CONNECT_NORESPONE;
 import static cn.com.hotled.xyled.global.Global.CONNECT_TIMEOUT;
 import static cn.com.hotled.xyled.global.Global.GENFILE_DONE;
+import static cn.com.hotled.xyled.global.Global.SEND_DONE;
 import static cn.com.hotled.xyled.global.Global.Start_Send;
 import static cn.com.hotled.xyled.global.Global.UPDATE_PROGRESS;
 import static cn.com.hotled.xyled.global.Global.WIFI_ERRO;
@@ -99,6 +100,11 @@ public class SendPcDataActivity extends BaseActivity {
                     break;
                 case Start_Send:
                     mTvStatus.setText(R.string.tos_start_send);
+                    break;
+                case SEND_DONE:
+                    mPbSend.setVisibility(View.GONE);
+                    mBtSend.setEnabled(true);
+                    send();
                     break;
             }
 

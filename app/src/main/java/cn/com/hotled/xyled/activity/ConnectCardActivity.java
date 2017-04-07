@@ -152,12 +152,12 @@ public class ConnectCardActivity extends BaseActivity implements ConnectAdapter.
         boolean endFlag = ssid.contains(Global.SSID_END);
         if (startFlag&&endFlag){
             mTvState.setTextColor(Color.parseColor("#00C853"));
-            mIvWifiLogo.setImageResource(R.drawable.ic_wifi_green_a700_svg);
+            mIvWifiLogo.setImageResource(R.drawable.ic_wifi_complete);
             mIvRound.setImageResource(R.drawable.connect_view_completed);
         }else {
             mTvTip.setText(R.string.click_check);
             mTvState.setTextColor(getResources().getColor(R.color.textSecondary));
-            mIvWifiLogo.setImageResource(R.drawable.ic_wifi_green_a700_svg_uncomplete);
+            mIvWifiLogo.setImageResource(R.drawable.ic_wifi_uncomplete);
             mIvRound.setImageResource(R.drawable.connect_view_uncomplete);
         }
 
@@ -224,6 +224,7 @@ public class ConnectCardActivity extends BaseActivity implements ConnectAdapter.
     private void roundInsideOnclick() {
 
         if (mWifiList.size()==1){
+            refreshWifiAndState();
             if (mWifiAdmin.getWifiInfo().getSSID().equals("\""+mWifiList.get(0).SSID+"\"")){
                 return;
             }
@@ -234,7 +235,7 @@ public class ConnectCardActivity extends BaseActivity implements ConnectAdapter.
                     connectWifi(0);
                 }
             }).start();
-            refreshWifiAndState();
+
         }else {
             if (mWifiAdmin.checkWifiState()) {
                 mIvRound.startAnimation(mInsideAnim);

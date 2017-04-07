@@ -32,6 +32,7 @@ public class Global {
     public static final String KEY_TRACE_SELECT="traceSelected";
     public static final String KEY_DATA_ORIENTATION="dataOrientation";
     public static final String KEY_SPECIAL="special";
+    public static final String KEY_BRIGHTNESS="brightness";
     public static final String KEY_DATA="data";
     public static final String KEY_OE="OE";
     public static final String KEY_138CODE="138code";

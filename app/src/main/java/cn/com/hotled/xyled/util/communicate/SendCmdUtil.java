@@ -2,6 +2,7 @@ package cn.com.hotled.xyled.util.communicate;
 
 import android.content.Context;
 import android.net.wifi.WifiInfo;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 
@@ -180,10 +181,20 @@ public class SendCmdUtil {
 
         }catch (SocketException e) {
             e.printStackTrace();
-            mHandler.sendEmptyMessage(SOCKET_ERRO);
+            Message msg = mHandler.obtainMessage();
+            msg.what=SOCKET_ERRO;
+            Bundle b=new Bundle();
+            b.putString("error",e.toString());
+            msg.setData(b);
+            mHandler.sendMessage(msg);
         } catch (IOException e) {
             e.printStackTrace();
-            mHandler.sendEmptyMessage(SOCKET_ERRO);
+            Message msg = mHandler.obtainMessage();
+            msg.what=SOCKET_ERRO;
+            Bundle b=new Bundle();
+            b.putString("error",e.toString());
+            msg.setData(b);
+            mHandler.sendMessage(msg);
         } finally {
             if (socket != null && !socket.isClosed()) {
                 try {

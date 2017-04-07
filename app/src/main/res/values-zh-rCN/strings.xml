@@ -53,6 +53,7 @@
     <string name="screen_height">屏幕高度</string>
     <string name="trace_setting">走线设置</string>
     <string name="advance_setting">高级设置</string>
+    <string name="brightness">亮度</string>
     <string name="rgb_order">RGB次序</string>
     <string name="data">DATA</string>
     <string name="oe">OE</string>

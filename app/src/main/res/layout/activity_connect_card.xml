@@ -16,7 +16,7 @@
             android:id="@+id/iv_connect_wifiLogo"
             android:gravity="center"
             android:layout_gravity="center"
-            android:src="@drawable/ic_wifi_green_a700_svg_uncomplete"
+            android:src="@drawable/ic_wifi_blue_grey_500_48dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
         <TextView

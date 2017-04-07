@@ -284,6 +284,16 @@ public class ReadScreenDataUtil {
         int data=readbackmsg[42]&0xff; //data
         int oe=readbackmsg[43]&0xff; // oe
         int code = 0;//138code
+        int brightness=readbackmsg[47]&0xff;
+        Log.i("brightness","brightness = "+brightness);
+        if (brightness==1){
+            brightness=100;
+        }else if (brightness==255){
+            brightness=33;
+        }else {
+            brightness=66;
+        }
+        Log.i("brightness","brightness = "+brightness);
         int screenScan=readbackmsg[38]&0xff;
         if (screenScan>=128){
             code=1;
@@ -305,6 +315,7 @@ public class ReadScreenDataUtil {
         edit.putInt(Global.KEY_SCREEN_SCAN,screenScan<64?screenScan:8);
         edit.putInt(Global.KEY_DATA,data<2?data:0);
         edit.putInt(Global.KEY_OE,oe<2?oe:0);
+        edit.putInt(Global.KEY_BRIGHTNESS,brightness);
         edit.putInt(Global.KEY_138CODE,code<3?code:0);
         edit.putInt(Global.KEY_BATH,batH<255?batH:16);
         edit.putInt(Global.KEY_BATW,batW<255?batW:16);

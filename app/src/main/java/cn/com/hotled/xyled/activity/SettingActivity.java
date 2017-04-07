@@ -9,6 +9,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -16,9 +17,7 @@ import android.support.v7.widget.Toolbar;
 import android.text.InputType;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.RelativeLayout;
-import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -78,12 +77,10 @@ public class SettingActivity extends BaseActivity implements View.OnClickListene
     Spinner mSpnSetOe;
     @BindView(R.id.spn_set_138code)
     Spinner mSpnSet138code;
-    @BindView(R.id.activity_setting)
-    ScrollView mActivitySetting;
-    @BindView(R.id.bt_send_config)
-    Button mBtSendConfig;
-    @BindView(R.id.bt_read_config)
-    Button mBtReadConfig;
+    @BindView(R.id.fab_send_config)
+    FloatingActionButton mFabSendConfig;
+    @BindView(R.id.fab_read_config)
+    FloatingActionButton mFabReadConfig;
     private SharedPreferences mSharedPreferences;
     private SharedPreferences.Editor mEditor;
     private TraceFileDao mTraceFileDao;
@@ -142,8 +139,8 @@ public class SettingActivity extends BaseActivity implements View.OnClickListene
         mSpnSetData.setOnItemSelectedListener(this);
         mSpnSetOe.setOnItemSelectedListener(this);
         mSpnSet138code.setOnItemSelectedListener(this);
-        mBtSendConfig.setOnClickListener(this);
-        mBtReadConfig.setOnClickListener(this);
+        mFabSendConfig.setOnClickListener(this);
+        mFabReadConfig.setOnClickListener(this);
     }
 
     @Override
@@ -167,7 +164,7 @@ public class SettingActivity extends BaseActivity implements View.OnClickListene
             case R.id.rl_set_advanceSet:
                 startActivity(new Intent(this, AdvanceSetActivity.class));
                 break;
-            case R.id.bt_send_config:
+            case R.id.fab_send_config:
                 long traceSelectedId = mSharedPreferences.getLong(Global.KEY_TRACE_SELECT, -1);
                 if (traceSelectedId != -1) {
                     List<TraceFile> list = mTraceFileDao.queryBuilder().where(TraceFileDao.Properties.Id.eq(traceSelectedId)).list();
@@ -178,10 +175,12 @@ public class SettingActivity extends BaseActivity implements View.OnClickListene
                 } else {
                     Snackbar.make(mSpnSet138code, R.string.tos_select_trace, Snackbar.LENGTH_SHORT).show();
                 }
+                Snackbar.make(mSpnSet138code, R.string.tos_start_send, Snackbar.LENGTH_SHORT).show();
                 break;
-            case R.id.bt_read_config:
+            case R.id.fab_read_config:
                 ReadScreenDataUtil readUtil =new ReadScreenDataUtil(this,mHandler);
                 readUtil.startReadData();
+                Snackbar.make(mSpnSet138code, R.string.tos_reading, Snackbar.LENGTH_SHORT).show();
                 break;
         }
     }

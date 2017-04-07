@@ -66,7 +66,7 @@
         android:layout_alignParentBottom="true"
         android:text="@string/msg_send"
         android:layout_marginBottom="5dp"
-        android:background="@drawable/button_bg"
+        android:background="@drawable/sendbutton_bg"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
 </RelativeLayout>

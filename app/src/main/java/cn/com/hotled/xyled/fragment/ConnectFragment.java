@@ -187,6 +187,7 @@ public class ConnectFragment extends Fragment implements View.OnClickListener, C
 
     private void roundInsideOnclick() {
         if (mWifiList.size()==1){
+            refreshWifiAndState();
             if (mWifiAdmin.getWifiInfo().getSSID().equals("\""+mWifiList.get(0).SSID+"\"")){
                 return;
             }
@@ -197,7 +198,6 @@ public class ConnectFragment extends Fragment implements View.OnClickListener, C
                     connectWifi(0);
                 }
             }).start();
-            refreshWifiAndState();
         }else {
             if (mWifiAdmin.checkWifiState()) {
                 mIvRound.startAnimation(mInsideAnim);
@@ -245,12 +245,12 @@ public class ConnectFragment extends Fragment implements View.OnClickListener, C
         boolean endFlag = ssid.contains(Global.SSID_END);
         if (startFlag&&endFlag){
             mTvState.setTextColor(Color.parseColor("#00C853"));
-            mIvLogo.setImageResource(R.drawable.ic_wifi_green_a700_svg);
+            mIvLogo.setImageResource(R.drawable.ic_wifi_complete);
             mIvRound.setImageResource(R.drawable.connect_view_completed);
         }else {
             mTvTip.setText(R.string.click_check);
             mTvState.setTextColor(getResources().getColor(R.color.textSecondary));
-            mIvLogo.setImageResource(R.drawable.ic_wifi_green_a700_svg_uncomplete);
+            mIvLogo.setImageResource(R.drawable.ic_wifi_uncomplete);
             mIvRound.setImageResource(R.drawable.connect_view_uncomplete);
         }
 

@@ -277,6 +277,14 @@ public class SendSetDataUtil {
         int code = sharedPreferences.getInt(Global.KEY_138CODE, 0);
         int dataOrient = sharedPreferences.getInt(Global.KEY_DATA_ORIENTATION, 0);
         int special = sharedPreferences.getInt(Global.KEY_SPECIAL, 0);
+        int brightness=sharedPreferences.getInt(Global.KEY_BRIGHTNESS,66);
+        if (brightness<=33){
+            brightness=-1;
+        }else if (brightness>33&&brightness<=66){
+            brightness=0;
+        }else if (brightness>66&&brightness<=100){
+            brightness=1;
+        }
         byte[] dataBytes =new byte[512];
 
 
@@ -297,7 +305,7 @@ public class SendSetDataUtil {
         byte[] fileBytes = fileName.getBytes();     //0-11 文件名
         setInbyteArray(0,fileBytes,dataBytes);
         dataBytes[19] = 97; //19 版本号
-        dataBytes[24] = (byte) 195; //24
+        dataBytes[24] = (byte) 195; //24 data&set C3
 
         byte[] pictureArray = intToByteArray(picture, 3);//实像素  32-34
         setInbyteArray(32,pictureArray,dataBytes);
@@ -313,6 +321,7 @@ public class SendSetDataUtil {
         dataBytes[41] = (byte) output; //41 输出端口
         dataBytes[42] = (byte) data; //data相位
         dataBytes[43] = (byte) oe;  //oe
+        dataBytes[47] = (byte) brightness; //brightness 亮度
         setInbyteArray(48,scanOrderArray,dataBytes); //48-63扫行次序
         byte[] routeArray = intToByteArray(route, 2); //64-65 走线表点数
         setInbyteArray(64,routeArray,dataBytes);

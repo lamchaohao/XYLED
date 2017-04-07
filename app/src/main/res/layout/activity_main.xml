@@ -30,7 +30,7 @@
                 android:id="@+id/bt_toolbar_send"
                 android:text="@string/msg_send"
                 android:textSize="20sp"
-                android:background="@drawable/button_bg"
+                android:background="@drawable/sendbutton_bg"
                 android:layout_margin="5dp"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"/>

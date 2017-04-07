@@ -9,6 +9,7 @@ import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -37,8 +38,8 @@ public class ForwardDataActivity extends BaseActivity {
     TextView mTvForwardFromQQ;
     @BindView(R.id.tv_forward_fromWechat)
     TextView mTvForwardFromWechat;
-    @BindView(R.id.tv_forward_fromOther)
-    TextView mTvForwardFromOther;
+    @BindView(R.id.ll_forward_fromOther)
+    LinearLayout mTvForwardFromOther;
     @BindView(R.id.tv_forward_selectResult)
     TextView mTvForwardSelectResult;
     @BindView(R.id.tv_forward_checking)
@@ -89,7 +90,7 @@ public class ForwardDataActivity extends BaseActivity {
 
 
 
-    @OnClick({R.id.tv_forward_fromQQ, R.id.tv_forward_fromWechat, R.id.tv_forward_fromOther, R.id.bt_forward_send})
+    @OnClick({R.id.tv_forward_fromQQ, R.id.tv_forward_fromWechat, R.id.ll_forward_fromOther, R.id.bt_forward_send})
     public void onClick(View view) {
         Intent intent = new Intent();
         switch (view.getId()) {
@@ -113,7 +114,7 @@ public class ForwardDataActivity extends BaseActivity {
                 intent.setDataAndType(Uri.parse(wechatFile.toString()), "file/*");
                 startActivityForResult(intent, SELECT_FILE);
                 break;
-            case R.id.tv_forward_fromOther:
+            case R.id.ll_forward_fromOther:
                 intent.setAction(Intent.ACTION_GET_CONTENT);
                 intent.addCategory(Intent.CATEGORY_OPENABLE);
                 intent.setType("file/*");

@@ -1,5 +1,6 @@
 package cn.com.hotled.xyled.fragment;
 
+import android.animation.ObjectAnimator;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -7,9 +8,11 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -21,12 +24,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.github.clans.fab.FloatingActionMenu;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 import cn.com.hotled.xyled.App;
 import cn.com.hotled.xyled.R;
 import cn.com.hotled.xyled.activity.EasyTextActivity;
@@ -40,6 +44,7 @@ import cn.com.hotled.xyled.dao.ProgramDao;
 import cn.com.hotled.xyled.dao.TextContentDao;
 import cn.com.hotled.xyled.global.Common;
 import cn.com.hotled.xyled.global.Global;
+import cn.com.hotled.xyled.util.android.DensityUtil;
 import cn.com.hotled.xyled.util.communicate.ReadScreenDataUtil;
 
 import static android.app.Activity.RESULT_OK;
@@ -54,26 +59,45 @@ import static cn.com.hotled.xyled.global.Global.WIFI_ERRO;
  * Created by Lam on 2016/12/1.
  */
 
-public class ScreenFragment extends Fragment implements View.OnClickListener ,ProgramAdapter.OnItemClickListener,ProgramAdapter.OnItemLongClickListener{
+public class ScreenFragment extends Fragment implements ProgramAdapter.OnItemClickListener, ProgramAdapter.OnItemLongClickListener {
     private static final int EASY_TEXT_REQUEST_CODE = 0x23;
     private static final int PHOTO_REQUEST_CODE = 0x24;
     private static final int ITEM_MANAGE_REQUEST_CODE = 0x25;
+    @BindView(R.id.iv_screenCatag_screen)
+    ImageView mIvScreen;
+    @BindView(R.id.tv_screenCatag_card)
+    TextView mTvCard;
+    @BindView(R.id.tv_screenCatag_size)
+    TextView mTvSize;
+    @BindView(R.id.tv_screenCatag_scanCount)
+    TextView mTvScanCount;
+    @BindView(R.id.iv_screenCatag_refresh)
+    ImageView mIvRefresh;
+    @BindView(R.id.cv_contentScreen_screen)
+    CardView mCvScreen;
+    @BindView(R.id.rv_fragmScreen)
+    RecyclerView mRecyclerView;
+    @BindView(R.id.fab_screen_add_text)
+    FloatingActionButton mFabAddText;
+    @BindView(R.id.fab_screen_add_pic)
+    FloatingActionButton mFabAddPic;
+    @BindView(R.id.fab_screen_add_menu)
+    FloatingActionButton mFabMenu;
 
-    private RecyclerView mRecyclerView;
     private ProgramAdapter mAdapter;
     private String mTitlePart;
     private int mProgramPosition;
     private List<Program> mProgramList;
-    private ImageView mIvRefresh;
     private Animation mRefreshAnim;
+    private boolean isMenuOpen;
     private SharedPreferences.OnSharedPreferenceChangeListener mListener = new SharedPreferences.OnSharedPreferenceChangeListener() {
 
         @Override
         public void onSharedPreferenceChanged(
                 SharedPreferences sharedPreferences, String key) {
-                if (key.equals(Global.KEY_CARD_SERIES)||key.equals(Global.KEY_SCREEN_H)||key.equals(Global.KEY_SCREEN_W)){
-                   updateScreenView();
-                }
+            if (key.equals(Global.KEY_CARD_SERIES) || key.equals(Global.KEY_SCREEN_H) || key.equals(Global.KEY_SCREEN_W)) {
+                updateScreenView();
+            }
         }
     };
 
@@ -97,16 +121,14 @@ public class ScreenFragment extends Fragment implements View.OnClickListener ,Pr
             }
         }
     };
-    private TextView mTvCardName;
-    private TextView mTvScreenSize;
-    private TextView mTvScreenScanCount;
     private ProgramDao mProgramDao;
-    private FloatingActionMenu mFabMenu;
+    private Animation mFirstAddAnim;
+    private Animation mSecondAddAnim;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getActivity().getSharedPreferences(Global.SP_SCREEN_CONFIG,MODE_PRIVATE).registerOnSharedPreferenceChangeListener(mListener);
+        getActivity().getSharedPreferences(Global.SP_SCREEN_CONFIG, MODE_PRIVATE).registerOnSharedPreferenceChangeListener(mListener);
         //1.加节目
         loadData();
     }
@@ -115,37 +137,23 @@ public class ScreenFragment extends Fragment implements View.OnClickListener ,Pr
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_sreen, null);
-        initView(view);
+        ButterKnife.bind(this, view);
+        initView();
         updateScreenView();
         return view;
     }
 
-    private void initView(View view) {
-        initActionButton(view);
+    private void initView() {
         TextContentDao textContentDao = ((App) (getActivity().getApplication())).getDaoSession().getTextContentDao();
-        View screenView = view.findViewById(R.id.cv_contentScreen_screen);
-        mIvRefresh = (ImageView) view.findViewById(R.id.iv_screenCatag_refresh);
-        mTvCardName = (TextView) view.findViewById(R.id.tv_screenCatag_card);
-        mTvScreenSize = (TextView) view.findViewById(R.id.tv_screenCatag_size);
-        mTvScreenScanCount = (TextView) view.findViewById(R.id.tv_screenCatag_scanCount);
-        screenView.setOnClickListener(this);
-        mIvRefresh.setOnClickListener(this);
-        mRecyclerView = (RecyclerView) view.findViewById(R.id.rv_fragmScreen);
-        mAdapter = new ProgramAdapter(getContext(), mProgramList,textContentDao);
+        mAdapter = new ProgramAdapter(getContext(), mProgramList, textContentDao);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         mRecyclerView.setAdapter(mAdapter);
         mAdapter.setOnItemClickListener(this);
         mAdapter.setOnItemLongClickListener(this);
-
+        mFirstAddAnim = AnimationUtils.loadAnimation(getContext(), R.anim.fab_scale_up);
+        mSecondAddAnim = AnimationUtils.loadAnimation(getContext(), R.anim.fab_slide_in_from_left);
     }
 
-    private void initActionButton(View view) {
-        View fabAddText = view.findViewById(R.id.fab_screen_add_text);
-        View fabAddPic = view.findViewById(R.id.fab_screen_add_pic);
-        mFabMenu = (FloatingActionMenu) view.findViewById(R.id.fab_screen_menu);
-        fabAddText.setOnClickListener(this);
-        fabAddPic.setOnClickListener(this);
-    }
 
     private void loadData() {
         mProgramList = new ArrayList<>();
@@ -167,14 +175,162 @@ public class ScreenFragment extends Fragment implements View.OnClickListener ,Pr
         int screenHight = sharedPre.getInt(Global.KEY_SCREEN_H, -32);
         int screenScan = sharedPre.getInt(Global.KEY_SCREEN_SCAN, -1);
         String cardName = sharedPre.getString(Global.KEY_CARD_SERIES, getString(R.string.msg_none));
-        mTvScreenSize.setText(screenWidth + getString(R.string.pic_plus) + screenHight);
-        mTvScreenScanCount.setText(screenScan + getString(R.string.screen_scan_symbol));
-        mTvCardName.setText(cardName);
+        mTvSize.setText(screenWidth + getString(R.string.pic_plus) + screenHight);
+        mTvScanCount.setText(screenScan + getString(R.string.screen_scan_symbol));
+        mTvCard.setText(cardName);
+    }
+
+
+    private void readData() {
+        mRefreshAnim = AnimationUtils.loadAnimation(getContext(), R.anim.search_round);
+        mIvRefresh.startAnimation(mRefreshAnim);
+        ReadScreenDataUtil readUtil = new ReadScreenDataUtil(getActivity(), mHandler);
+        readUtil.startReadData();
     }
 
     @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        if (resultCode == RESULT_OK && requestCode == EASY_TEXT_REQUEST_CODE) {
+            String newProgramName = data.getStringExtra(Common.EX_newProGramName);
+            mProgramList.get(mProgramPosition).setProgramName(newProgramName);
+            mAdapter.notifyItemChanged(mProgramPosition);
+        }
+        if (resultCode == TEXT_CONTENT_CHANGE_CODE && requestCode == EASY_TEXT_REQUEST_CODE) {
+            mAdapter.notifyItemChanged(mProgramPosition);
+        } else if (resultCode == RESULT_OK && requestCode == ITEM_MANAGE_REQUEST_CODE) {
+
+            List<Program> list = ((App) getActivity().getApplication()).getDaoSession().getProgramDao().queryBuilder().list();
+
+            Program[] sortProgramList = new Program[list.size()];
+            for (int i = 0; i < list.size(); i++) {
+                sortProgramList[list.get(i).getSortNumber()] = list.get(i);
+            }
+            mProgramList.clear();
+            List<Program> programs = Arrays.asList(sortProgramList);
+
+            mProgramList.addAll(programs);
+            mAdapter.notifyDataSetChanged();
+        }
+    }
+
+    public void closeFabMenu() {
+        if (isMenuOpen) {
+            float textCurrent = mFabAddText.getTranslationY();
+            float picCurrent = mFabAddPic.getTranslationY();
+            int transY = DensityUtil.dp2px(getContext(), 60);
+            ObjectAnimator textAnim = ObjectAnimator//
+                    .ofFloat(mFabAddText, "translationY", textCurrent,transY)//
+                    .setDuration(500);//
+            textAnim.start();
+
+            ObjectAnimator picAnim = ObjectAnimator//
+                    .ofFloat(mFabAddPic, "translationY",  picCurrent,transY*2)//
+                    .setDuration(500);//
+            picAnim.start();
+
+            isMenuOpen=false;
+        }
+    }
+
+    public boolean isMenuClose() {
+        return isMenuOpen;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        getActivity().getSharedPreferences(Global.SP_SCREEN_CONFIG, MODE_PRIVATE).unregisterOnSharedPreferenceChangeListener(mListener);
+    }
+
+    @Override
+    public void onClick(View v, int position) {
+        ProgramType programType = mProgramList.get(position).getProgramType();
+        if (programType == ProgramType.Pic) {
+            Intent intent = new Intent(getContext(), PhotoEditActivity.class);
+            intent.putExtra(Common.EX_programId, mProgramList.get(position).getId());
+            intent.putExtra(Common.EX_programName, mProgramList.get(position).getProgramName());
+            mProgramPosition = position;
+            startActivityForResult(intent, PHOTO_REQUEST_CODE);
+        } else if (programType == ProgramType.Text) {
+            Intent intent = new Intent(getContext(), EasyTextActivity.class);
+            intent.putExtra(Common.EX_programId, mProgramList.get(position).getId());
+            intent.putExtra(Common.EX_programName, mProgramList.get(position).getProgramName());
+            mProgramPosition = position;
+            startActivityForResult(intent, EASY_TEXT_REQUEST_CODE);
+        }
+    }
+
+    @Override
+    public void onLongClick(View v, final int position) {
+        mTitlePart = mProgramList.get(position).getProgramName();
+        new AlertDialog.Builder(getContext())
+                .setTitle(R.string.msg_delete_program)
+                .setMessage(getString(R.string.msg_confirm_delete) + mTitlePart)
+                .setPositiveButton(R.string.msg_confirm, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                        Program program = mProgramList.get(position);
+                        ((App) getActivity().getApplication()).getDaoSession().getProgramDao().delete(program);
+                        //删除一个节目后，要重新排序sortNum，不然会引发indexoutofbound,app就无法启动
+                        //2017/1/14 修复，由于之前重新排序的时候是所有屏幕的节目都重新排序，导致不该改变的屏幕的节目的sortnum都改变了，所以app无法启动
+                        int sortNumber = program.getSortNumber();
+                        for (Program program1 : mProgramList) {//在被删除的节目的sortnum后的，sortNUm都减一，保持队列
+                            if (program1.getSortNumber() > sortNumber) {
+                                int currentSortNum = program1.getSortNumber();
+                                currentSortNum--;
+                                program1.setSortNumber(currentSortNum);
+                            }
+                        }
+                        mProgramList.remove(position);
+                        ((App) getActivity().getApplication()).getDaoSession().getProgramDao().insertOrReplaceInTx(mProgramList);
+                        //删除文字
+                        List<TextContent> textContents = ((App) getActivity().getApplication()).getDaoSession().getTextContentDao().queryBuilder().where(TextContentDao.Properties.ProgramId.eq(program.getId())).list();
+                        ((App) getActivity().getApplication()).getDaoSession().getTextContentDao().deleteInTx(textContents);
+                        mAdapter.notifyItemRemoved(position);
+                        mAdapter.notifyDataSetChanged();
+                        Snackbar.make(mRecyclerView, getString(R.string.msg_deleted) + mTitlePart, Snackbar.LENGTH_LONG).show();
+                    }
+                })
+                .setNegativeButton(R.string.msg_cancle, null)
+                .show();
+    }
+
+    @OnClick({R.id.iv_screenCatag_refresh, R.id.cv_contentScreen_screen, R.id.fab_screen_add_text, R.id.fab_screen_add_pic, R.id.fab_screen_add_menu})
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.fab_screen_add_menu:
+                float textCurrent = mFabAddText.getTranslationY();
+                float picCurrent = mFabAddPic.getTranslationY();
+                mFabMenu.startAnimation(mFirstAddAnim);
+                int transY = DensityUtil.dp2px(getContext(), 60);
+                if (isMenuOpen){
+                    isMenuOpen=false;
+                    ObjectAnimator textAnim = ObjectAnimator//
+                            .ofFloat(mFabAddText, "translationY", textCurrent,transY)//
+                            .setDuration(500);//
+                    textAnim.start();
+
+                    ObjectAnimator picAnim = ObjectAnimator//
+                            .ofFloat(mFabAddPic, "translationY",  picCurrent,transY*2)//
+                            .setDuration(500);//
+                    picAnim.start();
+                }else {
+                    ObjectAnimator textAnim = ObjectAnimator//
+                            .ofFloat(mFabAddText, "translationY", textCurrent,-transY)//
+                            .setDuration(500);//
+                    textAnim.start();
+
+                    ObjectAnimator picAnim = ObjectAnimator//
+                            .ofFloat(mFabAddPic, "translationY", picCurrent,-transY*2)//
+                            .setDuration(500);//
+                    picAnim.start();
+                    isMenuOpen=true;
+                }
+
+
+                break;
             case R.id.fab_screen_add_text:
                 int size = mProgramList.size();
                 size++;
@@ -208,108 +364,5 @@ public class ScreenFragment extends Fragment implements View.OnClickListener ,Pr
                 mAdapter.notifyItemInserted(mProgramList.size());
                 break;
         }
-    }
-
-    private void readData() {
-        mRefreshAnim = AnimationUtils.loadAnimation(getContext(), R.anim.search_round);
-        mIvRefresh.startAnimation(mRefreshAnim);
-        ReadScreenDataUtil readUtil = new ReadScreenDataUtil(getActivity(), mHandler);
-        readUtil.startReadData();
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-
-        if (resultCode == RESULT_OK && requestCode == EASY_TEXT_REQUEST_CODE) {
-            String newProgramName = data.getStringExtra(Common.EX_newProGramName);
-            mProgramList.get(mProgramPosition).setProgramName(newProgramName);
-            mAdapter.notifyItemChanged(mProgramPosition);
-        }if (resultCode == TEXT_CONTENT_CHANGE_CODE && requestCode == EASY_TEXT_REQUEST_CODE) {
-            mAdapter.notifyItemChanged(mProgramPosition);
-        }
-        else if (resultCode == RESULT_OK && requestCode == ITEM_MANAGE_REQUEST_CODE) {
-
-            List<Program> list = ((App) getActivity().getApplication()).getDaoSession().getProgramDao().queryBuilder().list();
-
-            Program[] sortProgramList = new Program[list.size()];
-            for (int i = 0; i < list.size(); i++) {
-                sortProgramList[list.get(i).getSortNumber()] = list.get(i);
-            }
-            mProgramList.clear();
-            List<Program> programs = Arrays.asList(sortProgramList);
-
-            mProgramList.addAll(programs);
-            mAdapter.notifyDataSetChanged();
-        }
-    }
-
-    public void closeFabMenu(){
-        if (mFabMenu.isOpened()) {
-            mFabMenu.close(true);
-        }
-    }
-
-    public boolean isMenuClose(){
-        return mFabMenu.isOpened();
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        getActivity().getSharedPreferences(Global.SP_SCREEN_CONFIG,MODE_PRIVATE).unregisterOnSharedPreferenceChangeListener(mListener);
-    }
-
-    @Override
-    public void onClick(View v, int position) {
-        ProgramType programType = mProgramList.get(position).getProgramType();
-        if (programType == ProgramType.Pic) {
-            Intent intent = new Intent(getContext(), PhotoEditActivity.class);
-            intent.putExtra(Common.EX_programId, mProgramList.get(position).getId());
-            intent.putExtra(Common.EX_programName, mProgramList.get(position).getProgramName());
-            mProgramPosition = position;
-            startActivityForResult(intent, PHOTO_REQUEST_CODE);
-        } else if (programType == ProgramType.Text) {
-            Intent intent = new Intent(getContext(), EasyTextActivity.class);
-            intent.putExtra(Common.EX_programId, mProgramList.get(position).getId());
-            intent.putExtra(Common.EX_programName, mProgramList.get(position).getProgramName());
-            mProgramPosition = position;
-            startActivityForResult(intent, EASY_TEXT_REQUEST_CODE);
-        }
-    }
-
-    @Override
-    public void onLongClick(View v, final int position) {
-        mTitlePart = mProgramList.get(position).getProgramName();
-        new AlertDialog.Builder(getContext())
-                .setTitle(R.string.msg_delete_program)
-                .setMessage(getString(R.string.msg_confirm_delete)+mTitlePart)
-                .setPositiveButton(R.string.msg_confirm, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                        Program program = mProgramList.get(position);
-                        ((App) getActivity().getApplication()).getDaoSession().getProgramDao().delete(program);
-                        //删除一个节目后，要重新排序sortNum，不然会引发indexoutofbound,app就无法启动
-                        //2017/1/14 修复，由于之前重新排序的时候是所有屏幕的节目都重新排序，导致不该改变的屏幕的节目的sortnum都改变了，所以app无法启动
-                        int sortNumber = program.getSortNumber();
-                        for (Program program1 : mProgramList) {//在被删除的节目的sortnum后的，sortNUm都减一，保持队列
-                            if (program1.getSortNumber() > sortNumber) {
-                                int currentSortNum = program1.getSortNumber();
-                                currentSortNum--;
-                                program1.setSortNumber(currentSortNum);
-                            }
-                        }
-                        mProgramList.remove(position);
-                        ((App) getActivity().getApplication()).getDaoSession().getProgramDao().insertOrReplaceInTx(mProgramList);
-                        //删除文字
-                        List<TextContent> textContents = ((App) getActivity().getApplication()).getDaoSession().getTextContentDao().queryBuilder().where(TextContentDao.Properties.ProgramId.eq(program.getId())).list();
-                        ((App) getActivity().getApplication()).getDaoSession().getTextContentDao().deleteInTx(textContents);
-                        mAdapter.notifyItemRemoved(position);
-                        mAdapter.notifyDataSetChanged();
-                        Snackbar.make(mRecyclerView, getString(R.string.msg_deleted) + mTitlePart, Snackbar.LENGTH_LONG).show();
-                    }
-                })
-                .setNegativeButton(R.string.msg_cancle, null)
-                .show();
     }
 }

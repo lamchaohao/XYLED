@@ -45,5 +45,29 @@
             android:padding="10dp"
             android:layout_height="wrap_content"/>
     </LinearLayout>
+    <TextView
+        android:padding="5dp"
+        android:text="@string/brightness"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+    <LinearLayout
+        android:padding="3dp"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <ImageView
+            android:layout_gravity="center"
+            android:id="@+id/iv_set_brightness"
+            android:src="@drawable/ic_brightness_low_red_700_24dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <SeekBar
+            android:layout_gravity="center"
+            android:id="@+id/sb_set_brightness"
+            android:layout_weight="1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+    </LinearLayout>
 
 </LinearLayout>

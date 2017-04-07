@@ -150,7 +150,7 @@ public class DrawBitmapUtil3 {
             if (bitmap != null)
                 canvas.setBitmap(bitmap);
             //背景
-            drawBgColor(drawWidth,mHeight,canvas);
+            drawBgColor(tempWidth,mHeight,canvas);
             //文本
             switch (mTextEffect){
                 case Global.TEXT_EFFECT_MOVE_LEFT:

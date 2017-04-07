@@ -47,14 +47,14 @@
     <Button
         android:id="@+id/bt_setParam_enterSet"
         android:layout_margin="5dp"
-        android:background="@drawable/button_bg"
+        android:background="@drawable/sendbutton_bg"
         android:text="@string/screen_setting"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
     <Button
         android:id="@+id/bt_setParam_readback"
         android:layout_margin="5dp"
-        android:background="@drawable/button_bg"
+        android:background="@drawable/sendbutton_bg"
         android:text="@string/read_config"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>

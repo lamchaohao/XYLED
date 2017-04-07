@@ -29,6 +29,7 @@ import static cn.com.hotled.xyled.global.Global.WIFI_ERRO;
 
 public class SocketActivity extends BaseActivity implements View.OnClickListener{
 
+    private static final int RESET_COOLED = 333;
     @BindView(R.id.rv_message)
     RecyclerView mRecyclerView;
     @BindView(R.id.socket_test)
@@ -85,6 +86,8 @@ public class SocketActivity extends BaseActivity implements View.OnClickListener
                 mSendCmdUtil.sendCmd(SendCmdUtil.Cmd.Reset);
                 SocketMessage reSetMSG = new SocketMessage(getString(R.string.reset),System.currentTimeMillis(),true,false);
                 mMessageList.add(reSetMSG);
+                msgHandler.sendEmptyMessageDelayed(RESET_COOLED,1000);
+                btReset.setEnabled(false);
                 break;
             case R.id.socket_resume:
                 mSendCmdUtil.sendCmd(SendCmdUtil.Cmd.Resume);
@@ -111,6 +114,7 @@ public class SocketActivity extends BaseActivity implements View.OnClickListener
                     Bundle bundle = msg.getData();
                     String error1 = bundle.getString("error");
                     String message = "";
+
                     if (error1.contains("ECONNREFUSED")) {
                         message= getString(R.string.refuse_connect);//android.system.ErrnoException: connect failed: ECONNREFUSED (Connection refused)
                     }else {
@@ -143,6 +147,9 @@ public class SocketActivity extends BaseActivity implements View.OnClickListener
                     smsg=new SocketMessage(getString(R.string.resetSuccess),System.currentTimeMillis(),true,true);
                     mMessageList.add(smsg);
                     mAdapter.notifyItemInserted(mMessageList.size());
+                    break;
+                case RESET_COOLED:
+                    btReset.setEnabled(true);
                     break;
             }
             mAdapter.notifyDataSetChanged();

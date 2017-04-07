@@ -19,41 +19,39 @@
     </LinearLayout>
 
 
-    <com.github.clans.fab.FloatingActionMenu
-        android:id="@+id/fab_screen_menu"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    <FrameLayout
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
         android:layout_marginBottom="20dp"
         android:layout_marginRight="20dp"
-        app:menu_openDirection="up"
-        app:menu_colorNormal="@color/colorAccent"
-        app:menu_colorPressed="#E91E63"
-        app:menu_colorRipple="#99FFFFFF"
-        app:menu_labels_showAnimation="@anim/fab_slide_in_from_right"
-        app:menu_labels_hideAnimation="@anim/fab_slide_out_to_right">
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent">
 
-        <com.github.clans.fab.FloatingActionButton
+        <android.support.design.widget.FloatingActionButton
             android:id="@+id/fab_screen_add_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:fab_colorNormal="#43A047"
-            app:fab_colorPressed="#4CAF50"
-            app:fab_colorRipple="#99FFFFFF"
+            app:backgroundTint="#43A047"
+            app:rippleColor="#E0E0E0"
+            android:layout_gravity="bottom"
             android:src="@drawable/ic_text_fields_white_24dp"
-            app:fab_size="normal"
-            app:fab_label="@string/text_program" />
-        <com.github.clans.fab.FloatingActionButton
-            android:id="@+id/fab_screen_add_pic"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:fab_colorNormal="#FF5722"
-            app:fab_colorPressed="#E75043"
-            app:fab_colorRipple="#99FFFFFF"
+            android:layout_height="wrap_content"/>
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab_screen_add_pic"
+            app:backgroundTint="#FF5722"
+            app:rippleColor="#E0E0E0"
+            android:layout_gravity="bottom"
             android:src="@drawable/ic_photo_white_24dp"
-            app:fab_size="normal"
-            app:fab_label="@string/pic_program" />
-    </com.github.clans.fab.FloatingActionMenu>
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fab_screen_add_menu"
+            android:src="@drawable/ic_add_white_24dp"
+            android:layout_width="wrap_content"
+            android:layout_gravity="bottom"
+            android:layout_height="wrap_content"/>
+
+    </FrameLayout>
+
 
 </RelativeLayout>
