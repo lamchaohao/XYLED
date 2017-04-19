@@ -38,6 +38,9 @@ public class BaseAppCompatAtivity extends AppCompatActivity {
                 config.locale=Locale.SIMPLIFIED_CHINESE;
                 break;
             case 2:
+                config.locale=Locale.TRADITIONAL_CHINESE;
+                break;
+            case 3:
                 config.locale=Locale.ENGLISH;
                 break;
         }

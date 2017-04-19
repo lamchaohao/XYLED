@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -162,5 +163,11 @@ public class TraceSetActivity extends BaseActivity implements AdapterView.OnItem
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
 
+    }
+
+    @Override
+    public void onCreateCustomToolBar(Toolbar toolbar) {
+        super.onCreateCustomToolBar(toolbar);
+        toolbar.setTitle(R.string.trace_setting);
     }
 }

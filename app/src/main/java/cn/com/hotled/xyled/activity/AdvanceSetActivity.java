@@ -2,6 +2,7 @@ package cn.com.hotled.xyled.activity;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ImageView;
@@ -106,5 +107,11 @@ public class AdvanceSetActivity extends BaseActivity implements AdapterView.OnIt
     @Override
     public void onStopTrackingTouch(SeekBar seekBar) {
         mEditor.putInt(Global.KEY_BRIGHTNESS, mProgress).apply();
+    }
+
+    @Override
+    public void onCreateCustomToolBar(Toolbar toolbar) {
+        super.onCreateCustomToolBar(toolbar);
+        toolbar.setTitle(R.string.advance_setting);
     }
 }

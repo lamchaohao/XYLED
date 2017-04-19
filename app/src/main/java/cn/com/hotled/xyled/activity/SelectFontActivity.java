@@ -35,7 +35,7 @@ public class SelectFontActivity extends BaseActivity {
         File[] files = file.listFiles();
         File downloadFontDir = new File(Environment.getExternalStorageDirectory()+Common.FL_FONTS_FOLDER);
         if (!downloadFontDir.exists()){
-            downloadFontDir.mkdir();
+            downloadFontDir.mkdirs();
         }
         File[] downloadFonts = downloadFontDir.listFiles();
         mFileList = new ArrayList<>();

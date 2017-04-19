@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -113,11 +114,12 @@ public class PhotoEditActivity extends BaseActivity implements SeekBar.OnSeekBar
     }
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.i("activityResult","requestCode="+requestCode+",resultCode="+resultCode);
         if (resultCode == RESULT_OK && requestCode == REQUEST_CHOOSE_PIC) {
             UCrop.Options options = new UCrop.Options();
             options.setCompressionFormat(Bitmap.CompressFormat.PNG);
             options.setCompressionQuality(100);
-
+            Log.i("activityResult","UCrop=");
             UCrop uCrop = UCrop.of(data.getData(), Uri.parse(data.toURI()));
             uCrop = uCrop.withOptions(options);
             uCrop.start(this);
@@ -125,6 +127,7 @@ public class PhotoEditActivity extends BaseActivity implements SeekBar.OnSeekBar
         }
         if (resultCode == RESULT_OK && requestCode == UCrop.REQUEST_CROP) {
             Uri resultUri = UCrop.getOutput(data);
+            Log.i("activityResult","REQUEST_CROP=");
             Bitmap bitmap = BitmapFactory.decodeFile(resultUri.getPath());
             Bitmap bitmap1 = resizeBitmap(bitmap, mScreenWidth, mScreenHeight);
             String destinationFileName="";

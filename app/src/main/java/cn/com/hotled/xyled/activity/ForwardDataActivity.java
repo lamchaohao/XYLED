@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -136,6 +137,7 @@ public class ForwardDataActivity extends BaseActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.i("activityResult","requestCode="+requestCode+",resultCode="+resultCode);
         if (resultCode == RESULT_OK && requestCode == SELECT_FILE) {
             isCopyCompleted=false;
             String path = Uri.decode(data.getDataString());
@@ -243,5 +245,9 @@ public class ForwardDataActivity extends BaseActivity {
 
     }
 
+    @Override
+    public void onCreateCustomToolBar(Toolbar toolbar) {
+        toolbar.setTitle(R.string.forward_framPC);
+    }
 
 }

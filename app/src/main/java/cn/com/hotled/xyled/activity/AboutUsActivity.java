@@ -7,7 +7,7 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
+import android.support.v7.widget.Toolbar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -34,6 +34,12 @@ public class AboutUsActivity extends BaseActivity {
     private static final int IS_LATEST = 200;
     String mResult;
     UpdateInfo mUpdateInfo;
+    @BindView(R.id.tv_update_check)
+    TextView mTvUpdateCheck;
+    @BindView(R.id.tv_current_version)
+    TextView mTvCurrentVersion;
+
+
     Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -42,28 +48,25 @@ public class AboutUsActivity extends BaseActivity {
                     showAlertDialog();
                     break;
                 case IS_LATEST:
-                    Toast.makeText(AboutUsActivity.this, "你的版本已是最新版", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(AboutUsActivity.this, R.string.lastest, Toast.LENGTH_SHORT).show();
                     break;
             }
         }
     };
-    @BindView(R.id.tv_update_check)
-    TextView mTvUpdateCheck;
-    @BindView(R.id.tv_current_version)
-    TextView mTvCurrentVersion;
+
 
     private void showAlertDialog() {
         new AlertDialog.Builder(this)
-                .setTitle("发现新版本")
+                .setTitle(getString(R.string.foundNew)+mUpdateInfo.version)
                 .setMessage(mUpdateInfo.whatsNews)
-                .setPositiveButton("赶紧升级", new DialogInterface.OnClickListener() {
+                .setPositiveButton(R.string.download, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        Toast.makeText(AboutUsActivity.this, "开始下载更新", Toast.LENGTH_SHORT).show();
-                        UpdateUtil.download(AboutUsActivity.this, mUpdateInfo.downloadUrl, "led新版本");
+                        Toast.makeText(AboutUsActivity.this, R.string.startDownload, Toast.LENGTH_SHORT).show();
+                        UpdateUtil.download(AboutUsActivity.this, mUpdateInfo.downloadUrl, mUpdateInfo.name);
                     }
                 })
-                .setNegativeButton("忽略", null)
+                .setNegativeButton(R.string.ignore, null)
                 .show();
     }
 
@@ -78,16 +81,17 @@ public class AboutUsActivity extends BaseActivity {
     private void setVersion() {
         try {
             PackageInfo packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
-            mTvCurrentVersion.setText("版本"+packageInfo.versionName);
+            mTvCurrentVersion.setText(getString(R.string.version)+packageInfo.versionName);
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
         }
     }
 
+
     private void connectServer() {
         HttpURLConnection conn = null;
         try {
-            URL url = new URL("http://192.168.1.106:8080/update/updateInfo.json");
+            URL url = new URL("http://www.hotled.com.cn/download/android/updateInfo.json");
             conn = (HttpURLConnection) url.openConnection();
 
             conn.setDoOutput(true);
@@ -99,9 +103,7 @@ public class AboutUsActivity extends BaseActivity {
             conn.setRequestProperty("Content-type", "text/html");
             conn.connect();
             int responseCode = conn.getResponseCode();
-            byte[] result = new byte[512];
             if (responseCode == conn.HTTP_OK) {
-                Log.i("update", responseCode + "");
                 InputStream inputStream = conn.getInputStream();
                 BufferedReader in = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
                 StringBuffer buffer = new StringBuffer();
@@ -111,17 +113,12 @@ public class AboutUsActivity extends BaseActivity {
                 }
                 mResult = buffer.toString();
 
-                Log.i("update", buffer.toString());
                 JSONObject jsonObject = new JSONObject(buffer.toString());
-                int version = jsonObject.getInt("version");
+                String version = jsonObject.getString("versionName");
                 String name = jsonObject.getString("name");
                 String downloadUrl = jsonObject.getString("url");
-                String whatsnew = jsonObject.getString("whatsnew");
+                String whatsnew = jsonObject.getString("whatsNew");
                 mUpdateInfo = new UpdateInfo(version, name, downloadUrl, whatsnew);
-                Log.i("update", "version=" + version);
-                Log.i("update", "name=" + name);
-                Log.i("update", "downloadUrl=" + downloadUrl);
-                Log.i("update", "whatsnew=" + whatsnew);
                 boolean needToUpdate = compareVersion(version);
                 if (needToUpdate) {
                     mHandler.sendEmptyMessage(UPDATE_CODE);
@@ -136,18 +133,15 @@ public class AboutUsActivity extends BaseActivity {
         } catch (JSONException e) {
             e.printStackTrace();
         } finally {
-            conn.disconnect();
-            Log.i("update", "conn.disconnect()");
+            if (conn!=null)
+                conn.disconnect();
         }
     }
 
-
-    private boolean compareVersion(int versionCode) {
+    private boolean compareVersion(String versionName) {
         try {
             PackageInfo packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
-            Log.i("about", "version=" + packageInfo.versionCode);
-            Log.i("about", "versionName=" + packageInfo.versionName);
-            if (versionCode > packageInfo.versionCode) {
+            if (!versionName.equals(packageInfo.versionName)){
                 return true;
             }
 
@@ -156,6 +150,7 @@ public class AboutUsActivity extends BaseActivity {
         }
         return false;
     }
+
 
     @OnClick(R.id.tv_update_check)
     public void onClick() {
@@ -167,18 +162,24 @@ public class AboutUsActivity extends BaseActivity {
         }).start();
     }
 
+
     class UpdateInfo {
-        int version;
+        String version;
         String name;
         String downloadUrl;
         String whatsNews;
 
-        public UpdateInfo(int version, String name, String downloadUrl, String whatsNews) {
+        public UpdateInfo(String version, String name, String downloadUrl, String whatsNews) {
             this.version = version;
             this.name = name;
             this.downloadUrl = downloadUrl;
             this.whatsNews = whatsNews;
         }
 
+    }
+
+    @Override
+    public void onCreateCustomToolBar(Toolbar toolbar) {
+        toolbar.setTitle(R.string.about);
     }
 }

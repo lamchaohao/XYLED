@@ -7,6 +7,7 @@ import android.os.Message;
 import android.provider.Settings;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
@@ -157,4 +158,8 @@ public class SocketActivity extends BaseActivity implements View.OnClickListener
         }
     }
 
+    @Override
+    public void onCreateCustomToolBar(Toolbar toolbar) {
+        toolbar.setTitle(R.string.test_connet);
+    }
 }

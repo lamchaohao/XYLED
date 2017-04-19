@@ -15,6 +15,7 @@ import butterknife.OnClick;
 import cn.com.hotled.xyled.R;
 import cn.com.hotled.xyled.util.communicate.ReadScreenDataUtil;
 
+import static cn.com.hotled.xyled.global.Global.READ_CONFIG_CODE;
 import static cn.com.hotled.xyled.global.Global.READ_FAILE;
 import static cn.com.hotled.xyled.global.Global.READ_SUCCESS;
 import static cn.com.hotled.xyled.global.Global.WIFI_ERRO;
@@ -25,7 +26,6 @@ public class SetParamsHelpDiagActivity extends Activity {
     Button mBtSetParamEnterSet;
     @BindView(R.id.bt_setParam_readback)
     Button mBtSetParamReadback;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,8 +40,8 @@ public class SetParamsHelpDiagActivity extends Activity {
                 startActivity(new Intent(this, SettingActivity.class));
                 break;
             case R.id.bt_setParam_readback:
-                ReadScreenDataUtil readUtil = new ReadScreenDataUtil(this, mHandler);
-                readUtil.startReadData();
+
+                mHandler.sendEmptyMessageDelayed(READ_CONFIG_CODE,3000);
                 Toast.makeText(this,R.string.tos_reading,Toast.LENGTH_LONG).show();
                 break;
         }
@@ -59,6 +59,10 @@ public class SetParamsHelpDiagActivity extends Activity {
                     break;
                 case READ_FAILE:
                     Toast.makeText(SetParamsHelpDiagActivity.this, R.string.tos_screen_noresponse, Toast.LENGTH_SHORT).show();
+                    break;
+                case READ_CONFIG_CODE:
+                    ReadScreenDataUtil readUtil = new ReadScreenDataUtil(SetParamsHelpDiagActivity.this, mHandler);
+                    readUtil.startReadData();
                     break;
             }
         }

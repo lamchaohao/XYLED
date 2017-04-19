@@ -229,4 +229,5 @@ public class WelcomeActivity extends BaseAppCompatAtivity {
             }
         }
     }
+
 }

@@ -44,11 +44,9 @@ import cn.com.hotled.xyled.global.Global;
 import cn.com.hotled.xyled.receiver.WiFiReceiver;
 import cn.com.hotled.xyled.util.android.DensityUtil;
 import cn.com.hotled.xyled.util.android.WifiAdmin;
-import cn.com.hotled.xyled.util.communicate.SendCmdUtil;
 
 import static cn.com.hotled.xyled.global.Global.CONNECT_TIMEOUT;
 import static cn.com.hotled.xyled.global.Global.JUST_STOP_ANIM;
-import static cn.com.hotled.xyled.global.Global.SEND_TEST;
 import static cn.com.hotled.xyled.global.Global.UPDATE_NETWORK_INFO;
 import static cn.com.hotled.xyled.global.Global.WIFI_AVAILABLE_ACTION;
 import static cn.com.hotled.xyled.global.Global.WIFI_DISABLE;
@@ -79,7 +77,6 @@ public class ConnectCardActivity extends BaseActivity implements ConnectAdapter.
     private ConnectAdapter mConnectAdapter;
     private WiFiReceiver mWiFiReceiver;
     private static final int REQUST_LOCATION_PERMISSION_CODE = 301;
-
     private long mOldTime;
 
     @Override
@@ -100,13 +97,13 @@ public class ConnectCardActivity extends BaseActivity implements ConnectAdapter.
         mConnectAdapter = new ConnectAdapter(this, mWifiList, mWifiAdmin);
         mRvConnectWifi.setAdapter(mConnectAdapter);
         mConnectAdapter.setItemOnClickListener(this);
-        refreshWifiAndState();
+        updateView();
     }
 
     private void loadData() {
         mWifiAdmin = new WifiAdmin(this);
         mWifiList = new ArrayList<>();
-        List<ScanResult> scanResults = mWifiAdmin.startScan();
+        List<ScanResult> scanResults = mWifiAdmin.mWifiManager.getScanResults();
         for (ScanResult scanResult : scanResults) {
             boolean startFlag = scanResult.SSID.startsWith(Global.SSID_START);
             boolean endFlag = scanResult.SSID.endsWith(Global.SSID_END);
@@ -114,7 +111,6 @@ public class ConnectCardActivity extends BaseActivity implements ConnectAdapter.
                 mWifiList.add(scanResult);
             }
         }
-
     }
 
     private void registerWifiReciver() {
@@ -124,29 +120,32 @@ public class ConnectCardActivity extends BaseActivity implements ConnectAdapter.
         intentFilter.addAction(WifiManager.WIFI_STATE_CHANGED_ACTION); // ConnectivityManager.CONNECTIVITY_ACTION);
         intentFilter.setPriority(Integer.MAX_VALUE); // 设置优先级，最高为1000
         mWiFiReceiver = new WiFiReceiver(connHandler);
-        registerReceiver(mWiFiReceiver,intentFilter);
+        registerReceiver(mWiFiReceiver, intentFilter);
     }
 
 
-
-    private void refreshWifiAndState() {
+    private void refreshWifiList() {
         long currentTime = System.currentTimeMillis();
-        if (!(currentTime-mOldTime>5000)){
+        if ((currentTime-mOldTime<2000)){
             return;
         }
         mOldTime = currentTime;
 
-        List<ScanResult> scanResults = mWifiAdmin.startScan();
+        List<ScanResult> scanResults = mWifiAdmin.mWifiManager.getScanResults();
         mWifiList.clear();
         for (ScanResult scanResult : scanResults) {
             boolean startFlag = scanResult.SSID.startsWith(Global.SSID_START);
             boolean endFlag = scanResult.SSID.endsWith(Global.SSID_END);
             if (startFlag&&endFlag){
                 mWifiList.add(scanResult);
+                mConnectAdapter.notifyItemInserted(mWifiList.size());
             }
         }
         mConnectAdapter.notifyDataSetChanged();
+        updateView();
+    }
 
+    private void updateView(){
         String ssid = mWifiAdmin.getWifiInfo().getSSID();
         boolean startFlag = ssid.contains(Global.SSID_START);
         boolean endFlag = ssid.contains(Global.SSID_END);
@@ -163,6 +162,7 @@ public class ConnectCardActivity extends BaseActivity implements ConnectAdapter.
 
         String result=getString(R.string.search_result)+mWifiList.size();
         mTvCheckResult.setText(result);
+        mConnectAdapter.notifyDataSetChanged();
     }
 
     private Handler connHandler = new Handler() {
@@ -172,10 +172,6 @@ public class ConnectCardActivity extends BaseActivity implements ConnectAdapter.
                 case JUST_STOP_ANIM:
                     mInsideAnim.cancel();
                     break;
-                case SEND_TEST:
-                    SendCmdUtil sendCmdUtil = new SendCmdUtil(ConnectCardActivity.this,connHandler);
-                    sendCmdUtil.sendCmd(SendCmdUtil.Cmd.Test);
-                    break;
                 case WIFI_ERRO:
                     startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
                     Toast.makeText(ConnectCardActivity.this, R.string.tos_wifi_switch, Toast.LENGTH_LONG).show();
@@ -184,15 +180,15 @@ public class ConnectCardActivity extends BaseActivity implements ConnectAdapter.
                     Toast.makeText(ConnectCardActivity.this, R.string.tos_wifi_timeout, Toast.LENGTH_LONG).show();
                     break;
                 case WIFI_AVAILABLE_ACTION:
-                    refreshWifiAndState();
+                    refreshWifiList();
                     break;
                 case WIFI_DISABLE:
-                    refreshWifiAndState();
+                    refreshWifiList();
                     mTvState.setText(R.string.msg_wifi_disable);
                     mConnectAdapter.notifyDataSetChanged();
                     break;
                 case WIFI_ENABLED:
-                    refreshWifiAndState();
+                    refreshWifiList();
                     break;
                 case UPDATE_NETWORK_INFO:
                     NetworkInfo networkInfo = msg.getData().getParcelable(Global.EXTRA_NETWORKSTATE);
@@ -200,7 +196,7 @@ public class ConnectCardActivity extends BaseActivity implements ConnectAdapter.
                         if (networkInfo.getState().equals(NetworkInfo.State.CONNECTED)) {
                             mTvState.setText(getString(R.string.connected) + mWifiAdmin.getWifiInfo().getSSID());
                             mTvTip.setText(R.string.connected);
-                            sendTestCmd();
+                            updateView();
                             connHandler.sendEmptyMessageDelayed(JUST_STOP_ANIM,3000);
                         } else if (networkInfo.getState().equals(NetworkInfo.State.CONNECTING)) {
                             mTvState.setText(R.string.connecting);
@@ -212,8 +208,6 @@ public class ConnectCardActivity extends BaseActivity implements ConnectAdapter.
                             mTvState.setText(R.string.disconnect);
                             mTvTip.setText(R.string.disconnect);
                         }
-                        // 刷新状态显示
-                        refreshWifiAndState();
                     }
                     break;
             }
@@ -224,8 +218,8 @@ public class ConnectCardActivity extends BaseActivity implements ConnectAdapter.
     private void roundInsideOnclick() {
 
         if (mWifiList.size()==1){
-            refreshWifiAndState();
-            if (mWifiAdmin.getWifiInfo().getSSID().equals("\""+mWifiList.get(0).SSID+"\"")){
+            refreshWifiList();
+            if (mWifiList.get(0)==null||mWifiAdmin.getWifiInfo().getSSID().equals("\""+mWifiList.get(0).SSID+"\"")){
                 return;
             }
             mIvRound.startAnimation(mInsideAnim);
@@ -239,7 +233,7 @@ public class ConnectCardActivity extends BaseActivity implements ConnectAdapter.
         }else {
             if (mWifiAdmin.checkWifiState()) {
                 mIvRound.startAnimation(mInsideAnim);
-                refreshWifiAndState();
+                refreshWifiList();
                 connHandler.sendEmptyMessageDelayed(JUST_STOP_ANIM,3000);
             }else {
                 startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
@@ -269,15 +263,6 @@ public class ConnectCardActivity extends BaseActivity implements ConnectAdapter.
         unregisterReceiver(mWiFiReceiver);//取消监听广播
     }
 
-    private void sendTestCmd() {
-        String ssid = mWifiAdmin.getWifiInfo().getSSID();
-        boolean startFlag = ssid.contains(Global.SSID_START);
-        boolean endFlag = ssid.contains(Global.SSID_END);
-        if (startFlag&&endFlag){
-           connHandler.sendEmptyMessageDelayed(SEND_TEST,2000);
-        }
-
-    }
 
     @Override
     public void onItemClick(View view, int position) {
@@ -316,11 +301,11 @@ public class ConnectCardActivity extends BaseActivity implements ConnectAdapter.
                 String[] permissions = {Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION};
                 ActivityCompat.requestPermissions(this, permissions, REQUST_LOCATION_PERMISSION_CODE);
                 //用户授权的结果会回调到FragmentActivity的onRequestPermissionsResult
-                loadData();
             }
         }else {
             //已经拥有授权
             loadData();
+            initView();
         }
     }
     @Override
@@ -329,9 +314,9 @@ public class ConnectCardActivity extends BaseActivity implements ConnectAdapter.
         if (grantResults.length > 0
                 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             loadData();
+            initView();
         } else {
             // 权限拒绝了
-            loadData();
             Toast.makeText(this, R.string.tos_request_permission, Toast.LENGTH_SHORT).show();
             startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
         }

@@ -40,6 +40,7 @@ public class SelectLanguageActivity extends BaseActivity {
         List<String> languages = new ArrayList<>();
         languages.add(getString(R.string.auto));
         languages.add("简体中文");
+        languages.add("繁体中文");
         languages.add("English");
         LanguageAdapter adapter = new LanguageAdapter(languages, this,langPos);
         recyclerView.setAdapter(adapter);
@@ -54,6 +55,7 @@ public class SelectLanguageActivity extends BaseActivity {
     @Override
     public void onCreateCustomToolBar(Toolbar toolbar) {
         Button btSave=new Button(this);
+        toolbar.setTitle(R.string.language_setting);
         Toolbar.LayoutParams prams =new Toolbar.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         prams.gravity= Gravity.RIGHT;
         prams.rightMargin= DensityUtil.dp2px(this,10);
@@ -69,4 +71,5 @@ public class SelectLanguageActivity extends BaseActivity {
         btSave.setText(R.string.save);
         toolbar.addView(btSave,prams);
     }
+
 }

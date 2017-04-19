@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.design.widget.Snackbar;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -148,4 +149,8 @@ public class RemoteActivity extends BaseActivity {
         TextView programTextView;
     }
 
+    @Override
+    public void onCreateCustomToolBar(Toolbar toolbar) {
+        toolbar.setTitle(R.string.remote_switch);
+    }
 }

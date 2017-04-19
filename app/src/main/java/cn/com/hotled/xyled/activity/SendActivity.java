@@ -101,6 +101,10 @@ public class SendActivity extends BaseActivity {
                     isGeningFile = false;
                     mPbSend.setVisibility(View.GONE);
                     mBtSend.setEnabled(true);
+                    File colorFile=new File(getFilesDir()+ Common.FL_COLOR_PRG);
+                    long length = colorFile.length();
+                    length /=1024;
+                    mTvFileInfo.setText(getString(R.string.file_size)+length+"KB");
                     Toast.makeText(SendActivity.this,R.string.tos_genAndSend,Toast.LENGTH_SHORT).show();
                     if (!isSending&&fileReady) {
                         send();
@@ -122,6 +126,7 @@ public class SendActivity extends BaseActivity {
     private Button mBtSend;
     private boolean isGeningFile;
     private SendDataUtil mDataUtil;
+    private TextView mTvFileInfo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -175,6 +180,7 @@ public class SendActivity extends BaseActivity {
         mSendRound = (ImageView) findViewById(R.id.iv_send_round);
         msendRoundOutside = (ImageView) findViewById(R.id.iv_send_round_outside);
         mTvStatus = (TextView) findViewById(R.id.tv_progress_tip);
+        mTvFileInfo = (TextView) findViewById(R.id.tv_send_file);
         mSendProgress = (TextView) findViewById(R.id.tv_send_progress);
         mSendAnim = AnimationUtils.loadAnimation(this, R.anim.search_round);
         mSendOutsideAnim = AnimationUtils.loadAnimation(this, R.anim.anti_clock);

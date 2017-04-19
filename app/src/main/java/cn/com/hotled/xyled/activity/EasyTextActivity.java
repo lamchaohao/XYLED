@@ -200,8 +200,6 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
             float stayTime = mProgram.getStayTime();
             tv_showSpeed.setText(String.valueOf((int) frameTime));
             tv_showStaytime.setText(String.valueOf((int)stayTime));
-            frameTime --;
-            frameTime *= 4;
             stayTime *= 10;
             sb_speed.setProgress((int) frameTime);
             sb_stayTime.setProgress((int) stayTime);
@@ -220,9 +218,8 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
 
                 mBt_textSize.setText(String.valueOf(mTextContent.getTextSize()));
                 if (mTextContent.getTypeface()!=null) {
-                    int lastIndexOf = mTextContent.getTypeface().getName().lastIndexOf(".");
-                    String fontFile = mTextContent.getTypeface().getName().substring(0, lastIndexOf);
-                    mBt_setFont.setText(fontFile);
+                    String easyName = dealFileName(mTextContent.getTypeface().getName());
+                    mBt_setFont.setText(easyName);
                 }
                 if (mTextContent.getIsbold()) {
                     ib_setBold.setBackgroundResource(R.drawable.recycler_bg_select);
@@ -654,9 +651,8 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
             File fontFile = new File(fileName);
             if (fontFile.exists()){
                 mTextContent.setTypeface(fontFile);
-                int lastIndexOf = fontFile.getName().lastIndexOf(".");
-                String fontFileName = fontFile.getName().substring(0, lastIndexOf);
-                mBt_setFont.setText(fontFileName);
+                String easyName = dealFileName(fontFile.getName());
+                mBt_setFont.setText(easyName);
                 drawText();
             }
         }
@@ -781,7 +777,7 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
 
         switch (seekBar.getId()) {
             case R.id.sb_fgText_speed:
-                int speed = progress/4+1;
+                int speed = progress;
                 tv_showSpeed.setText(String.valueOf(speed));
                 mProgram.setFrameTime(speed);
                 break;
@@ -809,5 +805,31 @@ public class EasyTextActivity extends BaseActivity implements View.OnClickListen
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
         mTextContent.setIsTextReverse(isChecked);
         drawText();
+    }
+
+    private String dealFileName(String fileName) {
+        if (fileName.contains("-Regular")){
+            //2.get lastIndexof -Regular
+            int lastIndexOf = fileName.lastIndexOf("-Regular");
+            //3.substring
+            String substring=null;
+            if (lastIndexOf!=-1){
+                substring = fileName.substring(0, lastIndexOf);
+                return substring;
+            }else {
+                return fileName;
+            }
+        }else {
+            int lastIndexOf = fileName.lastIndexOf(".");
+            //3.substring
+            String substring=null;
+            if (lastIndexOf!=-1){
+                substring = fileName.substring(0, lastIndexOf);
+                return substring;
+            }else {
+                return fileName;
+            }
+        }
+
     }
 }
