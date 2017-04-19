@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_connected_send_setting"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="cn.com.hotled.xyled.activity.ConnectedSendSettingActivity">
+
+    <TextView
+        android:textSize="18sp"
+        android:layout_margin="8dp"
+        android:text="@string/autoDisplay_state"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+    <RadioGroup
+        android:id="@+id/rg_auto"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <RadioButton
+            android:id="@+id/rb_auto_send"
+            android:text="@string/autoSend"
+            android:textSize="18sp"
+            android:padding="8dp"
+            android:background="@drawable/recycler_bg"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+        <RadioButton
+            android:id="@+id/rb_auto_notSend"
+            android:text="@string/autoNotSend"
+            android:textSize="18sp"
+            android:padding="8dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/recycler_bg"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+    </RadioGroup>
+
+
+</LinearLayout>

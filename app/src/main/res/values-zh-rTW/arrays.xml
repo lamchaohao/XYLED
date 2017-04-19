@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="textEffect">
-        <item>连续左移</item>
-        <item>连续右移</item>
-        <item>立刻出现并左移</item>
-        <item>立刻出现并右移</item>
-        <item>静态(固定)显示</item>
+        <item>左移</item>
+        <item>右移</item>
+        <item>立刻出現並左移</item>
+        <item>立刻出現並右移</item>
+        <item>靜態(固定)顯示</item>
         <item>上移</item>
         <item>下移</item>
     </string-array>
 
     <array name="flowEffect">
-        <item>顺时针</item>
-        <item>逆时针</item>
+        <item>順時針</item>
+        <item>逆時針</item>
     </array>
     <array name="flowSpeed">
-        <item>静 止</item>
+        <item>靜 止</item>
         <item>速度 1</item>
         <item>速度 2</item>
         <item>速度 3</item>
@@ -29,7 +29,7 @@
     </array>
     
     <array name="space_trace">
-        <item>全部点距</item>
+        <item>全部點距</item>
         <item>P1.8</item>
         <item>P2</item>
         <item>P3</item>
@@ -44,7 +44,7 @@
         <item>P20</item>
     </array>
     <array name="scan_trace">
-        <item>全部扫描</item>
+        <item>全部掃描</item>
         <item>Scan 1</item>
         <item>Scan 2</item>
         <item>Scan 3</item>
@@ -77,13 +77,17 @@
         <item>0-右到左(横)</item>
         <item>1----------</item>
         <item>2----------</item>
-        <item>3-上到下(竖)</item>
+        <item>3-上到下(豎)</item>
     </string-array>
     <string-array name="pref_special">
-        <item>无</item>
-        <item>链接增高(板高8)</item>
-        <item>链接增高(板高16)</item>
-        <item>链接增高(板高32)</item>
+        <item>無</item>
+        <item>交叉增高(8*8)</item>
+        <item>交叉增高(16*8)</item>
+        <item>交叉增高(16*16)</item>
+        <item>交叉增高(32*16)</item>
+        <item>交叉增高(32*32)</item>
+        <item>鏈接增高(H:16)</item>
+        <item>鏈接增高(H:32)</item>
     </string-array>
     <string-array name="pref_rgbSequence">
         <item>R-G-B</item>
@@ -103,9 +107,9 @@
     </array>
 
     <string-array name="pref_138code">
-        <item>0-有138行译码</item>
-        <item>1-无138行译码</item>
-        <item>2-使用595逐行扫描</item>
+        <item>0-有138行譯碼</item>
+        <item>1-無138行譯碼</item>
+        <item>2-使用595逐行掃描</item>
     </string-array>
 
 </resources>

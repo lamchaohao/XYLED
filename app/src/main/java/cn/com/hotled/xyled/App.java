@@ -23,6 +23,7 @@ public class App extends Application {
         mDb = ENCRYPTED ? helper.getEncryptedWritableDb("super-secret") : helper.getWritableDb();
 
         daoSession = new DaoMaster(mDb).newSession();
+
     }
 
     public DaoSession getDaoSession() {

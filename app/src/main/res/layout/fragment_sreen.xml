@@ -27,28 +27,72 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent">
 
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fab_screen_add_text"
-            app:backgroundTint="#43A047"
-            app:rippleColor="#E0E0E0"
-            android:layout_gravity="bottom"
-            android:src="@drawable/ic_text_fields_white_24dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-
-        <android.support.design.widget.FloatingActionButton
+        <RelativeLayout
             android:id="@+id/fab_screen_add_pic"
-            app:backgroundTint="#FF5722"
-            app:rippleColor="#E0E0E0"
-            android:layout_gravity="bottom"
-            android:src="@drawable/ic_photo_white_24dp"
+            android:layout_gravity="bottom|end"
+            android:orientation="horizontal"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content">
+            <TextView
+                android:id="@+id/tv_lable_pic"
+                android:text="@string/pic_program"
+                android:textColor="#FFFFFF"
+                android:visibility="gone"
+                android:background="@drawable/black_rectangle"
+                android:layout_marginRight="8dp"
+                android:layout_marginBottom="5dp"
+                android:padding="5dp"
+                android:layout_centerVertical="true"
+                android:layout_gravity="bottom"
+                android:gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+            <android.support.design.widget.FloatingActionButton
+                app:backgroundTint="#FF5722"
+                app:rippleColor="#E0E0E0"
+                app:elevation="0dp"
+                android:layout_toRightOf="@id/tv_lable_pic"
+                android:layout_gravity="bottom"
+                android:src="@drawable/ic_photo_white_24dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/fab_screen_add_text"
+            android:layout_gravity="bottom|end"
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+            <TextView
+                android:id="@+id/tv_lable_text"
+                android:text="@string/text_program"
+                android:textColor="#FFFFFF"
+                android:visibility="gone"
+                android:background="@drawable/black_rectangle"
+                android:layout_marginRight="8dp"
+                android:layout_marginBottom="5dp"
+                android:padding="5dp"
+                android:layout_centerVertical="true"
+                android:layout_gravity="bottom"
+                android:gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+            <android.support.design.widget.FloatingActionButton
+                app:backgroundTint="#43A047"
+                app:rippleColor="#E0E0E0"
+                app:elevation="0dp"
+                android:layout_toRightOf="@id/tv_lable_text"
+                android:src="@drawable/ic_text_fields_white_24dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+        </RelativeLayout>
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/fab_screen_add_menu"
             android:src="@drawable/ic_add_white_24dp"
+            app:elevation="0dp"
+            android:layout_gravity="bottom|end"
             android:layout_width="wrap_content"
-            android:layout_gravity="bottom"
             android:layout_height="wrap_content"/>
 
     </FrameLayout>

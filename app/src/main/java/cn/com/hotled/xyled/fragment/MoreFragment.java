@@ -15,6 +15,7 @@ import butterknife.OnClick;
 import cn.com.hotled.xyled.R;
 import cn.com.hotled.xyled.activity.AboutUsActivity;
 import cn.com.hotled.xyled.activity.CheckScreenActivity;
+import cn.com.hotled.xyled.activity.ConnectedSendSettingActivity;
 import cn.com.hotled.xyled.activity.ForwardDataActivity;
 import cn.com.hotled.xyled.activity.UseGuideActivity;
 
@@ -41,11 +42,14 @@ public class MoreFragment extends Fragment {
         return view;
     }
 
-    @OnClick({R.id.tv_more_search, R.id.tv_more_sendFromComputer, R.id.tv_more_help, R.id.tv_more_about})
+    @OnClick({R.id.tv_more_search,R.id.tv_more_autoSend, R.id.tv_more_sendFromComputer, R.id.tv_more_help, R.id.tv_more_about})
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.tv_more_search:
                 startActivity(new Intent(getContext(), CheckScreenActivity.class));
+                break;
+            case R.id.tv_more_autoSend:
+                startActivity(new Intent(getContext(), ConnectedSendSettingActivity.class));
                 break;
             case R.id.tv_more_sendFromComputer:
                 startActivity(new Intent(getContext(), ForwardDataActivity.class));

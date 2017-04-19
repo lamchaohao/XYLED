@@ -61,6 +61,8 @@ public class MoveDown extends BaseTimeAxis{
         int downIndicator = mVerticalAddressIndicator;
         //文字属性地址
         float frameTime =  mProgram.getFrameTime();
+        frameTime++;
+        frameTime*=1.28;
         for (int i = frameOfThisProgram-1; i >= 0; i--) {
             int tempTextAddress = textContentAddressInt + horizontalLength;
             //文字地址

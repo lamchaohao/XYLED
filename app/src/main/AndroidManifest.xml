@@ -101,6 +101,8 @@
         </activity>
         <activity android:name=".activity.ConnectCardActivity">
         </activity>
+        <activity android:name=".activity.ConnectedSendSettingActivity">
+        </activity>
     </application>
 
 </manifest>

@@ -39,6 +39,7 @@ public class Global {
     public static final String KEY_BATH="batH";
     public static final String KEY_BATW="batW";
     public static final String KEY_DOWNLOAD_ID="apk_downloadId";
+    public static final String KEY_AUTO_SEND="auto_send_test";
 
     //----------extra for activityResult------------
 
@@ -70,7 +71,7 @@ public class Global {
     public static final int RESUME_OK = 13202;
     public static final int RESET_OK = 13203;
     public static final int FILE_ILLEGAL = 13400;
-
+    public static final int READ_CONFIG_CODE=13500;
 
     public static final int WIFI_AVAILABLE_ACTION = 8001;
     public static final int WIFI_DISABLE = 8002;

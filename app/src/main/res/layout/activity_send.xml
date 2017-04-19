@@ -52,14 +52,28 @@
         android:text="@string/tos_wait"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
-    <TextView
-        android:text="@string/tos_press_send"
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_marginBottom="60dp"
         android:layout_centerHorizontal="true"
         android:layout_alignParentBottom="true"
-        android:gravity="center"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:id="@+id/tv_send_file"
+            android:layout_marginBottom="20dp"
+            android:gravity="center"
+            android:textColor="@color/colorAccent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <TextView
+            android:text="@string/tos_press_send"
+            android:gravity="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+
+
     <Button
         android:id="@+id/bt_send_send"
         android:layout_centerHorizontal="true"

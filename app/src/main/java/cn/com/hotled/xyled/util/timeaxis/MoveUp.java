@@ -40,6 +40,8 @@ public class MoveUp extends BaseTimeAxis{
         }
         //文字属性地址
         float frameTime = mProgram.getFrameTime();
+        frameTime++;
+        frameTime*=1.28;
         //流水边速度
         int flowSpeed = mProgram.getFlowSpeed();
         //先获取所有的流水边地址

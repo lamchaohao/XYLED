@@ -14,6 +14,7 @@ import java.util.List;
 
 import cn.com.hotled.xyled.R;
 import cn.com.hotled.xyled.activity.CheckScreenActivity;
+import cn.com.hotled.xyled.global.Global;
 import cn.com.hotled.xyled.util.android.WifiAdmin;
 
 /**
@@ -86,8 +87,8 @@ public class ConnectWifiAdapter extends RecyclerView.Adapter {
     }
 
     private boolean needToVisibility(String ssid) {
-        boolean startFlag = ssid.startsWith("HC-LED[");
-        boolean endFlag = ssid.endsWith("]");
+        boolean startFlag = ssid.startsWith(Global.SSID_START);
+        boolean endFlag = ssid.endsWith(Global.SSID_END);
         if (startFlag&&endFlag){
             return true;
         }else

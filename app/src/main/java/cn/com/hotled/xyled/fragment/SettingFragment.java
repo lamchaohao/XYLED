@@ -3,12 +3,17 @@ package cn.com.hotled.xyled.fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.afollestad.materialdialogs.MaterialDialog;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -59,7 +64,8 @@ public class SettingFragment extends Fragment {
                 startActivity(new Intent(getContext(), SocketActivity.class));
                 break;
             case R.id.tv_setfrgm_screenSet:
-                startActivity(new Intent(getContext(), SettingActivity.class));
+                onOpenSetting();
+
                 break;
             case R.id.tv_setfrgm_remote:
                 startActivity(new Intent(getContext(), RemoteActivity.class));
@@ -69,6 +75,28 @@ public class SettingFragment extends Fragment {
                 startActivityForResult(intent, SELECT_LANGUAGE_CODE);
                 break;
         }
+    }
+
+    private void onOpenSetting() {
+        MaterialDialog.Builder builder = new MaterialDialog.Builder(getContext());
+        builder.title(R.string.password_title)
+                .inputType(InputType.TYPE_CLASS_NUMBER)
+                .input(getString(R.string.password_hint), "", new MaterialDialog.InputCallback() {
+                    @Override
+                    public void onInput(@NonNull MaterialDialog dialog, CharSequence input) {
+                        String password = input.toString();
+                        if (password.equals("168")) {
+                            startActivity(new Intent(getContext(), SettingActivity.class));
+                        }else {
+                            Toast.makeText(getContext(),R.string.password_erro,Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                })
+                .positiveText(R.string.msg_confirm)
+                .onPositive(null)
+                .negativeText(R.string.msg_cancle)
+                .onNegative(null)
+                .show();
     }
 
 

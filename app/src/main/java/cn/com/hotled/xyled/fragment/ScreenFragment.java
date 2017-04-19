@@ -1,5 +1,6 @@
 package cn.com.hotled.xyled.fragment;
 
+import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -21,6 +22,7 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -59,7 +61,7 @@ import static cn.com.hotled.xyled.global.Global.WIFI_ERRO;
  * Created by Lam on 2016/12/1.
  */
 
-public class ScreenFragment extends Fragment implements ProgramAdapter.OnItemClickListener, ProgramAdapter.OnItemLongClickListener {
+public class ScreenFragment extends Fragment implements ProgramAdapter.OnItemClickListener, ProgramAdapter.OnItemLongClickListener,Animator.AnimatorListener {
     private static final int EASY_TEXT_REQUEST_CODE = 0x23;
     private static final int PHOTO_REQUEST_CODE = 0x24;
     private static final int ITEM_MANAGE_REQUEST_CODE = 0x25;
@@ -78,11 +80,15 @@ public class ScreenFragment extends Fragment implements ProgramAdapter.OnItemCli
     @BindView(R.id.rv_fragmScreen)
     RecyclerView mRecyclerView;
     @BindView(R.id.fab_screen_add_text)
-    FloatingActionButton mFabAddText;
+    RelativeLayout mFabAddText;
     @BindView(R.id.fab_screen_add_pic)
-    FloatingActionButton mFabAddPic;
+    RelativeLayout mFabAddPic;
     @BindView(R.id.fab_screen_add_menu)
     FloatingActionButton mFabMenu;
+    @BindView(R.id.tv_lable_text)
+    TextView mTextLable;
+    @BindView(R.id.tv_lable_pic)
+    TextView mPicLable;
 
     private ProgramAdapter mAdapter;
     private String mTitlePart;
@@ -123,7 +129,9 @@ public class ScreenFragment extends Fragment implements ProgramAdapter.OnItemCli
     };
     private ProgramDao mProgramDao;
     private Animation mFirstAddAnim;
-    private Animation mSecondAddAnim;
+    private ObjectAnimator mTextAnim;
+    private ObjectAnimator mPicAnim;
+    private Animation mInAnim;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -151,7 +159,21 @@ public class ScreenFragment extends Fragment implements ProgramAdapter.OnItemCli
         mAdapter.setOnItemClickListener(this);
         mAdapter.setOnItemLongClickListener(this);
         mFirstAddAnim = AnimationUtils.loadAnimation(getContext(), R.anim.fab_scale_up);
-        mSecondAddAnim = AnimationUtils.loadAnimation(getContext(), R.anim.fab_slide_in_from_left);
+        initAnim();
+
+
+    }
+
+    private void initAnim() {
+        mTextAnim = ObjectAnimator
+                .ofFloat(mFabAddText, "translationY",0)
+                .setDuration(300);
+        mPicAnim = ObjectAnimator
+                .ofFloat(mFabAddPic, "translationY",0)
+                .setDuration(300);
+        mTextAnim.addListener(this);
+        mPicAnim.addListener(this);
+        mInAnim = AnimationUtils.loadAnimation(getActivity(), R.anim.fab_slide_in_from_right);
     }
 
 
@@ -215,22 +237,7 @@ public class ScreenFragment extends Fragment implements ProgramAdapter.OnItemCli
     }
 
     public void closeFabMenu() {
-        if (isMenuOpen) {
-            float textCurrent = mFabAddText.getTranslationY();
-            float picCurrent = mFabAddPic.getTranslationY();
-            int transY = DensityUtil.dp2px(getContext(), 60);
-            ObjectAnimator textAnim = ObjectAnimator//
-                    .ofFloat(mFabAddText, "translationY", textCurrent,transY)//
-                    .setDuration(500);//
-            textAnim.start();
-
-            ObjectAnimator picAnim = ObjectAnimator//
-                    .ofFloat(mFabAddPic, "translationY",  picCurrent,transY*2)//
-                    .setDuration(500);//
-            picAnim.start();
-
-            isMenuOpen=false;
-        }
+       openOrCloseMenu();
     }
 
     public boolean isMenuClose() {
@@ -301,35 +308,7 @@ public class ScreenFragment extends Fragment implements ProgramAdapter.OnItemCli
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.fab_screen_add_menu:
-                float textCurrent = mFabAddText.getTranslationY();
-                float picCurrent = mFabAddPic.getTranslationY();
-                mFabMenu.startAnimation(mFirstAddAnim);
-                int transY = DensityUtil.dp2px(getContext(), 60);
-                if (isMenuOpen){
-                    isMenuOpen=false;
-                    ObjectAnimator textAnim = ObjectAnimator//
-                            .ofFloat(mFabAddText, "translationY", textCurrent,transY)//
-                            .setDuration(500);//
-                    textAnim.start();
-
-                    ObjectAnimator picAnim = ObjectAnimator//
-                            .ofFloat(mFabAddPic, "translationY",  picCurrent,transY*2)//
-                            .setDuration(500);//
-                    picAnim.start();
-                }else {
-                    ObjectAnimator textAnim = ObjectAnimator//
-                            .ofFloat(mFabAddText, "translationY", textCurrent,-transY)//
-                            .setDuration(500);//
-                    textAnim.start();
-
-                    ObjectAnimator picAnim = ObjectAnimator//
-                            .ofFloat(mFabAddPic, "translationY", picCurrent,-transY*2)//
-                            .setDuration(500);//
-                    picAnim.start();
-                    isMenuOpen=true;
-                }
-
-
+                openOrCloseMenu();
                 break;
             case R.id.fab_screen_add_text:
                 int size = mProgramList.size();
@@ -343,6 +322,7 @@ public class ScreenFragment extends Fragment implements ProgramAdapter.OnItemCli
                 mProgramDao.insert(program);
                 mProgramList.add(program);
                 mAdapter.notifyItemInserted(mProgramList.size());
+                mRecyclerView.smoothScrollToPosition(mProgramList.size());
                 break;
             case R.id.cv_contentScreen_screen:
                 Intent intent = new Intent(getContext(), ProgramManageActivity.class);
@@ -362,7 +342,69 @@ public class ScreenFragment extends Fragment implements ProgramAdapter.OnItemCli
                 mProgramDao.insert(picProgram);
                 mProgramList.add(picProgram);
                 mAdapter.notifyItemInserted(mProgramList.size());
+                mRecyclerView.smoothScrollToPosition(mProgramList.size());
                 break;
         }
+    }
+
+    private void openOrCloseMenu() {
+        float textCurrent = mFabAddText.getTranslationY();
+        float picCurrent = mFabAddPic.getTranslationY();
+        mFabMenu.startAnimation(mFirstAddAnim);
+        int transY = DensityUtil.dp2px(getContext(), 60);
+        if (isMenuOpen){
+            isMenuOpen=false;
+
+            mTextAnim.setFloatValues(textCurrent,transY*2);
+            mTextAnim.start();
+
+            mPicAnim.setFloatValues(picCurrent,transY);
+            mPicAnim.start();
+        }else {
+            isMenuOpen=true;
+            mTextAnim.setFloatValues(textCurrent,-transY*2);
+            mTextAnim.start();
+
+            mPicAnim.setFloatValues(picCurrent,-transY);
+            mPicAnim.start();
+        }
+    }
+
+    @Override
+    public void onAnimationStart(Animator animation) {
+        if (animation==mTextAnim&&!isMenuOpen){
+            mTextLable.setVisibility(View.GONE);
+        }else if (animation==mPicAnim&&!isMenuOpen){
+            mPicLable.setVisibility(View.GONE);
+        }else if (animation==mTextAnim&&isMenuOpen){
+            mFabAddText.setVisibility(View.VISIBLE);
+        }else if (animation==mPicAnim&&isMenuOpen){
+            mFabAddPic.setVisibility(View.VISIBLE);
+        }
+    }
+
+    @Override
+    public void onAnimationEnd(Animator animation) {
+        if (animation==mTextAnim&&isMenuOpen){
+            mTextLable.setVisibility(View.VISIBLE);
+            mTextLable.startAnimation(mInAnim);
+        }else if (animation==mPicAnim&&isMenuOpen){
+            mPicLable.setVisibility(View.VISIBLE);
+            mPicLable.startAnimation(mInAnim);
+        }else if (animation==mTextAnim&&!isMenuOpen){
+            mFabAddText.setVisibility(View.GONE);
+        }else if (animation==mPicAnim&&!isMenuOpen){
+            mFabAddPic.setVisibility(View.GONE);
+        }
+    }
+
+    @Override
+    public void onAnimationCancel(Animator animation) {
+
+    }
+
+    @Override
+    public void onAnimationRepeat(Animator animation) {
+
     }
 }

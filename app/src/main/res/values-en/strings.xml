@@ -18,6 +18,7 @@
     <string name="new_pic_program">New Picture</string>
     <string name="empty_text">Empty text</string>
     <string name="program_manage">Program management</string>
+    <string name="file_size">FileSize:</string>
     <string name="program_manage_tip">Hold the icon to drag and sort</string>
     <!--连接页面-->
     <string name="click_check">Search</string>
@@ -50,6 +51,9 @@
     <string name="save">save</string>
     <string name="auto">Auto</string>
 
+    <string name="password_title">Please enter password </string>
+    <string name="password_hint">password</string>
+    <string name="password_erro">Password is wrong, please try again</string>
     <string name="card_series">Control card model</string>
     <string name="default_card">HC-1</string>
     <string name="screen_width">Screen width</string>
@@ -76,6 +80,10 @@
     <string name="screen_height_setHint">Please enter the screen height</string>
     <!--更多页-->
     <string name="check_screen">Search screen</string>
+    <string name="connected_display">Connected Display</string>
+    <string name="autoDisplay_state">Connect to the screen to automatically send a message, the screen receives the message and displays the Wi-Fi name</string>
+    <string name="autoSend">Automatically send</string>
+    <string name="autoNotSend">Do not send</string>
     <string name="forward_framPC">Forward data from PC</string>
     <string name="about">About</string>
     <string name="check_update">Check for updates</string>
@@ -174,4 +182,10 @@
     <string name="help_part5.1">5.1Delete the program. In the main interface of the program section, long press the program can delete the program</string>
     <string name="help_part6">6.Connection.In the connection page, if multiple screens are detected, click the screen you want to connect to connect, if the connection is not successful, please open the WiFi settings interface to connect</string>
     <string name="help_part7">7.Program switching.Enter the settings section of the remote switch, you can switch programs, if the recording multiple sets of programs, please use the PC version of the software to record</string>
+    <string name="version">version</string>
+    <string name="lastest">Your version is up to date</string>
+    <string name="foundNew">Discover the new version</string>
+    <string name="download">download</string>
+    <string name="ignore">ignore</string>
+    <string name="startDownload">downloading</string>
 </resources>

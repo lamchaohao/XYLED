@@ -66,9 +66,7 @@ public class SendCmdUtil {
         if (startFlag && endFlag) {
             macStr = ssid.substring(ssid.indexOf("[") + 1, ssid.indexOf("]"));
         } else {
-            Message message = mHandler.obtainMessage();
-            message.what = WIFI_ERRO;
-            mHandler.sendMessage(message);
+            mHandler.sendEmptyMessage(WIFI_ERRO);
             return;
         }
         String regEx = "[0-9a-fA-F]{6}";

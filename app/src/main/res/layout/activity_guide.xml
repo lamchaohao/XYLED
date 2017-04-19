@@ -23,11 +23,6 @@
             android:typeface="serif"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
-        <ProgressBar
-            android:id="@+id/pb_copy_show"
-            android:layout_margin="10dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
 
         <ProgressBar
             android:id="@+id/pb_copy"

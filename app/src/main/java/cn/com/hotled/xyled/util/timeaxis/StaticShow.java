@@ -43,6 +43,8 @@ public class StaticShow extends BaseTimeAxis{
         }
         //文字属性地址
         float frameTime = mProgram.getFrameTime();
+        frameTime++;
+        frameTime*=1.28;
         for (int i = 0; i < frameOfThisProgram; i++) {
             byte[] timeAxis = new byte[16];
             timeAxis[0] = (byte) frameTime;

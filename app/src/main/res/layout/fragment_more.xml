@@ -10,6 +10,12 @@
         style="@style/MainFragGuideText"
         android:text="@string/check_screen"/>
     <TextView
+        android:id="@+id/tv_more_autoSend"
+        android:drawableLeft="@drawable/ic_sync_amber_700_36dp"
+        style="@style/MainFragGuideText"
+        android:text="@string/connected_display"/>
+
+    <TextView
         android:id="@+id/tv_more_sendFromComputer"
         android:drawableLeft="@drawable/ic_screen_share_green_a700_36dp"
         style="@style/MainFragGuideText"

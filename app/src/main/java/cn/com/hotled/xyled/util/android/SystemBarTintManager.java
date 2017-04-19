@@ -21,6 +21,8 @@ import android.widget.FrameLayout;
 
 import java.lang.reflect.Method;
 
+import cn.com.hotled.xyled.R;
+
 /**
  * Created by Lam on 2016/11/25.
  */
@@ -79,7 +81,7 @@ public class SystemBarTintManager {
             TypedArray a = activity.obtainStyledAttributes(attrs);
             try {
                 mStatusBarAvailable = a.getBoolean(0, false);
-                mNavBarAvailable = a.getBoolean(1, false);
+                mNavBarAvailable = a.getBoolean(R.styleable.CardView_android_minHeight, false);
             } finally {
                 a.recycle();
             }

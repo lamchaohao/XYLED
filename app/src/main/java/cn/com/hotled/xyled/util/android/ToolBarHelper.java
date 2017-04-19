@@ -28,7 +28,7 @@ public class ToolBarHelper {
 
     /*视图构造器*/
     private LayoutInflater mInflater;
-
+    private int styleIndex=1;
     /*
     * 两个属性
     * 1、toolbar是否悬浮在窗口之上
@@ -72,7 +72,7 @@ public class ToolBarHelper {
         /*获取主题中定义的悬浮标志*/
         boolean overly = typedArray.getBoolean(0, false);
         /*获取主题中定义的toolbar的高度*/
-        int toolBarSize = (int) typedArray.getDimension(1,(int) mContext.getResources().getDimension(R.dimen.abc_action_bar_default_height_material));
+        int toolBarSize = (int) typedArray.getDimension(R.styleable.CardView_android_minHeight,(int) mContext.getResources().getDimension(R.dimen.abc_action_bar_default_height_material));
         typedArray.recycle();
         /*如果是悬浮状态，则不需要设置间距*/
         params.topMargin = overly ? 0 : toolBarSize;

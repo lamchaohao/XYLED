@@ -12,6 +12,7 @@ import android.widget.TextView;
 import java.util.List;
 
 import cn.com.hotled.xyled.R;
+import cn.com.hotled.xyled.global.Global;
 import cn.com.hotled.xyled.util.android.WifiAdmin;
 
 /**
@@ -54,7 +55,7 @@ public class ConnectAdapter extends RecyclerView.Adapter {
         setUplevel(viewHolder.iv_wifiLevel,position);
         viewHolder.tv_wifiName.setText(mWifiList.get(position).SSID);
         if (needToVisibility(mWifiList.get(position).SSID)) {
-            viewHolder.iv_identifyWifi.setVisibility(View.VISIBLE);//先设置不显示是否属于新翼led的图标
+            viewHolder.iv_identifyWifi.setVisibility(View.VISIBLE);
         }else {
             viewHolder.iv_identifyWifi.setVisibility(View.GONE);
         }
@@ -79,8 +80,8 @@ public class ConnectAdapter extends RecyclerView.Adapter {
     }
 
     private boolean needToVisibility(String ssid) {
-        boolean startFlag = ssid.startsWith("HC-LED[");
-        boolean endFlag = ssid.endsWith("]");
+        boolean startFlag = ssid.startsWith(Global.SSID_START);
+        boolean endFlag = ssid.endsWith(Global.SSID_END);
         if (startFlag&&endFlag){
             return true;
         }else

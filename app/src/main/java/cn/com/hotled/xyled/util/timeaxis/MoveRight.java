@@ -44,6 +44,8 @@ public class MoveRight extends BaseTimeAxis{
 
         int rightIndicator = mColbyteCountIndicator;
         float frameTime = mProgram.getFrameTime();
+        frameTime++;
+        frameTime*=1.28;
         //流水边速度
         int flowSpeed = mProgram.getFlowSpeed();
         //先获取所有的流水边地址

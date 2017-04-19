@@ -4,6 +4,7 @@ import android.Manifest;
 import android.annotation.TargetApi;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.NetworkInfo;
@@ -45,9 +46,12 @@ import cn.com.hotled.xyled.receiver.WiFiReceiver;
 import cn.com.hotled.xyled.util.android.WifiAdmin;
 import cn.com.hotled.xyled.util.communicate.SendCmdUtil;
 
+import static android.content.Context.MODE_PRIVATE;
 import static cn.com.hotled.xyled.global.Global.CONNECT_TIMEOUT;
 import static cn.com.hotled.xyled.global.Global.JUST_STOP_ANIM;
+import static cn.com.hotled.xyled.global.Global.KEY_AUTO_SEND;
 import static cn.com.hotled.xyled.global.Global.SEND_TEST;
+import static cn.com.hotled.xyled.global.Global.TEST_OK;
 import static cn.com.hotled.xyled.global.Global.UPDATE_NETWORK_INFO;
 import static cn.com.hotled.xyled.global.Global.WIFI_AVAILABLE_ACTION;
 import static cn.com.hotled.xyled.global.Global.WIFI_DISABLE;
@@ -77,6 +81,8 @@ public class ConnectFragment extends Fragment implements View.OnClickListener, C
     private ConnectAdapter mConnectAdapter;
     private Animation mInsideAnim;
     private long mOldTime;
+    private long mUpdateTime;
+    private long mSendCoolTime;
     private WiFiReceiver mWiFiReceiver;
 
     private Handler connHandler = new Handler() {
@@ -91,29 +97,29 @@ public class ConnectFragment extends Fragment implements View.OnClickListener, C
                     sendCmdUtil.sendCmd(SendCmdUtil.Cmd.Test);
                     break;
                 case WIFI_ERRO:
-                    startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
-                    Toast.makeText(getActivity(), R.string.tos_wifi_switch, Toast.LENGTH_LONG).show();
                     break;
                 case CONNECT_TIMEOUT:
                     Toast.makeText(getActivity(), R.string.tos_wifi_timeout, Toast.LENGTH_LONG).show();
                     break;
                 case WIFI_AVAILABLE_ACTION:
-                    refreshWifiAndState();
+                    refreshWifiList();
                     break;
                 case WIFI_DISABLE:
-                    refreshWifiAndState();
+                    refreshWifiList();
                     mTvState.setText(R.string.msg_wifi_disable);
                     mConnectAdapter.notifyDataSetChanged();
                     break;
                 case WIFI_ENABLED:
-                    refreshWifiAndState();
+                    refreshWifiList();
                     break;
                 case UPDATE_NETWORK_INFO:
                     NetworkInfo networkInfo = msg.getData().getParcelable(Global.EXTRA_NETWORKSTATE);
                     if (networkInfo != null) {
                         if (networkInfo.getState().equals(NetworkInfo.State.CONNECTED)) {
                             mTvState.setText(getString(R.string.connected) + mWifiAdmin.getWifiInfo().getSSID());
-                            mTvTip.setText(R.string.connected);
+                            mTvTip.setText(R.string.click_check);
+                            refreshWifiList();
+                            updateView();
                             sendTestCmd();
                             connHandler.sendEmptyMessageDelayed(JUST_STOP_ANIM,3000);
                         } else if (networkInfo.getState().equals(NetworkInfo.State.CONNECTING)) {
@@ -125,14 +131,17 @@ public class ConnectFragment extends Fragment implements View.OnClickListener, C
                         } else if (networkInfo.getState().equals(NetworkInfo.State.DISCONNECTED)) {
                             mTvState.setText(R.string.disconnect);
                             mTvTip.setText(R.string.disconnect);
+                            updateView();
                         }
-                        // 刷新状态显示
-                        refreshWifiAndState();
                     }
+                    break;
+                case TEST_OK:
+                    Toast.makeText(getActivity(), R.string.testSuccess, Toast.LENGTH_SHORT).show();
                     break;
             }
         }
     };
+    private SharedPreferences mSharedPreferences;
 
     @Nullable
     @Override
@@ -154,13 +163,14 @@ public class ConnectFragment extends Fragment implements View.OnClickListener, C
         mConnectAdapter = new ConnectAdapter(getActivity(), mWifiList, mWifiAdmin);
         mRvWifi.setAdapter(mConnectAdapter);
         mConnectAdapter.setItemOnClickListener(this);
-        refreshWifiAndState();
+        updateView();
     }
 
     private void loadData() {
+        mSharedPreferences = getActivity().getSharedPreferences(Global.SP_SYSTEM_CONFIG, MODE_PRIVATE);
         mWifiAdmin = new WifiAdmin(getActivity());
         mWifiList = new ArrayList<>();
-        List<ScanResult> scanResults = mWifiAdmin.startScan();
+        List<ScanResult> scanResults = mWifiAdmin.mWifiManager.getScanResults();
         for (ScanResult scanResult : scanResults) {
             boolean startFlag = scanResult.SSID.startsWith(Global.SSID_START);
             boolean endFlag = scanResult.SSID.endsWith(Global.SSID_END);
@@ -168,7 +178,6 @@ public class ConnectFragment extends Fragment implements View.OnClickListener, C
                 mWifiList.add(scanResult);
             }
         }
-
     }
 
     private void connectWifi(int position) {
@@ -186,8 +195,9 @@ public class ConnectFragment extends Fragment implements View.OnClickListener, C
     }
 
     private void roundInsideOnclick() {
+        updateView();
+        mWifiAdmin.startScan();
         if (mWifiList.size()==1){
-            refreshWifiAndState();
             if (mWifiAdmin.getWifiInfo().getSSID().equals("\""+mWifiList.get(0).SSID+"\"")){
                 return;
             }
@@ -201,7 +211,7 @@ public class ConnectFragment extends Fragment implements View.OnClickListener, C
         }else {
             if (mWifiAdmin.checkWifiState()) {
                 mIvRound.startAnimation(mInsideAnim);
-                refreshWifiAndState();
+                refreshWifiList();
                 connHandler.sendEmptyMessageDelayed(JUST_STOP_ANIM,3000);
             }else {
                 startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
@@ -222,24 +232,35 @@ public class ConnectFragment extends Fragment implements View.OnClickListener, C
     }
 
 
-    private void refreshWifiAndState() {
+    private void refreshWifiList() {
         long currentTime = System.currentTimeMillis();
-        if (!(currentTime-mOldTime>5000)){
+        if (currentTime-mOldTime<2000){
             return;
         }
         mOldTime = currentTime;
 
-        List<ScanResult> scanResults = mWifiAdmin.startScan();
+        List<ScanResult> scanResults = mWifiAdmin.mWifiManager.getScanResults();
         mWifiList.clear();
         for (ScanResult scanResult : scanResults) {
             boolean startFlag = scanResult.SSID.startsWith(Global.SSID_START);
             boolean endFlag = scanResult.SSID.endsWith(Global.SSID_END);
             if (startFlag&&endFlag){
                 mWifiList.add(scanResult);
+                mConnectAdapter.notifyItemInserted(mWifiList.size());
             }
         }
+        mConnectAdapter.notifyItemChanged(0);
         mConnectAdapter.notifyDataSetChanged();
+        String result=getString(R.string.search_result)+mWifiList.size();
+        mTvCheckResult.setText(result);
+    }
 
+    private void updateView(){
+        long currentTime = System.currentTimeMillis();
+        if (currentTime-mUpdateTime<1000){
+            return;
+        }
+        mUpdateTime = currentTime;
         String ssid = mWifiAdmin.getWifiInfo().getSSID();
         boolean startFlag = ssid.contains(Global.SSID_START);
         boolean endFlag = ssid.contains(Global.SSID_END);
@@ -256,14 +277,22 @@ public class ConnectFragment extends Fragment implements View.OnClickListener, C
 
         String result=getString(R.string.search_result)+mWifiList.size();
         mTvCheckResult.setText(result);
+        mConnectAdapter.notifyDataSetChanged();
     }
 
     private void sendTestCmd() {
+        long currentTime = System.currentTimeMillis();
+        if ((currentTime-mSendCoolTime<2000)){
+            return;
+        }
+        mSendCoolTime = currentTime;
         String ssid = mWifiAdmin.getWifiInfo().getSSID();
         boolean startFlag = ssid.contains(Global.SSID_START);
         boolean endFlag = ssid.contains(Global.SSID_END);
         if (startFlag&&endFlag){
-            connHandler.sendEmptyMessageDelayed(SEND_TEST,2000);
+            if (mSharedPreferences.getBoolean(KEY_AUTO_SEND,true)) {
+                connHandler.sendEmptyMessageDelayed(SEND_TEST,2000);
+            }
         }
 
     }
@@ -276,17 +305,17 @@ public class ConnectFragment extends Fragment implements View.OnClickListener, C
             if (ActivityCompat.shouldShowRequestPermissionRationale(getActivity(),
                     Manifest.permission.ACCESS_COARSE_LOCATION)) {
                 // 给出一个提示，告诉用户为什么需要这个权限
-
+                Toast.makeText(getContext(), R.string.tos_request_permission, Toast.LENGTH_SHORT).show();
             } else {
                 // 用户没有拒绝，直接申请权限
                 String[] permissions = {Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION};
                 ActivityCompat.requestPermissions(getActivity(), permissions, REQUST_LOCATION_PERMISSION_CODE);
                 //用户授权的结果会回调到FragmentActivity的onRequestPermissionsResult
-                loadData();
             }
         } else {
             //已经拥有授权
             loadData();
+            initView();
         }
     }
 
@@ -296,9 +325,11 @@ public class ConnectFragment extends Fragment implements View.OnClickListener, C
         if (grantResults.length > 0
                 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             loadData();
+            initView();
         } else {
             // 权限拒绝了
             loadData();
+            initView();
             Toast.makeText(getContext(), R.string.tos_request_permission, Toast.LENGTH_SHORT).show();
             startActivity(new Intent(Settings.ACTION_WIFI_SETTINGS));
         }
@@ -318,7 +349,6 @@ public class ConnectFragment extends Fragment implements View.OnClickListener, C
             return;
         }
         mIvRound.startAnimation(mInsideAnim);
-        mTvTip.setText(R.string.connecting);
         connectWifi(position);
     }
 
