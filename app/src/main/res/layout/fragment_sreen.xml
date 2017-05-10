@@ -3,7 +3,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical"
-                xmlns:app="http://schemas.android.com/apk/res-auto">
+                xmlns:fab="http://schemas.android.com/apk/res-auto">
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
@@ -18,84 +18,51 @@
             android:layout_height="wrap_content"/>
     </LinearLayout>
 
-
-    <FrameLayout
+    <cn.com.hotled.xyled.view.fab.FloatingActionMenu
+        android:id="@+id/fab_screen_add_menu"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
-        android:layout_marginBottom="20dp"
-        android:layout_marginRight="20dp"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent">
+        android:layout_marginRight="10dp"
+        android:layout_marginBottom="10dp"
+        fab:menu_fab_size="normal"
+        fab:menu_showShadow="true"
+        fab:menu_shadowColor="#66000000"
+        fab:menu_shadowRadius="1dp"
+        fab:menu_shadowXOffset="1dp"
+        fab:menu_shadowYOffset="1dp"
+        fab:menu_colorNormal="#DA4336"
+        fab:menu_colorPressed="#E75043"
+        fab:menu_colorRipple="#99FFFFFF"
+        fab:menu_animationDelayPerItem="50"
+        fab:menu_icon="@drawable/ic_add_white_24dp"
+        fab:menu_openDirection="up"
+        fab:menu_backgroundColor="@android:color/transparent">
 
-        <RelativeLayout
-            android:id="@+id/fab_screen_add_pic"
-            android:layout_gravity="bottom|end"
-            android:orientation="horizontal"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-            <TextView
-                android:id="@+id/tv_lable_pic"
-                android:text="@string/pic_program"
-                android:textColor="#FFFFFF"
-                android:visibility="gone"
-                android:background="@drawable/black_rectangle"
-                android:layout_marginRight="8dp"
-                android:layout_marginBottom="5dp"
-                android:padding="5dp"
-                android:layout_centerVertical="true"
-                android:layout_gravity="bottom"
-                android:gravity="center"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-            <android.support.design.widget.FloatingActionButton
-                app:backgroundTint="#FF5722"
-                app:rippleColor="#E0E0E0"
-                app:elevation="0dp"
-                android:layout_toRightOf="@id/tv_lable_pic"
-                android:layout_gravity="bottom"
-                android:src="@drawable/ic_photo_white_24dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-        </RelativeLayout>
-
-        <RelativeLayout
+        <cn.com.hotled.xyled.view.fab.FloatingActionButton
             android:id="@+id/fab_screen_add_text"
-            android:layout_gravity="bottom|end"
-            android:orientation="horizontal"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-            <TextView
-                android:id="@+id/tv_lable_text"
-                android:text="@string/text_program"
-                android:textColor="#FFFFFF"
-                android:visibility="gone"
-                android:background="@drawable/black_rectangle"
-                android:layout_marginRight="8dp"
-                android:layout_marginBottom="5dp"
-                android:padding="5dp"
-                android:layout_centerVertical="true"
-                android:layout_gravity="bottom"
-                android:gravity="center"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-            <android.support.design.widget.FloatingActionButton
-                app:backgroundTint="#43A047"
-                app:rippleColor="#E0E0E0"
-                app:elevation="0dp"
-                android:layout_toRightOf="@id/tv_lable_text"
-                android:src="@drawable/ic_text_fields_white_24dp"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-        </RelativeLayout>
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fab_screen_add_menu"
-            android:src="@drawable/ic_add_white_24dp"
-            app:elevation="0dp"
-            android:layout_gravity="bottom|end"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_text_fields_white_24dp"
+            fab:fab_size="mini"
+            fab:fab_colorNormal="#00C853"
+            fab:fab_colorRipple="#4CAF50"
+            fab:fab_colorPressed="#81C784"
+            fab:fab_label="@string/text_program" />
 
-    </FrameLayout>
+        <cn.com.hotled.xyled.view.fab.FloatingActionButton
+            android:id="@+id/fab_screen_add_pic"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ic_photo_white_24dp"
+            fab:fab_size="mini"
+            fab:fab_colorNormal="#FF5722"
+            fab:fab_colorRipple="#FFAB91"
+            fab:fab_colorPressed="#FF8A65"
+            fab:fab_label="@string/pic_program" />
+
+    </cn.com.hotled.xyled.view.fab.FloatingActionMenu>
 
 
 </RelativeLayout>

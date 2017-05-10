@@ -189,4 +189,6 @@
     <string name="download">download</string>
     <string name="ignore">ignore</string>
     <string name="startDownload">downloading</string>
+    <string name="permission_read_storage_rationale">Storage read permission is needed to pick files.</string>
+    <string name="permission_title_rationale">Permission needed</string>
 </resources>

@@ -187,4 +187,6 @@
     <string name="download">下載</string>
     <string name="ignore">忽略</string>
     <string name="startDownload">開始下載</string>
+    <string name="permission_read_storage_rationale">需要开启读取存储权限才能选择图片</string>
+    <string name="permission_title_rationale">需要权限</string>
 </resources>

@@ -1,17 +1,21 @@
 package cn.com.hotled.xyled.activity;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.yalantis.ucrop.UCrop;
 
@@ -78,7 +82,7 @@ public class PhotoEditActivity extends BaseActivity implements SeekBar.OnSeekBar
         fabAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                setImage();
+                pickFromGallery();
             }
         });
         mPhotoView.enable();
@@ -90,13 +94,24 @@ public class PhotoEditActivity extends BaseActivity implements SeekBar.OnSeekBar
         mSbStaytime.setOnSeekBarChangeListener(this);
     }
 
-    public void setImage(){
-        Intent intent = new Intent();
-        intent.setType("image/*");
-        intent.setAction(Intent.ACTION_GET_CONTENT);
-        intent.addCategory(Intent.CATEGORY_OPENABLE);
-        startActivityForResult(Intent.createChooser(intent, getString(R.string.msg_choose_pic)), REQUEST_CHOOSE_PIC);
+    private void pickFromGallery() {
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN
+                && ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            requestPermission(Manifest.permission.READ_EXTERNAL_STORAGE,
+                    getString(R.string.permission_read_storage_rationale),
+                    REQUEST_STORAGE_READ_ACCESS_PERMISSION);
+        } else {
+            Intent intent = new Intent();
+            intent.setType("image/*");
+            intent.setAction(Intent.ACTION_GET_CONTENT);
+            intent.addCategory(Intent.CATEGORY_OPENABLE);
+            startActivityForResult(Intent.createChooser(intent, getString(R.string.msg_choose_pic)), REQUEST_CHOOSE_PIC);
+        }
     }
+
+
     public void setBitmapToView(Bitmap bm){
         // 设置想要的大小
         int newWidth = bm.getWidth()*5;
@@ -114,20 +129,23 @@ public class PhotoEditActivity extends BaseActivity implements SeekBar.OnSeekBar
     }
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Log.i("activityResult","requestCode="+requestCode+",resultCode="+resultCode);
+
         if (resultCode == RESULT_OK && requestCode == REQUEST_CHOOSE_PIC) {
-            UCrop.Options options = new UCrop.Options();
-            options.setCompressionFormat(Bitmap.CompressFormat.PNG);
-            options.setCompressionQuality(100);
-            Log.i("activityResult","UCrop=");
-            UCrop uCrop = UCrop.of(data.getData(), Uri.parse(data.toURI()));
-            uCrop = uCrop.withOptions(options);
-            uCrop.start(this);
-//
+            final Uri selectedUri = data.getData();
+            if (selectedUri != null) {
+                UCrop.Options options = new UCrop.Options();
+                options.setCompressionFormat(Bitmap.CompressFormat.PNG);
+                options.setCompressionQuality(100);
+                UCrop uCrop = UCrop.of(data.getData(), Uri.fromFile(new File(getCacheDir(), ""+System.currentTimeMillis())));
+                uCrop = uCrop.withOptions(options);
+                uCrop.start(this);
+            } else {
+                Toast.makeText(this, R.string.msg_none, Toast.LENGTH_SHORT).show();
+            }
+
         }
         if (resultCode == RESULT_OK && requestCode == UCrop.REQUEST_CROP) {
             Uri resultUri = UCrop.getOutput(data);
-            Log.i("activityResult","REQUEST_CROP=");
             Bitmap bitmap = BitmapFactory.decodeFile(resultUri.getPath());
             Bitmap bitmap1 = resizeBitmap(bitmap, mScreenWidth, mScreenHeight);
             String destinationFileName="";

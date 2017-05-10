@@ -19,9 +19,9 @@ import cn.com.hotled.xyled.util.genFile.FullCompressAlgorithm;
  */
 
 public class GenFlow extends BaseFlowBound{
-    File[] flowFile;
+    private File[] flowFile;
     private int[] programLengthArrays;
-    boolean[] useFlows;
+    private boolean[] useFlows;
     private List<byte[]> mBitmapPixelList;
     private List<Integer> mBitmapHeightList;
     private List<byte[]> mFlowBoundList;

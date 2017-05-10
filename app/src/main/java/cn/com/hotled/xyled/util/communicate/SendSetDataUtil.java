@@ -305,7 +305,7 @@ public class SendSetDataUtil {
         byte[] fileBytes = fileName.getBytes();     //0-11 文件名
         setInbyteArray(0,fileBytes,dataBytes);
         dataBytes[19] = 97; //19 版本号
-        dataBytes[24] = (byte) 195; //24 data&set C3
+        dataBytes[24] = (byte) 81; //24 data&set 51
 
         byte[] pictureArray = intToByteArray(picture, 3);//实像素  32-34
         setInbyteArray(32,pictureArray,dataBytes);
